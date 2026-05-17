@@ -72,6 +72,17 @@ public class OrderItem {
   )
   private Invoice invoice;
 
+  @ManyToOne(
+      fetch = FetchType.LAZY
+  )
+  @JoinColumn(
+      name = "address_id",
+      foreignKey = @ForeignKey(
+          name = "fk_order_item_address_id"
+      )
+  )
+  private Address address;
+
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "order_item_product_attributes",
@@ -95,9 +106,6 @@ public class OrderItem {
   @Builder.Default
   private List<ProductAttribute> productAttributes = new ArrayList<>();
 
-  @Column(
-      nullable = false
-  )
   private Double amount;
 
   @Column(

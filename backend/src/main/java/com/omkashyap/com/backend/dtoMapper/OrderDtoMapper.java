@@ -17,6 +17,7 @@ public class OrderDtoMapper {
         .orderId(orderItem.getOrderItemId())
         .quantity(orderItem.getQuantity())
         .amount(orderItem.getAmount())
+        .coins(orderItem.getCoins())
         .productUrl(orderItem.getProduct().getProductUrl())
         .productId(orderItem.getProduct().getProductId())
         .orderStatus(orderItem.getStatus().getOrderStatus())

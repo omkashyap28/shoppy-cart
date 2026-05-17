@@ -3,6 +3,8 @@ package com.omkashyap.com.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -51,6 +53,11 @@ public class Address {
   private String country;
 
   private Boolean isDefault;
+
+  @OneToMany(
+      mappedBy = "address"
+  )
+  private List<OrderItem> orderItem;
 
   @PrePersist
   void generateAddressId() {

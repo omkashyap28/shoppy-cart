@@ -26,6 +26,7 @@ public class OrderServiceImpl implements OrderService {
   private final ProductAttributeRepository productAttributeRepository;
   private final OrderDtoMapper orderDtoMapper;
   private final OrderStatusRepository orderStatusRepository;
+  private final AddressRepository addressRepository;
 
   @Override
   @Transactional
@@ -33,12 +34,16 @@ public class OrderServiceImpl implements OrderService {
     User user = userRepository.findByUserId(userId).orElseThrow(() ->
         new IllegalArgumentException("User not exists")
     );
+
+    Address address = addressRepository.fidByAddressId(requestDto.getAddressId()).orElseThrow(() ->
+        new IllegalArgumentException("This Address is not exists for user"));
+
     Product product = productRepository.findByProductId(requestDto.getProductId()).orElseThrow(() ->
         new IllegalArgumentException("Product not exists")
     );
 
     if (product.getQuantity() < requestDto.getQuantity()) {
-      throw new IllegalArgumentException("Selected product quantity not available");
+      throw new IllegalArgumentException("Selected quantity for product not available");
     }
 
     Orders orders = ordersRepository.findByUser_UserId(userId).orElseGet(() -> Orders.builder()
@@ -49,10 +54,12 @@ public class OrderServiceImpl implements OrderService {
     OrderItem orderItem = OrderItem.builder()
         .order(orders)
         .product(product)
+        .address(address)
         .payments(null)
         .invoice(null)
         .quantity(requestDto.getQuantity())
         .amount(product.getPrice().doubleValue() * requestDto.getQuantity())
+        .coins(product.getCoins() * requestDto.getQuantity())
         .build();
 
     if (requestDto.getSelectedAttributes() != null && !requestDto.getSelectedAttributes().isEmpty()) {
