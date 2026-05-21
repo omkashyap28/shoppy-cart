@@ -24,6 +24,7 @@ public class ProductServiceImpl implements ProductService {
   private final ModelMapper modelMapper;
   private final CategoryRepository categoryRepository;
   private final ProductDtoMapper productDtoMapper;
+  private final AffiliateCommissionRepository affiliateCommissionRepository;
 
   @Override
   @Transactional
@@ -31,7 +32,12 @@ public class ProductServiceImpl implements ProductService {
 
     Seller seller = sellerRepository.findBySellerId(sellerId).orElseThrow();
 
-    Category category = categoryRepository.findById(productRequestDto.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("Category not found"));
+    Category category = categoryRepository.findById(productRequestDto.getCategoryId()).orElseThrow(() ->
+        new IllegalArgumentException("Category not found"));
+
+    AffiliateCommission commission = affiliateCommissionRepository.findByCategoryName(category.getName()).orElseGet(
+        () -> affiliateCommissionRepository.findByCategoryName(category.getParent().getName()).orElse(null)
+    );
 
     Product product = Product.builder()
         .description(productRequestDto.getDescription())
@@ -39,6 +45,7 @@ public class ProductServiceImpl implements ProductService {
         .quantity(productRequestDto.getQuantity())
         .seller(seller)
         .averageRating(0.0F)
+        .affiliateCommission(commission)
         .totalReviews(0)
         .price(productRequestDto.getPrice())
         .inStock(productRequestDto.getQuantity() != 0)

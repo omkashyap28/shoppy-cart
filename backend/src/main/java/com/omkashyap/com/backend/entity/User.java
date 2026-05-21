@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -145,6 +146,13 @@ public class User implements UserDetails {
   )
   private Seller seller;
 
+  @OneToOne(
+      mappedBy = "user",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true
+  )
+  private AffiliateUser affiliateUser;
+
   @Column(updatable = false)
   @CreationTimestamp
   private LocalDateTime createdAt;
@@ -172,14 +180,14 @@ public class User implements UserDetails {
   }
 
   @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
+  public @NonNull Collection<? extends GrantedAuthority> getAuthorities() {
     return roles.stream()
         .map(role -> new SimpleGrantedAuthority(role.getRole().toString()))
         .toList();
   }
 
   @Override
-  public String getUsername() {
+  public @NonNull String getUsername() {
     return email;
   }
 

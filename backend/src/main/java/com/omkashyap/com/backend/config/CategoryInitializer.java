@@ -38,6 +38,15 @@ public class CategoryInitializer implements CommandLineRunner {
     Category furniture =
         new Category("FURNITURE", null);
 
+    Category kitchen =
+        new Category("KITCHEN", null);
+
+    Category apparel =
+        new Category("APPAREL", null);
+
+    Category beauty =
+        new Category("BEAUTY", null);
+
     Category mobiles =
         new Category("MOBILES", electronics);
 
@@ -82,5 +91,8 @@ public class CategoryInitializer implements CommandLineRunner {
     categoryRepository.save(grocery);
     categoryRepository.save(books);
     categoryRepository.save(furniture);
+    categoryRepository.save(kitchen);
+    categoryRepository.save(apparel);
+    categoryRepository.save(beauty);
   }
 }
