@@ -1,16 +1,16 @@
 package com.omkashyap.com.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @Table(
     indexes = {
         @Index(name = "idx_recent_user", columnList = "user_id"),
@@ -35,23 +35,24 @@ public class RecentViewed {
   )
   private User user;
 
-  @ManyToOne(
-      fetch = FetchType.LAZY
-  )
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(
-      name = "product_attribute_id",
+      name = "product_id",
       nullable = false,
       foreignKey = @ForeignKey(
-          name = "fk_viewed_attributeid"
+          name = "fk_recent_attributes"
       )
   )
-  private ProductAttribute productAttribute;
+  private Product product;
 
-  @CreationTimestamp
   private LocalDateTime viewedAt;
 
-  public RecentViewed(User user, ProductAttribute productAttribute) {
-    this.user = user;
-    this.productAttribute = productAttribute;
+  @PrePersist
+  public void onCreated() {
+    this.viewedAt = LocalDateTime.now();
+  }
+
+  public void updateViewedAtTimeStamp() {
+    this.viewedAt = LocalDateTime.now();
   }
 }
