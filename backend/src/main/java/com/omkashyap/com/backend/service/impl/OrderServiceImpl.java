@@ -35,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
         new IllegalArgumentException("User not exists")
     );
 
-    Address address = addressRepository.fidByAddressId(requestDto.getAddressId()).orElseThrow(() ->
+    Address address = addressRepository.findByAddressId(requestDto.getAddressId()).orElseThrow(() ->
         new IllegalArgumentException("This Address is not exists for user"));
 
     Product product = productRepository.findByProductId(requestDto.getProductId()).orElseThrow(() ->
