@@ -1,28 +1,32 @@
 package com.omkashyap.com.backend.entity;
 
-import ch.qos.logback.core.joran.spi.NoAutoStart;
-import com.omkashyap.com.backend.entity.Product;
-import com.omkashyap.com.backend.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Table(
     indexes = {
         @Index(name = "idx_discussion_userid", columnList = "user_id"),
         @Index(name = "idx_discussion_productid", columnList = "product_id"),
+        @Index(name = "idx_discussion_id", columnList = "discussion_id")
+    },
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_product_discussion", columnNames = {"user_id", "product_id"}
+        )
     }
 )
 public class ProductDiscussion {
@@ -30,6 +34,13 @@ public class ProductDiscussion {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @Column(
+      nullable = false,
+      length = 32,
+      unique = true
+  )
+  private String discussionId;
 
   @Column(nullable = false, length = 255)
   private String message;
@@ -58,7 +69,7 @@ public class ProductDiscussion {
   )
   private Product product;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(
       name = "parent_id",
       foreignKey = @ForeignKey(
@@ -68,15 +79,18 @@ public class ProductDiscussion {
   private ProductDiscussion parent;
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<ProductDiscussion> replies;
+  @Builder.Default
+  private List<ProductDiscussion> replies = new ArrayList<>();
 
   @OneToMany(
       mappedBy = "discussions",
       cascade = CascadeType.ALL,
       orphanRemoval = true
   )
-  private List<DiscussionLike> likes;
+  @Builder.Default
+  private List<DiscussionLike> likes = new ArrayList<>();
 
+  @Builder.Default
   private Boolean edited = false;
 
   @CreationTimestamp
@@ -85,4 +99,11 @@ public class ProductDiscussion {
 
   @UpdateTimestamp
   private LocalDateTime updatedAt;
+
+  @PrePersist
+  void generateId() {
+    if (this.discussionId == null) {
+      this.discussionId = UUID.randomUUID().toString().replace("-", "");
+    }
+  }
 }
