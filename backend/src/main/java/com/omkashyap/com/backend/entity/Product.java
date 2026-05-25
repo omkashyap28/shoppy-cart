@@ -78,6 +78,8 @@ public class Product {
 
   private Float price;
 
+  private Integer coins;
+
   private String productUrl;
 
   @ManyToOne(
@@ -106,6 +108,22 @@ public class Product {
   @Builder.Default
   private List<ProductAttribute> productAttributes = new ArrayList<>();
 
+  @OneToMany(
+      mappedBy = "product",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true
+  )
+  private List<AffiliateUserProduct> affiliateUserProduct = new ArrayList<>();
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(
+      name = "affiliate_commission_id",
+      foreignKey = @ForeignKey(
+          name = "fk_product_affiliate_commission"
+      )
+  )
+  private AffiliateCommission affiliateCommission;
+
   @CreationTimestamp
   private LocalDateTime createdAt;
 
@@ -116,6 +134,20 @@ public class Product {
   private void generateId() {
     if (this.productId == null) {
       this.productId = UUID.randomUUID().toString().replace("-", "");
+    }
+  }
+
+  @PreUpdate
+  void inStock() {
+    if (this.quantity == 0) {
+      this.inStock = false;
+    }
+  }
+
+  @PostPersist
+  void setPriceInCoins() {
+    if (this.coins == null) {
+      this.coins = price.intValue() * 2;
     }
   }
 

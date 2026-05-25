@@ -108,6 +108,8 @@ public class OrderItem {
 
   private Double amount;
 
+  private Integer coins;
+
   @Column(
       nullable = false
   )

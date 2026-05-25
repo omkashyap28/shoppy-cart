@@ -3,7 +3,6 @@ package com.omkashyap.com.backend.dto.responseDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +20,7 @@ public class ProductResponseDto {
   private Float averageRating;
   private Long categoryId;
   private Float price;
+  private Integer coins;
   private String productUrl;
 
 }

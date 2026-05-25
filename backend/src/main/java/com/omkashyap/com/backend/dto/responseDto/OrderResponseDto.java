@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tools.jackson.databind.node.DoubleNode;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -19,6 +18,7 @@ public class OrderResponseDto {
   private String orderId;
   private Integer quantity;
   private Double amount;
+  private Integer coins;
   private String productUrl;
   private String productId;
   private Map<String, String> selectedAttributes;

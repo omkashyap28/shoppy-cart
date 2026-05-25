@@ -3,11 +3,17 @@ package com.omkashyap.com.backend.entity;
 import com.omkashyap.com.backend.type.PaymentMethodEnum;
 import com.omkashyap.com.backend.type.PaymentStatusEnum;
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Table(
     indexes = @Index(name = "idx_payment_paymentid", columnList = "payment_id"),
     uniqueConstraints = {
@@ -36,24 +42,35 @@ public class Payment {
           name = "fk_payment_orderid"
       )
   )
-  private Orders order;
+  private OrderItem orderItem;
 
   @Enumerated(EnumType.STRING)
+  @Column(
+      nullable = false
+  )
   private PaymentMethodEnum paymentMethod;
 
   @Enumerated(EnumType.STRING)
+  @Column(
+      nullable = false
+  )
   private PaymentStatusEnum paymentStatus;
 
+  private Double amount;
+
+  private Long coins;
+
   @Column(
-      nullable = false,
       length = 100
   )
   private String transactionId;
 
-  @CreationTimestamp
-  @Column(
-      updatable = false
-  )
-  private LocalDateTime createdAt;
+  private LocalDateTime paidAt;
 
+  @PrePersist
+  void generateId() {
+    if (this.paymentId == null) {
+      this.paymentId = UUID.randomUUID().toString().replace("-", "");
+    }
+  }
 }
