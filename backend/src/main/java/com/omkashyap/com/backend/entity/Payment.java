@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -66,6 +67,13 @@ public class Payment {
   private String transactionId;
 
   private LocalDateTime paidAt;
+
+  @OneToMany(
+      mappedBy = "payment",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true
+  )
+  private List<Invoice> invoiceList;
 
   @PrePersist
   void generateId() {

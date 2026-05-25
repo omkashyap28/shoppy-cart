@@ -27,6 +27,7 @@ public class OrderServiceImpl implements OrderService {
   private final OrderDtoMapper orderDtoMapper;
   private final OrderStatusRepository orderStatusRepository;
   private final AddressRepository addressRepository;
+  private final InvoiceRepository invoiceRepository;
 
   @Override
   @Transactional

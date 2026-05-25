@@ -160,6 +160,13 @@ public class User implements UserDetails {
   )
   private UserWallet wallet;
 
+  @OneToMany(
+      mappedBy = "user",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true
+  )
+  private List<Invoice> invoice;
+
   @Column(updatable = false)
   @CreationTimestamp
   private LocalDateTime createdAt;
