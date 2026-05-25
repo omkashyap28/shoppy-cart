@@ -1,8 +1,16 @@
 package com.omkashyap.com.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.UUID;
 
 @Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Invoice {
 
   @Id
@@ -16,38 +24,56 @@ public class Invoice {
       name = "order_id",
       foreignKey = @ForeignKey(
           name = "fk_invoice_orderid"
-      )
+      ),
+      nullable = false
   )
-  private Orders order;
+  private OrderItem orderItem;
 
   @Column(
       nullable = false
   )
   private String invoiceNo;
 
-  @Column(
+  @ManyToOne(
+      fetch = FetchType.LAZY
+  )
+  @JoinColumn(
+      name = "user_id",
+      foreignKey = @ForeignKey(
+          name = "fk_user_id"
+      ),
       nullable = false
   )
-  private String customerName;
+  private User user;
 
-  @Column(
+  @ManyToOne(
+      fetch = FetchType.LAZY
+  )
+  @JoinColumn(
+      name = "user_address_id",
+      foreignKey = @ForeignKey(
+          name = "fk_user_address_id"
+      ),
       nullable = false
   )
-  private String customerEmail;
+  private Address billingAddress;
 
-  @Column(
-      nullable = false
+  @ManyToOne(
+      fetch = FetchType.LAZY
   )
-  private String billingAddress;
+  @JoinColumn(
+      name = "payment_id",
+      foreignKey = @ForeignKey(
+          name = "fk_payment_id"
+      )
+  )
+  private Payment payment;
 
-  @Column(
-      nullable = false
-  )
-  private Double totalAmount;
-
-  @Column(
-      nullable = false
-  )
-  private Double taxAmount;
+  @PrePersist
+  void generateInvoiceNumber() {
+    if (this.invoiceNo == null) {
+      this.invoiceNo = UUID.randomUUID().toString().replace("-", "");
+    }
+  }
 
 }

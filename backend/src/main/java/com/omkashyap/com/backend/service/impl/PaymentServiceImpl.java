@@ -4,8 +4,10 @@ import com.omkashyap.com.backend.dto.requestDto.PaymentRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.PaymentUpdateRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.PaymentResponseDto;
 import com.omkashyap.com.backend.dtoMapper.PaymentDtoMapper;
+import com.omkashyap.com.backend.entity.Invoice;
 import com.omkashyap.com.backend.entity.OrderItem;
 import com.omkashyap.com.backend.entity.Payment;
+import com.omkashyap.com.backend.repository.InvoiceRepository;
 import com.omkashyap.com.backend.repository.OrderItemRepository;
 import com.omkashyap.com.backend.repository.PaymentRepository;
 import com.omkashyap.com.backend.service.PaymentService;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Transactional
 public class PaymentServiceImpl implements PaymentService {
+  private final InvoiceRepository invoiceRepository;
 
   private final PaymentRepository paymentRepository;
   private final PaymentDtoMapper paymentDtoMapper;
@@ -47,8 +50,16 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     payment.setTransactionId(paymentUtil.generateTransactionId());
-
     paymentRepository.save(payment);
+
+    Invoice invoice = Invoice.builder()
+        .orderItem(orderItem)
+        .user(orderItem.getOrder().getUser())
+        .billingAddress(orderItem.getAddress())
+        .payment(payment)
+        .build();
+
+    invoiceRepository.save(invoice);
 
     orderItem.setPayments(payment);
     orderItemRepository.save(orderItem);
