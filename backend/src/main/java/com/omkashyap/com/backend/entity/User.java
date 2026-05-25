@@ -153,6 +153,13 @@ public class User implements UserDetails {
   )
   private AffiliateUser affiliateUser;
 
+  @OneToOne(
+      mappedBy = "user",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true
+  )
+  private UserWallet wallet;
+
   @Column(updatable = false)
   @CreationTimestamp
   private LocalDateTime createdAt;
