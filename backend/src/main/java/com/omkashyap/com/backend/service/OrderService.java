@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface OrderService {
 
-  OrderResponseDto placeNewOrder(String userId, OrderRequestDto requestDto);
+  OrderResponseDto placeNewOrder(String authHeader, String productId, String refId, OrderRequestDto requestDto);
 
   List<OrderResponseDto> getUserAllOrders(String userId);
 

@@ -14,7 +14,6 @@ import java.util.Map;
 @Builder
 public class OrderRequestDto {
 
-  public String productId;
   public String addressId;
   private Map<String, String> selectedAttributes;
   private Integer quantity;

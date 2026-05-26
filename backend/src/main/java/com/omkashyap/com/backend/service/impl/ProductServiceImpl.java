@@ -25,6 +25,7 @@ public class ProductServiceImpl implements ProductService {
   private final CategoryRepository categoryRepository;
   private final ProductDtoMapper productDtoMapper;
   private final AffiliateCommissionRepository affiliateCommissionRepository;
+  private final AffiliateUserProductRepository affiliateUserProductRepository;
 
   @Override
   @Transactional
@@ -93,8 +94,18 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductResponseDto getProductById(String productId) {
-    Product product = productRepository.findByProductId(productId).orElseThrow(() -> new IllegalArgumentException("Product not exists with this id"));
+  public ProductResponseDto getProductById(String productId, String refId) {
+    Product product = productRepository.findByProductId(productId).orElseThrow(
+        () -> new IllegalArgumentException("Product not exists with this id"));
+
+    if (refId != null) {
+      AffiliateUserProduct affiliateUserProduct = affiliateUserProductRepository.findByAffiliateUser_AffiliateCode(refId).orElse(null);
+
+      if (affiliateUserProduct != null) {
+        affiliateUserProduct.increaseClick();
+        affiliateUserProductRepository.save(affiliateUserProduct);
+      }
+    }
 
     return productDtoMapper.mapToDto(product);
   }

@@ -15,4 +15,6 @@ public interface AffiliateUserProductRepository extends JpaRepository<AffiliateU
   );
 
   void deleteByAffiliateUser_AffiliateCodeAndProduct_ProductId(String affiliateCode, String productId);
+
+  Optional<AffiliateUserProduct> findByAffiliateUser_AffiliateCode(String refId);
 }

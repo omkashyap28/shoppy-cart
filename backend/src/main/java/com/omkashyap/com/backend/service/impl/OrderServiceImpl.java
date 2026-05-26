@@ -7,6 +7,8 @@ import com.omkashyap.com.backend.entity.*;
 import com.omkashyap.com.backend.repository.*;
 import com.omkashyap.com.backend.service.OrderService;
 import com.omkashyap.com.backend.type.OrderStatusEnum;
+import com.omkashyap.com.backend.util.AffiliateUtil;
+import com.omkashyap.com.backend.util.AuthHeaderUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,19 +29,27 @@ public class OrderServiceImpl implements OrderService {
   private final OrderDtoMapper orderDtoMapper;
   private final OrderStatusRepository orderStatusRepository;
   private final AddressRepository addressRepository;
-  private final InvoiceRepository invoiceRepository;
+  private final AuthHeaderUtil authHeaderUtil;
+  private final AffiliateUserProductRepository affiliateUserProductRepository;
+  private final AffiliateUtil affiliateUtil;
 
   @Override
   @Transactional
-  public OrderResponseDto placeNewOrder(String userId, OrderRequestDto requestDto) {
-    User user = userRepository.findByUserId(userId).orElseThrow(() ->
+  public OrderResponseDto placeNewOrder(
+      String authHeader,
+      String productId,
+      String refId,
+      OrderRequestDto requestDto
+  ) {
+    String email = authHeaderUtil.getEmailFromAuthHeader(authHeader);
+    User user = userRepository.findByEmail(email).orElseThrow(() ->
         new IllegalArgumentException("User not exists")
     );
 
     Address address = addressRepository.findByAddressId(requestDto.getAddressId()).orElseThrow(() ->
         new IllegalArgumentException("This Address is not exists for user"));
 
-    Product product = productRepository.findByProductId(requestDto.getProductId()).orElseThrow(() ->
+    Product product = productRepository.findByProductId(productId).orElseThrow(() ->
         new IllegalArgumentException("Product not exists")
     );
 
@@ -47,7 +57,7 @@ public class OrderServiceImpl implements OrderService {
       throw new IllegalArgumentException("Selected quantity for product not available");
     }
 
-    Orders orders = ordersRepository.findByUser_UserId(userId).orElseGet(() -> Orders.builder()
+    Orders orders = ordersRepository.findByUser_UserId(authHeader).orElseGet(() -> Orders.builder()
         .user(user)
         .build());
     ordersRepository.save(orders);
@@ -87,6 +97,23 @@ public class OrderServiceImpl implements OrderService {
 
     product.setQuantity(product.getQuantity() - requestDto.getQuantity());
     productRepository.save(product);
+
+    if (refId != null) {
+      AffiliateUserProduct affiliateUserProduct = affiliateUserProductRepository.
+          findByAffiliateUser_AffiliateCode(refId).orElse(null);
+
+      if (affiliateUserProduct != null) {
+        affiliateUserProduct.increaseConversion();
+        affiliateUserProduct.setTotalEarnings(
+            affiliateUserProduct.getTotalEarnings().add(
+                affiliateUtil.getTotalEarning(
+                    orderItem.getAmount(),
+                    product.getAffiliateCommission().getCommissionPercentage()
+                )
+            ));
+        affiliateUserProductRepository.save(affiliateUserProduct);
+      }
+    }
 
     return orderDtoMapper.mapToDto(orderItem);
   }

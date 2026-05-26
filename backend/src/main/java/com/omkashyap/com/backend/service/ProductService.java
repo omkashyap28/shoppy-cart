@@ -9,7 +9,7 @@ import java.util.Map;
 public interface ProductService {
   ProductResponseDto addNewProduct(String sellerId, ProductRequestDto productRequestDto);
 
-  ProductResponseDto getProductById(String productId);
+  ProductResponseDto getProductById(String productId, String refId);
 
   ProductResponseDto patchProductById(String sellerId, String productId, Map<String, Object> values);
 

@@ -1,6 +1,5 @@
 package com.omkashyap.com.backend.controller;
 
-import com.omkashyap.com.backend.dto.requestDto.OrderRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.OrderResponseDto;
 import com.omkashyap.com.backend.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +16,6 @@ import java.util.List;
 public class OrderController {
 
   private final OrderService orderService;
-
-  @PostMapping
-  ResponseEntity<OrderResponseDto> placeNewOrder(@PathVariable String userId, @RequestBody OrderRequestDto requestDto) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeNewOrder(userId, requestDto));
-  }
 
   @GetMapping
   ResponseEntity<List<OrderResponseDto>> getUserAllOrders(@PathVariable String userId) {

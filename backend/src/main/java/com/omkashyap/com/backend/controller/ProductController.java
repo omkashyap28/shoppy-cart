@@ -1,8 +1,11 @@
 package com.omkashyap.com.backend.controller;
 
+import com.omkashyap.com.backend.dto.requestDto.OrderRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.ReviewRequestDto;
+import com.omkashyap.com.backend.dto.responseDto.OrderResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ReviewResponseDto;
+import com.omkashyap.com.backend.service.OrderService;
 import com.omkashyap.com.backend.service.ProductService;
 import com.omkashyap.com.backend.service.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +23,11 @@ public class ProductController {
 
   private final ProductService productService;
   private final ReviewService reviewService;
+  private final OrderService orderService;
 
   @GetMapping
-  ResponseEntity<ProductResponseDto> getProductById(@PathVariable String productId) {
-    return ResponseEntity.status(HttpStatus.OK).body(productService.getProductById(productId));
+  ResponseEntity<ProductResponseDto> getProductById(@PathVariable String productId, @RequestParam(required = false) String refId) {
+    return ResponseEntity.status(HttpStatus.OK).body(productService.getProductById(productId, refId));
   }
 
   @PostMapping("/reviews")
@@ -41,5 +45,17 @@ public class ProductController {
     reviewService.deleteReviewByProductAndReviewId(productId, reviewId);
     return ResponseEntity.noContent().build();
   }
+
+  @PostMapping("/order")
+  ResponseEntity<OrderResponseDto> placeNewOrder(
+      @RequestHeader("Authorization") String authHeader,
+      @PathVariable String productId,
+      @RequestParam(required = false) String refId,
+      @RequestBody OrderRequestDto requestDto) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(
+        orderService.placeNewOrder(authHeader, productId, refId, requestDto)
+    );
+  }
+
 
 }
