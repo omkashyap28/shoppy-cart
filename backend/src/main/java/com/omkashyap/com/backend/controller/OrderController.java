@@ -3,7 +3,6 @@ package com.omkashyap.com.backend.controller;
 import com.omkashyap.com.backend.dto.responseDto.OrderResponseDto;
 import com.omkashyap.com.backend.service.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,18 +26,18 @@ public class OrderController {
     return ResponseEntity.status(HttpStatus.OK).body(orderService.getUserOrdersByOrderId(userId, orderId));
   }
 
-  @PatchMapping("/cancellation")
-  ResponseEntity<OrderResponseDto> cancelUserOrdersByOrderId(@PathVariable String userId, @Param("orderId") String orderId) {
+  @PatchMapping("/{orderId}/cancellation")
+  ResponseEntity<OrderResponseDto> cancelUserOrdersByOrderId(@PathVariable String userId, @PathVariable String orderId) {
     return ResponseEntity.status(HttpStatus.ACCEPTED).body(orderService.cancelUserOrdersByOrderId(userId, orderId));
   }
 
-  @PatchMapping("/return")
-  ResponseEntity<OrderResponseDto> returnUserOrdersByOrderId(@PathVariable String userId, @Param("orderId") String orderId) {
+  @PatchMapping("/{orderId}/return")
+  ResponseEntity<OrderResponseDto> returnUserOrdersByOrderId(@PathVariable String userId, @PathVariable String orderId) {
     return ResponseEntity.status(HttpStatus.ACCEPTED).body(orderService.returnUserOrdersByOrderId(userId, orderId));
   }
 
-  @PatchMapping("/exchange")
-  ResponseEntity<OrderResponseDto> exchangeUserOrdersByOrderId(@PathVariable String userId, @Param("orderId") String orderId) {
+  @PatchMapping("/{orderId}/exchange")
+  ResponseEntity<OrderResponseDto> exchangeUserOrdersByOrderId(@PathVariable String userId, @PathVariable String orderId) {
     return ResponseEntity.status(HttpStatus.ACCEPTED).body(orderService.exchangeUserOrdersByOrderId(userId, orderId));
   }
 

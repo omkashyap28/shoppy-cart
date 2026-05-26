@@ -82,6 +82,12 @@ public class Product {
 
   private String productUrl;
 
+  @Builder.Default
+  private Integer returnCount = 0;
+
+  @Builder.Default
+  private Integer exchangeCount = 0;
+
   @ManyToOne(
       fetch = FetchType.LAZY
   )

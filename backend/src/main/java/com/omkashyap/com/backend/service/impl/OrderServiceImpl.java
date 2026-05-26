@@ -166,7 +166,11 @@ public class OrderServiceImpl implements OrderService {
     orderStatusRepository.save(orderStatus);
 
     orderItemRepository.save(orderItem);
-
+    Product product = productRepository.findByProductId(orderItem.getProduct().getProductId()).orElse(null);
+    if (product != null) {
+      product.setReturnCount(product.getReturnCount() + 1);
+      productRepository.save(product);
+    }
     return orderDtoMapper.mapToDto(orderItem);
   }
 
@@ -194,7 +198,11 @@ public class OrderServiceImpl implements OrderService {
     orderStatus.setOrderStatus(OrderStatusEnum.EXCHANGE_REQUEST);
     orderStatus.setExchangedAt(LocalDateTime.now());
     orderStatusRepository.save(orderStatus);
-
+    Product product = productRepository.findByProductId(orderItem.getProduct().getProductId()).orElse(null);
+    if (product != null) {
+      product.setExchangeCount(product.getExchangeCount() + 1);
+      productRepository.save(product);
+    }
     return orderDtoMapper.mapToDto(orderItem);
   }
 
