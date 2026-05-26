@@ -167,6 +167,14 @@ public class User implements UserDetails {
   )
   private List<Invoice> invoice;
 
+  @OneToMany(
+      mappedBy = "user",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true
+  )
+  @Builder.Default
+  private List<Otp> otp = new ArrayList<>();
+
   @Column(updatable = false)
   @CreationTimestamp
   private LocalDateTime createdAt;
