@@ -77,6 +77,7 @@ public class WishListServiceImpl implements WishListService {
   }
 
   @Override
+  @Transactional
   public void removeProductFromWishlist(String wishlistId) {
     wishListItemRepository.deleteByWishListItemId(wishlistId);
   }

@@ -7,9 +7,11 @@ import com.omkashyap.com.backend.dtoMapper.PaymentDtoMapper;
 import com.omkashyap.com.backend.entity.Invoice;
 import com.omkashyap.com.backend.entity.OrderItem;
 import com.omkashyap.com.backend.entity.Payment;
+import com.omkashyap.com.backend.entity.Product;
 import com.omkashyap.com.backend.repository.InvoiceRepository;
 import com.omkashyap.com.backend.repository.OrderItemRepository;
 import com.omkashyap.com.backend.repository.PaymentRepository;
+import com.omkashyap.com.backend.repository.ProductRepository;
 import com.omkashyap.com.backend.service.PaymentService;
 import com.omkashyap.com.backend.type.PaymentMethodEnum;
 import com.omkashyap.com.backend.type.PaymentStatusEnum;
@@ -19,11 +21,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class PaymentServiceImpl implements PaymentService {
+  private final ProductRepository productRepository;
   private final InvoiceRepository invoiceRepository;
 
   private final PaymentRepository paymentRepository;
@@ -63,6 +68,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     orderItem.setPayments(payment);
     orderItemRepository.save(orderItem);
+
+    if (payment.getPaymentStatus().equals(PaymentStatusEnum.SUCCESS)) {
+      Product product = productRepository.findByProductId(orderItem.getProduct().getProductId()).orElse(null);
+      if (product != null) {
+        product.setTotalEarning(product.getTotalEarning().add(BigDecimal.valueOf(product.getPrice() * orderItem.getQuantity())));
+        paymentRepository.save(payment);
+      }
+    }
 
     return paymentDtoMapper.mapToDto(payment);
   }

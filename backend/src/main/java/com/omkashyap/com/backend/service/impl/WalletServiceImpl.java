@@ -6,9 +6,11 @@ import com.omkashyap.com.backend.dto.responseDto.WalletPaymentResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.WalletResponseDto;
 import com.omkashyap.com.backend.dtoMapper.UserWalletDtoMapper;
 import com.omkashyap.com.backend.entity.Payment;
+import com.omkashyap.com.backend.entity.Product;
 import com.omkashyap.com.backend.entity.User;
 import com.omkashyap.com.backend.entity.UserWallet;
 import com.omkashyap.com.backend.repository.PaymentRepository;
+import com.omkashyap.com.backend.repository.ProductRepository;
 import com.omkashyap.com.backend.repository.UserRepository;
 import com.omkashyap.com.backend.repository.UserWalletRepository;
 import com.omkashyap.com.backend.service.WalletService;
@@ -20,6 +22,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -32,6 +35,7 @@ public class WalletServiceImpl implements WalletService {
   private final UserWalletDtoMapper userWalletDtoMapper;
   private final WalletUtil walletUtil;
   private final PaymentRepository paymentRepository;
+  private final ProductRepository productRepository;
 
   @Override
   public WalletResponseDto createUserWallet(
@@ -144,7 +148,15 @@ public class WalletServiceImpl implements WalletService {
       throw new IllegalArgumentException("Invalid MPin");
     }
 
-
+    if (payment.getPaymentStatus().equals(PaymentStatusEnum.SUCCESS)) {
+      Product product = productRepository.findByProductId(
+          payment.getOrderItem().getProduct().getProductId()
+      ).orElse(null);
+      if (product != null) {
+        product.setTotalEarning(product.getTotalEarning().add(BigDecimal.valueOf(product.getPrice() * payment.getOrderItem().getQuantity())));
+        paymentRepository.save(payment);
+      }
+    }
     return userWalletDtoMapper.mapToWalletPaymentResponseDto(payment);
   }
 }

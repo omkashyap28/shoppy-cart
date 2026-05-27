@@ -22,76 +22,76 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/seller")
+@RequestMapping("/seller/{sellerId}")
 public class SellerController {
 
   private final SellerService sellerService;
   private final ProductService productService;
   private final ReviewService reviewService;
 
-  @GetMapping("/{sellerId}")
+  @GetMapping
   ResponseEntity<SellerResponseDto> getSellerBySellerId(@PathVariable("sellerId") String sellerId) {
     return ResponseEntity.status(HttpStatus.OK).body(sellerService.getSellerBySellerId(sellerId));
   }
 
-  @PostMapping("/{sellerId}/address")
+  @PostMapping("/address")
   ResponseEntity<ShopAddressResponseDto> addShopAddressBySellerId(@PathVariable String sellerId, @RequestBody AddressRequestDto addressRequestDto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.addAddressBySellerId(sellerId, addressRequestDto));
   }
 
-  @GetMapping("/{sellerId}/address")
+  @GetMapping("/address")
   ResponseEntity<ShopAddressResponseDto> getShopAddressBySellerId(@PathVariable String sellerId) {
     return ResponseEntity.status(HttpStatus.OK).body(sellerService.getSellerAddressBySellerId(sellerId));
   }
 
-  @PatchMapping("/{sellerId}")
+  @PatchMapping
   ResponseEntity<SellerResponseDto> updatePartialSellerDetail(@PathVariable String sellerId, @Valid @RequestBody Map<String, Object> updates) {
     return ResponseEntity.status(HttpStatus.OK).body(sellerService.updatePartialSellerDetails(sellerId, updates));
   }
 
-  @PostMapping("/{sellerId}/verification")
+  @PostMapping("/verification")
   ResponseEntity<SellerResponseDto> addSellerVerification(@PathVariable String sellerId, @Valid @RequestBody SellerVerificationRequestDto requestDto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.addSellerVerification(sellerId, requestDto));
   }
 
-  @PostMapping("/{sellerId}/account-verification")
+  @PostMapping("/account-verification")
   ResponseEntity<SellerResponseDto> addSellerAccountInfo(@PathVariable String sellerId, @Valid @RequestBody SellerAccountRequestDto requestDto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.addSellerAccountInfo(sellerId, requestDto));
   }
 
-  @DeleteMapping("/{sellerId}")
+  @DeleteMapping
   ResponseEntity<Void> deleteSeller(@PathVariable String sellerId) {
     sellerService.deleteSellerById(sellerId);
     return ResponseEntity.noContent().build();
   }
 
-  @PostMapping("/{sellerId}/products")
+  @PostMapping("/products")
   ResponseEntity<ProductResponseDto> createProduct(@PathVariable String sellerId, @Valid @RequestBody ProductRequestDto productRequestDto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(productService.addNewProduct(sellerId, productRequestDto));
   }
 
-  @GetMapping("/{sellerId}/products/{productId}")
+  @GetMapping("/products/{productId}")
   ResponseEntity<ProductResponseDto> getProduct(@PathVariable String sellerId, @PathVariable String productId) {
     return ResponseEntity.status(HttpStatus.CREATED).body(productService.getProductBySellerAndProductId(sellerId, productId));
   }
 
-  @PatchMapping("/{sellerId}/products/{productId}")
+  @PatchMapping("/products/{productId}")
   ResponseEntity<ProductResponseDto> updatePartialProductById(@PathVariable String sellerId, @PathVariable String productId, @RequestBody Map<String, Object> values) {
     return ResponseEntity.status(HttpStatus.OK).body(productService.patchProductById(sellerId, productId, values));
   }
 
-  @GetMapping("/{sellerId}/products")
+  @GetMapping("/products")
   ResponseEntity<List<ProductResponseDto>> getAllProduct(@PathVariable String sellerId) {
     return ResponseEntity.status(HttpStatus.OK).body(productService.getAllProducts(sellerId));
   }
 
-  @DeleteMapping("/{sellerId}/products/{productId}")
+  @DeleteMapping("/products/{productId}")
   ResponseEntity<Void> deleteProduct(@PathVariable String sellerId, @PathVariable String productId) {
     productService.deleteProductBySellerId(sellerId, productId);
     return ResponseEntity.noContent().build();
   }
 
-  @GetMapping("/{sellerId}/products/{productId}/reviews")
+  @GetMapping("/products/{productId}/reviews")
   ResponseEntity<List<ReviewResponseDto>> getAllReviewsBySellerId(@PathVariable String productId) {
     return ResponseEntity.status(HttpStatus.OK).body(reviewService.getAllProductReviewsByProductId(productId));
   }

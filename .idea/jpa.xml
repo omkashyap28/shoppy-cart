@@ -3,4 +3,16 @@
   <component name="JpaBuddyIdeaProjectConfig" newRepositoryParent="org.springframework.data.jpa.repository.JpaRepository">
     <option name="newEntityIdStrategy" value="Identity" />
   </component>
+  <component name="JpaPluginProjectSettings">
+    <option name="lastSelectedLanguage" value="Java" />
+  </component>
+  <component name="PersistenceUnitSettings">
+    <persistence-units>
+      <persistence-unit moduleName="e_commerce_backend" name="Default">
+        <packages>
+          <package value="com.omkashyap.com.backend" />
+        </packages>
+      </persistence-unit>
+    </persistence-units>
+  </component>
 </project>
