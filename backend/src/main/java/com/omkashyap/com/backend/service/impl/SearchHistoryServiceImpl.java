@@ -4,10 +4,7 @@ import com.omkashyap.com.backend.dto.responseDto.InfiniteScrollResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.SearchHistoryResponseDto;
 import com.omkashyap.com.backend.dtoMapper.ProductDtoMapper;
-import com.omkashyap.com.backend.entity.Product;
-import com.omkashyap.com.backend.entity.SearchHistory;
-import com.omkashyap.com.backend.entity.SearchSuggestion;
-import com.omkashyap.com.backend.entity.User;
+import com.omkashyap.com.backend.entity.*;
 import com.omkashyap.com.backend.repository.ProductRepository;
 import com.omkashyap.com.backend.repository.SearchHistoryRepository;
 import com.omkashyap.com.backend.repository.SearchSuggestionRepository;
@@ -131,6 +128,70 @@ public class SearchHistoryServiceImpl implements SearchHistoryService {
         .findTop10ByKeywordStartingWithIgnoreCaseOrderByTotalSearchesDesc(searchText)
         .stream()
         .map(SearchSuggestion::getKeyword)
+        .toList();
+  }
+
+  @Override
+  public InfiniteScrollResponseDto<ProductResponseDto> searchProductByTags(
+      String slug,
+      Long lastProductId,
+      int limit
+  ) {
+    Pageable pageable = PageRequest.of(0, Math.min(limit, 10));
+
+    List<Product> products;
+
+    if (lastProductId == null) {
+      products = productRepository.findByTags_SlugIgnoreCaseOrderByIdDesc(
+          slug,
+          pageable
+      );
+    } else {
+      products = productRepository.findByTags_SlugIgnoreCaseAndIdLessThanOrderByIdDesc(
+          slug,
+          lastProductId,
+          pageable
+      );
+    }
+
+    List<ProductResponseDto> responseDtos = products.stream()
+        .map(productDtoMapper::mapToDto)
+        .toList();
+    Long nextCursor = products.isEmpty()
+        ? null
+        : products.getLast().getId();
+
+    boolean hasMore = products.size() == limit;
+    return InfiniteScrollResponseDto.<ProductResponseDto>builder()
+        .content(responseDtos)
+        .nextCursor(nextCursor)
+        .hasMore(hasMore)
+        .build();
+  }
+
+  @Override
+  public List<ProductResponseDto> getRelatedProducts(
+      String productId,
+      int limit
+  ) {
+
+    Product product = productRepository.findByProductId(productId)
+        .orElseThrow(() -> new RuntimeException("Product not found"));
+
+    List<String> tags = product.getTags()
+        .stream()
+        .map(Tags::getSlug)
+        .toList();
+
+    List<Product> relatedProducts = productRepository
+        .findRandomRelatedProducts(
+            productId,
+            tags,
+            Math.min(limit, 20)
+        );
+
+    return relatedProducts.stream()
+        .map(productDtoMapper::mapToDto)
         .toList();
   }
 }

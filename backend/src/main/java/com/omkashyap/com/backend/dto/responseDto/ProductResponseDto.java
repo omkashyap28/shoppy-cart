@@ -22,5 +22,6 @@ public class ProductResponseDto {
   private Float price;
   private Integer coins;
   private String productUrl;
+  private List<String> tags;
 
 }

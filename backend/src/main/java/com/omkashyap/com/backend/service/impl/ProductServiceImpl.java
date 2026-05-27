@@ -6,6 +6,7 @@ import com.omkashyap.com.backend.dtoMapper.ProductDtoMapper;
 import com.omkashyap.com.backend.entity.*;
 import com.omkashyap.com.backend.repository.*;
 import com.omkashyap.com.backend.service.ProductService;
+import com.omkashyap.com.backend.util.TagsUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -26,6 +27,8 @@ public class ProductServiceImpl implements ProductService {
   private final ProductDtoMapper productDtoMapper;
   private final AffiliateCommissionRepository affiliateCommissionRepository;
   private final AffiliateUserProductRepository affiliateUserProductRepository;
+  private final TagsRepository tagsRepository;
+  private final TagsUtil tagsUtil;
 
   @Override
   @Transactional
@@ -52,6 +55,19 @@ public class ProductServiceImpl implements ProductService {
         .inStock(productRequestDto.getQuantity() != 0)
         .seller(seller)
         .build();
+
+    productRequestDto.getTags().forEach(tag -> {
+      Tags tags = tagsRepository.findByTagName(tag).orElseGet(() -> {
+        Tags newTags = Tags.builder()
+            .tagName(tag)
+            .slug(tagsUtil.generateSlugByTagName(tag))
+            .build();
+
+        return tagsRepository.save(newTags);
+      });
+
+      product.getTags().add(tags);
+    });
 
     productRepository.save(product);
     product.setProductUrl("product/" + product.getProductId());

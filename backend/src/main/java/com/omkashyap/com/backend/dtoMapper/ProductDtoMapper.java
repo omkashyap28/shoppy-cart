@@ -34,6 +34,12 @@ public class ProductDtoMapper {
       dto.setProductImages(images);
     }
 
+    List<String> tags = new ArrayList<>();
+    if (product.getTags() != null && !product.getTags().isEmpty()) {
+      product.getTags().forEach(tag -> tags.add(tag.getTagName()));
+      dto.setTags(tags);
+    }
+
     Map<String, String> attributes = new HashMap<>();
     if (product.getProductAttributes() != null) {
       product.getProductAttributes()

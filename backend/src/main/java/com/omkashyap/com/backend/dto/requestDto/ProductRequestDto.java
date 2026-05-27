@@ -17,5 +17,6 @@ public class ProductRequestDto {
   private Float price;
   private List<ProductImageRequestDto> productImages;
   private List<ProductAttributeRequestDto> productAttributes;
+  private List<String> tags;
 
 }

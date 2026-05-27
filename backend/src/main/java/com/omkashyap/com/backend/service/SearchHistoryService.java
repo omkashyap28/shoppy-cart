@@ -20,4 +20,16 @@ public interface SearchHistoryService {
   List<String> getTrendingSearches();
 
   List<String> autoCompleteSearch(String searchText);
+
+  InfiniteScrollResponseDto<ProductResponseDto> searchProductByTags(
+      String tag,
+      Long lastProductId,
+      int limit
+  );
+
+  List<ProductResponseDto> getRelatedProducts(
+      String productId,
+      int limit
+  );
+
 }

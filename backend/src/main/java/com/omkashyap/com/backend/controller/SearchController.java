@@ -37,6 +37,22 @@ public class SearchController {
     );
   }
 
+  @GetMapping("/tags")
+  ResponseEntity<InfiniteScrollResponseDto<ProductResponseDto>> searchProductByTags(
+      @RequestParam String slug,
+      @RequestParam(required = false)
+      Long lastProductId,
+
+      @RequestParam(defaultValue = "10")
+      int limit
+  ) {
+    return ResponseEntity.status(HttpStatus.OK).body(
+        searchHistoryService.searchProductByTags(
+            slug, lastProductId, limit
+        )
+    );
+  }
+
   @GetMapping("/recent/{userId}")
   ResponseEntity<List<SearchHistoryResponseDto>> getRecentSearches(@PathVariable String userId) {
     return ResponseEntity.status(HttpStatus.OK).body(

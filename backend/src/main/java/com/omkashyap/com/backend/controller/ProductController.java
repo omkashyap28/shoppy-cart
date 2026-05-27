@@ -8,6 +8,7 @@ import com.omkashyap.com.backend.dto.responseDto.ReviewResponseDto;
 import com.omkashyap.com.backend.service.OrderService;
 import com.omkashyap.com.backend.service.ProductService;
 import com.omkashyap.com.backend.service.ReviewService;
+import com.omkashyap.com.backend.service.SearchHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ public class ProductController {
   private final ProductService productService;
   private final ReviewService reviewService;
   private final OrderService orderService;
+  private final SearchHistoryService searchHistoryService;
 
   @GetMapping
   ResponseEntity<ProductResponseDto> getProductById(@PathVariable String productId, @RequestParam(required = false) String refId) {
@@ -57,5 +59,15 @@ public class ProductController {
     );
   }
 
+
+  @GetMapping("/related")
+  ResponseEntity<List<ProductResponseDto>> getRelatedProductsByTag(
+      @PathVariable String productId,
+      @RequestParam(required = false, defaultValue = "10") int limit
+  ) {
+    return ResponseEntity.status(HttpStatus.OK).body(
+        searchHistoryService.getRelatedProducts(productId, limit)
+    );
+  }
 
 }

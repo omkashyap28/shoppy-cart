@@ -6,10 +6,9 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Getter
@@ -88,6 +87,9 @@ public class Product {
   @Builder.Default
   private Integer exchangeCount = 0;
 
+  @Builder.Default
+  private BigDecimal totalEarning = BigDecimal.valueOf(0);
+
   @ManyToOne(
       fetch = FetchType.LAZY
   )
@@ -129,6 +131,16 @@ public class Product {
       )
   )
   private AffiliateCommission affiliateCommission;
+
+
+  @Builder.Default
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(
+      name = "product_tags",
+      joinColumns = @JoinColumn(name = "product_id"),
+      inverseJoinColumns = @JoinColumn(name = "tag_id")
+  )
+  private Set<Tags> tags = new HashSet<>();
 
   @CreationTimestamp
   private LocalDateTime createdAt;
