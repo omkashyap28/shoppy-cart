@@ -7,6 +7,7 @@ import com.omkashyap.com.backend.repository.OtpRepository;
 import com.omkashyap.com.backend.repository.UserRepository;
 import com.omkashyap.com.backend.service.OtpService;
 import com.omkashyap.com.backend.util.AuthHeaderUtil;
+import com.omkashyap.com.backend.util.EmailUtil;
 import com.omkashyap.com.backend.util.OtpUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,6 +23,7 @@ public class OtpServiceImpl implements OtpService {
   private final OtpUtil otpUtil;
   private final UserRepository userRepository;
   private final AuthHeaderUtil authHeaderUtil;
+  private final EmailUtil emailUtil;
 
   public String generateOtp(String authHeader) {
 
@@ -45,11 +47,13 @@ public class OtpServiceImpl implements OtpService {
     String generatedOtp = otpUtil.generateOtp();
 
     Otp otp = Otp.builder()
-        .otp(generatedOtp)
+        .otp(otpUtil.encodeOtp(generatedOtp))
         .user(user)
         .build();
 
     otpRepository.save(otp);
+
+    emailUtil.sendOtpEmail(user.getEmail(), generatedOtp);
 
     return "Otp sent successfully";
   }

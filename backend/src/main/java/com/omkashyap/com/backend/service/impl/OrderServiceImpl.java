@@ -7,8 +7,11 @@ import com.omkashyap.com.backend.entity.*;
 import com.omkashyap.com.backend.repository.*;
 import com.omkashyap.com.backend.service.OrderService;
 import com.omkashyap.com.backend.type.OrderStatusEnum;
+import com.omkashyap.com.backend.type.PaymentMethodEnum;
+import com.omkashyap.com.backend.type.PaymentStatusEnum;
 import com.omkashyap.com.backend.util.AffiliateUtil;
 import com.omkashyap.com.backend.util.AuthHeaderUtil;
+import com.omkashyap.com.backend.util.EmailUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +35,8 @@ public class OrderServiceImpl implements OrderService {
   private final AuthHeaderUtil authHeaderUtil;
   private final AffiliateUserProductRepository affiliateUserProductRepository;
   private final AffiliateUtil affiliateUtil;
+  private final EmailUtil emailUtil;
+  private final UserWalletRepository userWalletRepository;
 
   @Override
   @Transactional
@@ -171,6 +176,24 @@ public class OrderServiceImpl implements OrderService {
       product.setReturnCount(product.getReturnCount() + 1);
       productRepository.save(product);
     }
+    if (orderItem.getStatus().getOrderStatus().equals(OrderStatusEnum.CANCELLED)) {
+      if (orderItem.getPayments().getPaymentMethod().equals(PaymentMethodEnum.WALLET)) {
+        if (orderItem.getPayments().getPaymentStatus().equals(PaymentStatusEnum.SUCCESS)) {
+          UserWallet wallet = userWalletRepository.
+              findByUser_Email(orderItem.getOrder().getUser().getEmail()).orElse(null);
+          assert wallet != null;
+          wallet.setCoins(wallet.getCoins() + orderItem.getPayments().getCoins());
+          wallet.setTotalCredits(orderItem.getPayments().getCoins());
+          userWalletRepository.save(wallet);
+        }
+      }
+    }
+
+    emailUtil.sendOrderCancellationEmail(
+        orderItem.getOrder().getUser().getEmail(),
+        orderItem.getOrderItemId()
+    );
+
     return orderDtoMapper.mapToDto(orderItem);
   }
 
@@ -203,6 +226,13 @@ public class OrderServiceImpl implements OrderService {
       product.setExchangeCount(product.getExchangeCount() + 1);
       productRepository.save(product);
     }
+
+    emailUtil.sendOrderExchangeRequestEmail(
+        orderItem.getOrder().getUser().getEmail(),
+        orderItem.getOrderItemId(),
+        ""
+    );
+
     return orderDtoMapper.mapToDto(orderItem);
   }
 
@@ -232,6 +262,12 @@ public class OrderServiceImpl implements OrderService {
     orderStatus.setOrderStatus(OrderStatusEnum.RETURN_REQUEST);
     orderStatus.setReturnedAt(LocalDateTime.now());
     orderStatusRepository.save(orderStatus);
+
+    emailUtil.sendOrderReturnRequestEmail(
+        orderItem.getOrder().getUser().getEmail(),
+        orderItem.getOrderItemId(),
+        ""
+    );
 
     return orderDtoMapper.mapToDto(orderItem);
   }

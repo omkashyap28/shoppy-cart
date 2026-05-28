@@ -11,6 +11,7 @@ import com.omkashyap.com.backend.service.SessionService;
 import com.omkashyap.com.backend.type.LoginProviderType;
 import com.omkashyap.com.backend.type.RoleEnum;
 import com.omkashyap.com.backend.util.AuthUtil;
+import com.omkashyap.com.backend.util.EmailUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class OAuthServiceImpl implements OAuthService {
   private final JwtUtil jwtUtil;
   private final HttpServletRequest httpServletRequest;
   private final RoleRepository roleRepository;
+  private final EmailUtil emailUtil;
 
   @Override
   public ResponseEntity<LoginResponseDto> handleOAuth2LoginRequest(OAuth2User oAuth2User, String registrationId) {
@@ -82,6 +84,11 @@ public class OAuthServiceImpl implements OAuthService {
     } else {
       throw new IllegalArgumentException("Invalid OAuth state");
     }
+    emailUtil.sendUserWelcomeEmail(
+        finalUser.getEmail(),
+        finalUser.getFirstName(),
+        finalUser.getUserId()
+    );
 
     String token = jwtUtil.generateAccessToken(finalUser.getEmail());
     String userAgent = httpServletRequest.getHeader("User-Agent");

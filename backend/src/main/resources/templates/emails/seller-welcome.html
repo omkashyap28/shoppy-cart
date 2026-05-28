@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Welcome to Shopyhub</title>
+    <style>
+        /* Base Reset */
+        body, p, h2, h4 {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            padding: 40px 20px;
+        }
+
+        .wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        /* Company Header */
+        .brand-header {
+            border-bottom: 1px solid #0f172a; /* Slate 900 */
+            padding: 24px;
+            text-align: center;
+        }
+
+        .brand-name {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.05em;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 40px 32px;
+        }
+
+        h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #475569;
+            margin-bottom: 16px;
+        }
+
+        /* User ID Callout Box */
+        .user-id-box {
+            background-color: #f1f5f9;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 24px 0;
+            border-left: 4px solid #3b82f6; /* Accent blue */
+            font-size: 15px;
+            color: #1e293b;
+        }
+
+        .user-id-value {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        /* Standard Divider Rules */
+        hr {
+            border: 0;
+            height: 1px;
+            background-color: #e2e8f0;
+            margin: 32px 0;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 0 32px 40px 32px;
+        }
+
+        h4.footer-heading {
+            color: #0f172a;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .timestamp {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <!-- Brand Header -->
+    <div class="brand-header">
+        <span class="brand-name">Shopyhub</span>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <h2 th:text="${heading}">Dynamic Heading Goes Here</h2>
+
+        <p>Hey <span style="font-weight: 600; color: #0f172a;" th:text="${shopName}">Seller</span>,</p>
+
+        <p>Hariom Kashyap this side, creator of <strong>Shopyhub</strong>.</p>
+        <p>Thanks for choosing us! We hope you are enjoying our services seamlessly.</p>
+
+        <!-- User ID Highlight Box -->
+        <div class="user-id-box">
+            Your seller ID: <span class="user-id-value" th:text="${sellerId}">USR-123456</span>
+        </div>
+
+        <hr/>
+
+        <!-- Footer Section -->
+        <div class="footer">
+            <h4 class="footer-heading">Start selling now and unlock earnings!</h4>
+            <p class="timestamp">
+                Sent automatically by Shopyhub &bull; <span
+                    th:text="${#dates.format(#dates.createNow(), 'dd MMM yyyy, hh:mm a')}">27 May 2026, 09:10 PM</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

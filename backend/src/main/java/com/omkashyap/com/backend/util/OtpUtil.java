@@ -19,14 +19,14 @@ public class OtpUtil {
 
     log.info("{}", otp);
 
-    return encodeOtp(String.valueOf(otp));
+    return String.valueOf(otp);
   }
 
   public boolean decodeOtp(String otp, String hashedOtp) {
     return BCrypt.checkpw(otp, hashedOtp);
   }
 
-  private String encodeOtp(String otp) {
+  public String encodeOtp(String otp) {
     return BCrypt.hashpw(otp, BCrypt.gensalt());
   }
 

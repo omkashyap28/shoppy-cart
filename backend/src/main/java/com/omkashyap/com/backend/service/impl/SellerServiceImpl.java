@@ -12,6 +12,7 @@ import com.omkashyap.com.backend.repository.*;
 import com.omkashyap.com.backend.service.SellerService;
 import com.omkashyap.com.backend.type.CategoryEnum;
 import com.omkashyap.com.backend.type.RoleEnum;
+import com.omkashyap.com.backend.util.EmailUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -31,6 +32,7 @@ public class SellerServiceImpl implements SellerService {
   private final ShopAddressRepository shopAddressRepository;
   private final SellerVerificationRepository sellerVerificationRepository;
   private final SellerBankRepository sellerBankRepository;
+  private final EmailUtil emailUtil;
 
   @Override
   @Transactional
@@ -84,6 +86,12 @@ public class SellerServiceImpl implements SellerService {
     user.getRoles().add(role);
 
     Seller savedSeller = sellerRepository.save(seller);
+
+    emailUtil.sendSellerWelcomeEmail(
+        user.getEmail(),
+        seller.getShopName(),
+        seller.getSellerId()
+    );
 
     return modelMapper.map(savedSeller, SellerResponseDto.class);
   }

@@ -1,7 +1,10 @@
 package com.omkashyap.com.backend.service.impl;
 
 import com.omkashyap.com.backend.dto.requestDto.AffiliateProductRequestDto;
-import com.omkashyap.com.backend.dto.responseDto.*;
+import com.omkashyap.com.backend.dto.responseDto.AffiliateAllProductAnalyticsResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.AffiliateProductAnalyticsResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.AffiliateUserResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
 import com.omkashyap.com.backend.dtoMapper.ProductDtoMapper;
 import com.omkashyap.com.backend.entity.AffiliateUser;
 import com.omkashyap.com.backend.entity.AffiliateUserProduct;
@@ -13,6 +16,7 @@ import com.omkashyap.com.backend.repository.ProductRepository;
 import com.omkashyap.com.backend.repository.UserRepository;
 import com.omkashyap.com.backend.service.AffiliateUserService;
 import com.omkashyap.com.backend.util.AffiliateUtil;
+import com.omkashyap.com.backend.util.EmailUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +36,7 @@ public class AffiliateUserServiceImpl implements AffiliateUserService {
   private final ProductDtoMapper productDtoMapper;
   private final ProductRepository productRepository;
   private final AffiliateUtil affiliateUtil;
+  private final EmailUtil emailUtil;
 
   @Override
   public AffiliateUserResponseDto registerAffiliateUser(String email) {
@@ -47,6 +52,12 @@ public class AffiliateUserServiceImpl implements AffiliateUserService {
         .user(user)
         .build();
     affiliateUserRepository.save(affiliateUser);
+
+    emailUtil.sendAffiliateWelcomeEmail(
+        user.getEmail(),
+        user.getFirstName(),
+        affiliateUser.getAffiliateCode()
+    );
 
     return AffiliateUserResponseDto.builder()
         .affiliateCode(affiliateUser.getAffiliateCode())

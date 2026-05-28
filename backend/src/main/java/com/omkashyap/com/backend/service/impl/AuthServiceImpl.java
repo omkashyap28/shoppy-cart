@@ -5,7 +5,6 @@ import com.omkashyap.com.backend.dto.requestDto.SignUpRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.LoginResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.SignUpResponseDto;
 import com.omkashyap.com.backend.entity.Role;
-import com.omkashyap.com.backend.entity.Session;
 import com.omkashyap.com.backend.entity.User;
 import com.omkashyap.com.backend.repository.RoleRepository;
 import com.omkashyap.com.backend.repository.SessionRepository;
@@ -15,6 +14,7 @@ import com.omkashyap.com.backend.service.AuthService;
 import com.omkashyap.com.backend.service.SessionService;
 import com.omkashyap.com.backend.type.LoginProviderType;
 import com.omkashyap.com.backend.type.RoleEnum;
+import com.omkashyap.com.backend.util.EmailUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +43,7 @@ public class AuthServiceImpl implements AuthService {
   private String token;
   @Autowired
   private HttpServletRequest httpServletRequest;
+  private final EmailUtil emailUtil;
 
   @Override
   @Transactional
@@ -99,6 +100,8 @@ public class AuthServiceImpl implements AuthService {
     user.getRoles().add(role);
 
     userRepository.save(user);
+
+    emailUtil.sendUserWelcomeEmail(user.getEmail(), user.getFirstName(), user.getUserId());
 
     return SignUpResponseDto.builder()
         .userId(user.getUserId())

@@ -16,6 +16,7 @@ import com.omkashyap.com.backend.repository.UserWalletRepository;
 import com.omkashyap.com.backend.service.WalletService;
 import com.omkashyap.com.backend.type.PaymentStatusEnum;
 import com.omkashyap.com.backend.util.AuthHeaderUtil;
+import com.omkashyap.com.backend.util.EmailUtil;
 import com.omkashyap.com.backend.util.WalletUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -36,6 +37,7 @@ public class WalletServiceImpl implements WalletService {
   private final WalletUtil walletUtil;
   private final PaymentRepository paymentRepository;
   private final ProductRepository productRepository;
+  private final EmailUtil emailUtil;
 
   @Override
   public WalletResponseDto createUserWallet(
@@ -52,6 +54,12 @@ public class WalletServiceImpl implements WalletService {
         .build();
 
     userWalletRepository.save(userWallet);
+
+    emailUtil.sendWalletWelcomeEmail(
+        userWallet.getUser().getEmail(),
+        userWallet.getUser().getFirstName(),
+        userWallet.getWalletId()
+    );
 
     return userWalletDtoMapper.mapToWalletResponseDto(userWallet);
   }
@@ -110,6 +118,12 @@ public class WalletServiceImpl implements WalletService {
 
     if (userWallet.getCoins().equals(0L) && (userWallet.getCoins() < payment.getCoins())) {
       payment.setPaymentStatus(PaymentStatusEnum.FAILED);
+      emailUtil.sendPaymentFailEmail(
+          payment.getOrderItem().getOrder().getUser().getEmail(),
+          payment.getOrderItem().getOrderItemId(),
+          String.valueOf(payment.getAmount()),
+          payment.getTransactionId()
+      );
       throw new IllegalArgumentException("User not have sufficient coins to pay");
     }
 
@@ -157,6 +171,23 @@ public class WalletServiceImpl implements WalletService {
         paymentRepository.save(payment);
       }
     }
+
+    if (payment.getPaymentStatus().equals(PaymentStatusEnum.FAILED)) {
+      emailUtil.sendPaymentFailEmail(
+          payment.getOrderItem().getOrder().getUser().getEmail(),
+          payment.getOrderItem().getOrderItemId(),
+          String.valueOf(payment.getAmount()),
+          payment.getTransactionId()
+      );
+    } else {
+      emailUtil.sendPaymentSuccessEmail(
+          payment.getOrderItem().getOrder().getUser().getEmail(),
+          payment.getOrderItem().getOrderItemId(),
+          String.valueOf(payment.getAmount()),
+          payment.getTransactionId()
+      );
+    }
+
     return userWalletDtoMapper.mapToWalletPaymentResponseDto(payment);
   }
 }

@@ -4,17 +4,13 @@ import com.omkashyap.com.backend.dto.requestDto.PaymentRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.PaymentUpdateRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.PaymentResponseDto;
 import com.omkashyap.com.backend.dtoMapper.PaymentDtoMapper;
-import com.omkashyap.com.backend.entity.Invoice;
-import com.omkashyap.com.backend.entity.OrderItem;
-import com.omkashyap.com.backend.entity.Payment;
-import com.omkashyap.com.backend.entity.Product;
-import com.omkashyap.com.backend.repository.InvoiceRepository;
-import com.omkashyap.com.backend.repository.OrderItemRepository;
-import com.omkashyap.com.backend.repository.PaymentRepository;
-import com.omkashyap.com.backend.repository.ProductRepository;
+import com.omkashyap.com.backend.entity.*;
+import com.omkashyap.com.backend.repository.*;
 import com.omkashyap.com.backend.service.PaymentService;
+import com.omkashyap.com.backend.type.OrderStatusEnum;
 import com.omkashyap.com.backend.type.PaymentMethodEnum;
 import com.omkashyap.com.backend.type.PaymentStatusEnum;
+import com.omkashyap.com.backend.util.EmailUtil;
 import com.omkashyap.com.backend.util.PaymentUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +24,10 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 @Transactional
 public class PaymentServiceImpl implements PaymentService {
+  private final OrderStatusRepository orderStatusRepository;
   private final ProductRepository productRepository;
   private final InvoiceRepository invoiceRepository;
-
+  private final EmailUtil emailUtil;
   private final PaymentRepository paymentRepository;
   private final PaymentDtoMapper paymentDtoMapper;
   private final OrderItemRepository orderItemRepository;
@@ -76,6 +73,33 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
       }
     }
+    OrderStatus orderStatus = orderStatusRepository.findByOrderItem_OrderItemId(orderItem.getOrderItemId()).orElse(null);
+    assert orderStatus != null;
+
+    if (payment.getPaymentStatus().equals(PaymentStatusEnum.SUCCESS)) {
+      orderStatus.setOrderStatus(OrderStatusEnum.CONFIRMED);
+      emailUtil.sendOrderConfirmationEmail(
+          orderItem.getOrder().getUser().getEmail(),
+          orderItem.getOrderItemId(),
+          ""
+      );
+    } else if (payment.getPaymentStatus().equals(PaymentStatusEnum.FAILED)) {
+      orderStatus.setOrderStatus(OrderStatusEnum.CANCELLED);
+      emailUtil.sendOrderCancellationEmail(
+          orderItem.getOrder().getUser().getEmail(),
+          orderItem.getOrderItemId()
+      );
+    } else {
+      if (payment.getPaymentMethod().equals(PaymentMethodEnum.PAY_ON_DELIVERY)) {
+        orderStatus.setOrderStatus(OrderStatusEnum.CONFIRMED);
+        emailUtil.sendOrderConfirmationEmail(
+            orderItem.getOrder().getUser().getEmail(),
+            orderItem.getOrderItemId(),
+            ""
+        );
+      }
+    }
+    orderStatusRepository.save(orderStatus);
 
     return paymentDtoMapper.mapToDto(payment);
   }
