@@ -26,9 +26,12 @@ public class WebSecurityConfiguration {
         .authorizeHttpRequests(auth ->
             auth
                 .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/search/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/user/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/seller/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/product/**").permitAll()
                 .requestMatchers("/user/**").hasRole("USER")
+                .requestMatchers("/wallet/**").hasRole("USER")
                 .requestMatchers("/seller/**").hasRole("SELLER")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
