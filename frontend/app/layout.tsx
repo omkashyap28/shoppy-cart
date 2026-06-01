@@ -1,10 +1,11 @@
-import { Geist, Geist_Mono, Outfit } from "next/font/google"
+import { Geist_Mono, Inter } from "next/font/google"
 
-import "./globals.css";
-import { cn } from "@/lib/utils";
-import React from "react";
+import "./globals.css"
+import { cn } from "@/lib/utils"
+import React from "react"
+import { Container, Header } from "@/components/layout/index"
 
-const outfit = Outfit({subsets:['latin'],variable:'--font-sans'})
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
@@ -20,10 +21,18 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", outfit.variable)}
+      className={cn(
+        "antialiased",
+        fontMono.variable,
+        "font-sans",
+        inter.variable
+      )}
     >
       <body cz-shortcut-listen="true">
-        {children}
+        <Container>
+          <Header />
+          {children}
+        </Container>
       </body>
     </html>
   )
