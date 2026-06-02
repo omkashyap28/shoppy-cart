@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button"
+import { Hero } from "@/sections/index"
 
 export default function Page() {
   return (
-    <h1>
-      Hello Nextjs
-    </h1>
+    <>
+      <Hero />
+    </>
   )
 }
