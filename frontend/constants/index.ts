@@ -11,9 +11,18 @@ export const categories = [
   "Pet Supplies",
   "Office & Stationery",
   "Handmade & Eco-Friendly",
-]
+];
 export const navLinks = [
-  { href: "/seller", label: "Seller" },
-  { href: "/wallet", label: "Wallet" },
-  { href: "/orders", label: "Orders & Returns" },
-]
+  {
+    href: "/products",
+    label: "Products",
+  },
+  {
+    href: "/advertise",
+    label: "Advertise",
+  },
+  {
+    href: "/contact",
+    label: "Contact",
+  },
+];

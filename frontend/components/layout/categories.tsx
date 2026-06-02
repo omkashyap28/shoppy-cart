@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { useRef } from "react"
-import { categories } from "@/constants"
-import Link from "next/link"
-import { ChevronLeft, ChevronRight } from "lucide-react" // Or use your own SVG icons
+import { useRef } from "react";
+import { categories } from "@/constants";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react"; // Or use your own SVG icons
 
 export function Categories() {
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
-      const scrollAmount = 300 // Adjust scroll speed/distance here
+      const scrollAmount = 200;
       scrollContainerRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
-      })
+      });
     }
-  }
+  };
 
   return (
-    <div className="group relative h-10 w-full border-y border-border bg-background">
+    <div className="group relative h-8 w-full border-y border-border bg-background">
       <div className="relative flex h-full w-full items-center">
         {/* Left Scroll Button & Gradient */}
         <div className="pointer-events-none absolute top-0 left-0 z-10 flex h-full w-16 items-center bg-linear-to-r from-background to-transparent pl-2">
@@ -56,6 +56,7 @@ export function Categories() {
               .toLowerCase()
               .replace(/[^a-z0-9\s-]/g, "")
               .replaceAll(" ", "-")
+              .replaceAll("--", "-");
 
             return (
               <Link
@@ -65,10 +66,10 @@ export function Categories() {
               >
                 {category}
               </Link>
-            )
+            );
           })}
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandDialog,
@@ -11,25 +11,25 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
-import { SearchIcon } from "lucide-react"
+} from "@/components/ui/command";
+import { SearchIcon } from "lucide-react";
 
 export function Search() {
-  const [open, setOpen] = React.useState(false)
-  const [searchValue, setSearchValue] = React.useState("")
+  const [open, setOpen] = React.useState(false);
+  const [searchValue, setSearchValue] = React.useState("");
 
   React.useEffect(() => {
     window.addEventListener(
       "keydown",
       (e: KeyboardEvent) => {
         if ((e.ctrlKey && e.key === "K") || e.key === "k") {
-          e.preventDefault()
-          setOpen(true)
+          e.preventDefault();
+          setOpen(true);
         }
       },
       false
-    )
-  }, [])
+    );
+  }, []);
 
   // handle search here
 
@@ -38,7 +38,7 @@ export function Search() {
       <Button
         onClick={() => setOpen(true)}
         variant="secondary"
-        className="flex h-9! w-lg items-center justify-between px-3 max-lg:hidden"
+        className="flex h-9! w-xl items-center justify-between px-3 max-lg:hidden"
       >
         <div className="flex items-center gap-2">
           <SearchIcon />
@@ -46,7 +46,7 @@ export function Search() {
             Search products...
           </span>
         </div>
-        <span className="font-mono text-sm tracking-tighter text-neutral-500">
+        <span className="flex items-center gap-0.5 font-mono text-xs tracking-tighter text-neutral-500">
           CtrlK
         </span>
       </Button>
@@ -75,5 +75,5 @@ export function Search() {
         </Command>
       </CommandDialog>
     </div>
-  )
+  );
 }

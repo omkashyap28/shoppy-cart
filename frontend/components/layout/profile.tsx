@@ -2,11 +2,15 @@ import {
   BadgeCheckIcon,
   BellIcon,
   CreditCardIcon,
+  HeartIcon,
   LogOutIcon,
-} from "lucide-react"
+  ShoppingCart,
+  User2Icon,
+  Wallet2,
+} from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 export function Profile() {
   return (
@@ -23,7 +27,9 @@ export function Profile() {
         <Button variant="ghost" size="icon" className="rounded-full">
           <Avatar>
             <AvatarImage src="https://github.com/shadcn.png" alt="shadcn" />
-            <AvatarFallback>LR</AvatarFallback>
+            <AvatarFallback>
+              <User2Icon />
+            </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
@@ -41,6 +47,18 @@ export function Profile() {
             <BellIcon />
             Notifications
           </DropdownMenuItem>
+          <DropdownMenuItem>
+            <ShoppingCart />
+            Cart
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <HeartIcon />
+            Wishlist
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Wallet2 />
+            Wallet
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
@@ -49,5 +67,5 @@ export function Profile() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

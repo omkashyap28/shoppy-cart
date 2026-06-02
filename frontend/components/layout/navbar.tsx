@@ -14,12 +14,12 @@ import { navLinks } from "@/constants"
 export function Navbar() {
   return (
     <NavigationMenu className="hidden sm:flex">
-      <NavigationMenuList className="gap-1">
+      <NavigationMenuList>
         {navLinks.map((link) => (
           <NavigationMenuItem key={link.href}>
             <NavigationMenuLink
               asChild
-              className={`${navigationMenuTriggerStyle()} rounded-md px-3 py-1.5`}
+              className={`${navigationMenuTriggerStyle()} rounded-md px-2`}
             >
               <Link href={link.href}>{link.label}</Link>
             </NavigationMenuLink>
