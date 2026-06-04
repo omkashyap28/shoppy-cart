@@ -1,21 +1,33 @@
-import { Geist_Mono, Inter } from "next/font/google"
+import { Geist_Mono, Inter } from "next/font/google";
 
-import "./globals.css"
-import { cn } from "@/lib/utils"
-import React from "react"
-import { Container, Header } from "@/components/layout/index"
+import "./globals.css";
+import { cn } from "@/lib/utils";
+import React from "react";
+import { Metadata } from "next";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
-})
+});
+
+export const metadata: Metadata = {
+  title: {
+    template: "Shoppy Cart - %s",
+    default: "Shoppy Cart",
+  },
+  description:
+    "Online e-commerce for all end users to shop anything at anytime",
+  applicationName: "Shoppy Cart",
+  creator: "Hariom Kashyap",
+  category: "e-commerce",
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html
@@ -28,12 +40,7 @@ export default function RootLayout({
         inter.variable
       )}
     >
-      <body cz-shortcut-listen="true">
-        <Container>
-          <Header />
-          {children}
-        </Container>
-      </body>
+      <body cz-shortcut-listen="true">{children}</body>
     </html>
-  )
+  );
 }

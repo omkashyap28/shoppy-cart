@@ -124,7 +124,7 @@ export function Hero() {
               >
                 <Image
                   src={item}
-                  alt=""
+                  alt={`Banner image ${item}`}
                   fill
                   priority={idx === 0}
                   loading="eager"
