@@ -6,15 +6,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { Logo } from "@/components/layout/index";
-import Link from "next/link";
 import { Metadata } from "next";
-import { RegisterForm } from "@/forms/index";
-import { FieldDescription } from "@/components/ui/field";
+import { CreateAccountForm } from "@/forms/index";
+import { Logo } from "@/components/layout";
 
 export const metadata: Metadata = {
-  title: "Register",
-  description: "Register to shoppy cart",
+  title: "Create Profile",
+  description: "Create profile to shoppy cart",
 };
 
 export default function LoginPage() {
@@ -27,17 +25,19 @@ export default function LoginPage() {
               <CardTitle className="mb-4 text-xl">
                 <Logo />
               </CardTitle>
-              <CardDescription>Register to Shoppy Cart</CardDescription>
+              <CardDescription>
+                <h1 className="text-center text-2xl font-bold text-foreground">
+                  Create Profile
+                </h1>
+                <p className="text-center text-balance text-muted-foreground">
+                  Create your account to Shoppt Cart
+                </p>
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <RegisterForm />
+              <CreateAccountForm />
             </CardContent>
           </Card>
-          <FieldDescription className="px-6 text-center">
-            By clicking continue, you agree to our{" "}
-            <Link href="#">Terms of Service</Link> and{" "}
-            <Link href="#">Privacy Policy</Link>.
-          </FieldDescription>
         </div>
       </div>
     </div>

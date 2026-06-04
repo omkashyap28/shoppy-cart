@@ -5,7 +5,7 @@ import { Container } from "./container";
 import { Search } from "./search";
 import { Profile } from "./profile";
 import { Categories } from "./categories";
-// import {Footer} from "./footer"
+import { Footer } from "./footer";
 import { MobileMenu } from "./mobile-menu";
 
 export {
@@ -16,6 +16,6 @@ export {
   Search,
   Profile,
   Categories,
-  // Footer,
+  Footer,
   MobileMenu,
 };

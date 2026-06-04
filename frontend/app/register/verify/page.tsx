@@ -1,3 +1,5 @@
+import { Logo } from "@/components/layout";
+import { VerifyForm } from "@/forms/index";
 import {
   Card,
   CardContent,
@@ -5,17 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-import { Logo } from "@/components/layout/index";
-import Link from "next/link";
-import { Metadata } from "next";
-import { RegisterForm } from "@/forms/index";
-import { FieldDescription } from "@/components/ui/field";
-
-export const metadata: Metadata = {
-  title: "Register",
-  description: "Register to shoppy cart",
-};
 
 export default function LoginPage() {
   return (
@@ -27,17 +18,14 @@ export default function LoginPage() {
               <CardTitle className="mb-4 text-xl">
                 <Logo />
               </CardTitle>
-              <CardDescription>Register to Shoppy Cart</CardDescription>
+              <CardDescription>
+                A verification code was just sent to your email.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <RegisterForm />
+              <VerifyForm />
             </CardContent>
           </Card>
-          <FieldDescription className="px-6 text-center">
-            By clicking continue, you agree to our{" "}
-            <Link href="#">Terms of Service</Link> and{" "}
-            <Link href="#">Privacy Policy</Link>.
-          </FieldDescription>
         </div>
       </div>
     </div>
