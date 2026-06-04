@@ -74,24 +74,24 @@ export function Hero() {
         className={`pointer-events-none absolute inset-0 z-1 h-full w-full bg-black/20`}
       >
         <div className="flex h-full w-full items-center justify-center">
-          <div className="flex flex-col items-center justify-center gap-10">
-            <h1 className="font-sans text-6xl font-semibold tracking-tight text-background text-shadow-lg">
+          <div className="flex flex-col items-center justify-center max-sm:gap-16 gap-10 px-4">
+            <h1 className="md:text-6vw text-center font-sans text-4xl font-semibold tracking-tight text-background text-shadow-lg sm:text-[6vw] lg:text-8xl 2xl:text-9xl ">
               Get upto 50% off on your first order
             </h1>
-            <div className="pointer-events-auto flex items-center gap-7">
+            <div className="pointer-events-auto flex w-full items-center justify-center gap-3 max-xs:flex-col sm:gap-7">
               <Link
                 href="/"
-                className="rounded-full border-2 border-background bg-background px-5 py-2 text-xl font-semibold tracking-tight text-accent-foreground shadow-md transition-colors duration-200 hover:bg-background/90"
+                className="rounded-full border-2 border-background bg-background px-5 py-2 text-xl font-semibold tracking-tight text-accent-foreground shadow-md transition-colors duration-200 hover:bg-background/90 max-xs:w-full!"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 max-xs:justify-center max-xs:gap-3 sm:gap-3">
                   Trendings <TrendingUp className="size-5" />
                 </div>
               </Link>
               <Link
                 href="/"
-                className="from-backgroun/40 relative overflow-hidden rounded-full border-2 border-background bg-linear-120 to-background/10 px-5 py-2 text-xl font-semibold tracking-tight text-background shadow-md backdrop-blur-md transition-colors duration-200 text-shadow-md hover:bg-background hover:text-accent-foreground hover:text-shadow-none"
+                className="relative overflow-hidden rounded-full border-2 border-background bg-linear-120 from-background/30 to-background/10 px-5 py-2 text-xl font-semibold tracking-tight text-background shadow-md backdrop-blur-md transition-colors duration-200 text-shadow-md hover:bg-background hover:text-accent-foreground hover:text-shadow-none max-xs:w-full!"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 max-xs:justify-center max-xs:gap-3 sm:gap-3">
                   Shop Now
                   <ShoppingBag className="size-5" />
                 </div>
@@ -108,13 +108,13 @@ export function Hero() {
         plugins={[plugin.current]}
         onMouseEnter={() => plugin.current.stop()}
         onMouseLeave={() => plugin.current.play()}
-        className="group h-[50vh] w-full overflow-hidden md:h-[85vh]"
+        className="group h-[60vh] max-h-186 w-full overflow-hidden sm:h-[calc(100vh-96px)] md:h-[calc(100vh-96px)] 2xl:max-h-126"
       >
-        <CarouselContent className="ml-0 h-[50vh] w-full md:h-[85vh]">
+        <CarouselContent className="ml-0 h-[60vh] max-h-186 w-full sm:h-[calc(100vh-96px)] md:h-[calc(100vh-96px)] 2xl:max-h-126">
           {productImages.map((item, idx) => (
             <CarouselItem
               key={idx}
-              className="relative h-[85vh] w-full overflow-hidden"
+              className="relative h-[60vh] max-h-186 w-full overflow-hidden sm:h-[calc(100vh-96px)] md:h-[calc(100vh-96px)] 2xl:max-h-126"
             >
               <div
                 ref={(el) => {
