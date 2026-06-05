@@ -1,7 +1,6 @@
 package com.omkashyap.com.backend.service.impl;
 
 import com.omkashyap.com.backend.dto.responseDto.AuthResponseDto;
-import com.omkashyap.com.backend.dto.responseDto.LoginResponseDto;
 import com.omkashyap.com.backend.entity.Role;
 import com.omkashyap.com.backend.entity.Session;
 import com.omkashyap.com.backend.entity.User;
@@ -14,11 +13,8 @@ import com.omkashyap.com.backend.type.LoginProviderType;
 import com.omkashyap.com.backend.type.RoleEnum;
 import com.omkashyap.com.backend.util.AuthUtil;
 import com.omkashyap.com.backend.util.EmailUtil;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 

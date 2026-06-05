@@ -46,9 +46,7 @@ public class WebSecurityConfiguration {
                     authorizationEndpointConfig.baseUri("/auth/login/oauth")
                     )
                 .successHandler(auth2SuccessHandler)
-                .failureHandler((req, res, ex) -> {
-                  log.error("OAuth2 error: {}", ex.getMessage());
-                })
+                .failureHandler((req, res, ex) -> log.error("OAuth2 error: {}", ex.getMessage()))
 
         )
         .build();
