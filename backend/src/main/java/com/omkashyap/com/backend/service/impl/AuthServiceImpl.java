@@ -2,16 +2,16 @@ package com.omkashyap.com.backend.service.impl;
 
 import com.omkashyap.com.backend.dto.requestDto.LoginRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.SignUpRequestDto;
-import com.omkashyap.com.backend.dto.responseDto.LoginResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.AuthResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.SignUpResponseDto;
 import com.omkashyap.com.backend.entity.Role;
+import com.omkashyap.com.backend.entity.Session;
 import com.omkashyap.com.backend.entity.User;
 import com.omkashyap.com.backend.repository.RoleRepository;
 import com.omkashyap.com.backend.repository.SessionRepository;
 import com.omkashyap.com.backend.repository.UserRepository;
 import com.omkashyap.com.backend.security.JwtUtil;
 import com.omkashyap.com.backend.service.AuthService;
-import com.omkashyap.com.backend.service.SessionService;
 import com.omkashyap.com.backend.type.LoginProviderType;
 import com.omkashyap.com.backend.type.RoleEnum;
 import com.omkashyap.com.backend.util.EmailUtil;
@@ -26,7 +26,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 
 @Service
@@ -38,33 +37,41 @@ public class AuthServiceImpl implements AuthService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final SessionRepository sessionRepository;
-  private final SessionService sessionService;
   private final RoleRepository roleRepository;
-  private String token;
   @Autowired
   private HttpServletRequest httpServletRequest;
   private final EmailUtil emailUtil;
 
   @Override
   @Transactional
-  public LoginResponseDto login(LoginRequestDto loginRequestDto) {
+  public AuthResponseDto login(LoginRequestDto requestDto) {
 
     Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword())
+        new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword())
     );
 
     User user = (User) authentication.getPrincipal();
 
 
     if (user != null) {
-      if (authentication.isAuthenticated()) {
-        token = jwtUtil.generateAccessToken(user.getEmail());
+      if (!authentication.isAuthenticated()) {
+        throw new IllegalArgumentException("User not authenticated");
       }
+      String accessToken = jwtUtil.generateAccessToken(user.getEmail());
+      String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+
       userRepository.save(user);
       String userAgent = httpServletRequest.getHeader("User-Agent");
       String ipAddress = getClientIp(httpServletRequest);
-      sessionService.createSession(user, token, LocalDateTime.now().plusDays(1), userAgent, ipAddress, LoginProviderType.EMAIL);
-      return new LoginResponseDto(token);
+
+      Session session = Session.builder()
+          .user(user).refreshToken(refreshToken).userAgent(userAgent).ipAddress(ipAddress).provider(LoginProviderType.EMAIL).build();
+      sessionRepository.save(session);
+
+      return AuthResponseDto.builder()
+          .accessToken(accessToken)
+          .refreshToken(refreshToken)
+          .build();
     }
 
     throw new RuntimeException("Invalid credentials");
@@ -111,9 +118,42 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Transactional
-  public void logout(String token) {
-    sessionRepository.deleteByAccessToken(token);
+  public void logout(String refreshToken) {
+    Session session = sessionRepository.findByRefreshToken(refreshToken).orElse(null);
+    assert session != null;
+    session.setRevoked(false);
+    sessionRepository.save(session);
     SecurityContextHolder.clearContext();
+  }
+
+  @Override
+  public AuthResponseDto refresh(String refreshToken) {
+
+  if(!jwtUtil.isTokenValid(refreshToken)) {
+    throw new RuntimeException("Invalid refresh token");
+  }
+  if (!jwtUtil.isRefreshToken(refreshToken)) {
+      throw new RuntimeException("Token is not refresh token");
+  }
+
+  Session session = sessionRepository.findByRefreshToken(refreshToken).orElseThrow(() ->
+      new IllegalArgumentException("Refresh token not founded"));
+
+  if (session.getRevoked()) {
+    throw new RuntimeException("Refresh token has been revoked");
+  }
+
+  String email = jwtUtil.getUserEmailFromToken(refreshToken);
+  String newAccessToken = jwtUtil.generateAccessToken(email);
+  String newRefreshToken = jwtUtil.generateRefreshToken(email);
+
+  session.setRefreshToken(newAccessToken);
+    sessionRepository.save(session);
+
+    return AuthResponseDto.builder()
+        .refreshToken(newRefreshToken)
+        .accessToken(newAccessToken)
+        .build();
   }
 
 //  Seller login

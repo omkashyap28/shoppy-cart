@@ -42,6 +42,9 @@ public class WebSecurityConfiguration {
         .addFilterBefore(jwtFilterChain, UsernamePasswordAuthenticationFilter.class)
         .oauth2Login(oauth ->
             oauth
+                .authorizationEndpoint(authorizationEndpointConfig ->
+                    authorizationEndpointConfig.baseUri("/auth/login/oauth")
+                    )
                 .successHandler(auth2SuccessHandler)
                 .failureHandler((req, res, ex) -> {
                   log.error("OAuth2 error: {}", ex.getMessage());

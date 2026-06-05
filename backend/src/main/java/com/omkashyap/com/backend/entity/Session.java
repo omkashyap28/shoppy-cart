@@ -4,6 +4,7 @@ import com.omkashyap.com.backend.type.LoginProviderType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -51,8 +52,10 @@ public class Session {
   @Column(
       nullable = false
   )
-  private String accessToken;
+  private String refreshToken;
 
+  @Builder.Default
+  private Boolean revoked = false;
 
   private LocalDateTime expiresAt;
 
@@ -66,8 +69,8 @@ public class Session {
   @CreationTimestamp
   private LocalDateTime createdAt;
 
-
-  private Boolean active;
+  @UpdateTimestamp
+  private LocalDateTime updatedAt;
 
   @PrePersist
   public void initializePublicId() {
