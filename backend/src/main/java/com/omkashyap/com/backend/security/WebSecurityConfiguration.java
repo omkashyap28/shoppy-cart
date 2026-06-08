@@ -19,10 +19,12 @@ public class WebSecurityConfiguration {
 
   private final JwtFilterChain jwtFilterChain;
   private final OAuth2SuccessHandler auth2SuccessHandler;
+  private final SecurityConfiguration securityConfiguration;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
     return httpSecurity
+        .cors(cors -> cors.configurationSource(securityConfiguration.corsConfigurationSource()))
         .authorizeHttpRequests(auth ->
             auth
                 .requestMatchers("/auth/**").permitAll()
