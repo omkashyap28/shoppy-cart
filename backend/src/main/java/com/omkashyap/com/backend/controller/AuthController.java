@@ -28,27 +28,24 @@ public class AuthController {
   @PostMapping("/login")
   ResponseEntity<LoginResponseDto> login(
       @RequestBody LoginRequestDto loginRequestDto,
-      HttpServletResponse response
-  ) {
+      HttpServletResponse response) {
 
     AuthResponseDto responseDto = authService.login(loginRequestDto);
 
     Cookie cookie = new Cookie(
         "refreshToken",
-        responseDto.getRefreshToken()
-    );
+        responseDto.getRefreshToken());
     cookie.setHttpOnly(true);
     cookie.setSecure(false);
     cookie.setPath("/");
-    cookie.setMaxAge(7 * 24 * 60 * 60 * 1000);
+    cookie.setAttribute("SameSite", "Lax");
+    cookie.setMaxAge(7 * 24 * 60 * 60);
 
     response.addCookie(cookie);
 
     return ResponseEntity.ok(
         new LoginResponseDto(
-            responseDto.getAccessToken()
-        )
-    );
+            responseDto.getAccessToken()));
   }
 
   @PostMapping("/signup")
@@ -59,32 +56,28 @@ public class AuthController {
   @PostMapping("/refresh")
   ResponseEntity<LoginResponseDto> refresh(
       @CookieValue("refreshToken") String refreshToken,
-      HttpServletResponse response
-  ) {
-      AuthResponseDto authResponseDto = authService.refresh(refreshToken);
+      HttpServletResponse response) {
+    AuthResponseDto authResponseDto = authService.refresh(refreshToken);
 
-      Cookie cookie = new Cookie(
-          "refreshToken",
-          authResponseDto.getRefreshToken()
-      );
-      cookie.setHttpOnly(true);
-      cookie.setSecure(false);
-      cookie.setPath("/");
-      cookie.setMaxAge(7 * 24 * 60 * 60 * 1000);
-      response.addCookie(cookie);
+    Cookie cookie = new Cookie(
+        "refreshToken",
+        authResponseDto.getRefreshToken());
+    cookie.setHttpOnly(true);
+    cookie.setSecure(false);
+    cookie.setPath("/");
+    cookie.setAttribute("SameSite", "Lax");
+    cookie.setMaxAge(7 * 24 * 60 * 60);
+    response.addCookie(cookie);
 
     return ResponseEntity.status(HttpStatus.OK).body(
         new LoginResponseDto(
-            authResponseDto.getAccessToken()
-        )
-    );
+            authResponseDto.getAccessToken()));
   }
 
   @DeleteMapping("/logout")
   void logout(@CookieValue("refreshToken") String refreshToken) {
     authService.logout(refreshToken);
   }
-
 
   @PostMapping("/seller/register")
   ResponseEntity<SellerResponseDto> registerSeller(@Valid @RequestBody SellerRequestDto requestDto) {

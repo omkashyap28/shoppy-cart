@@ -47,11 +47,9 @@ public class AuthServiceImpl implements AuthService {
   public AuthResponseDto login(LoginRequestDto requestDto) {
 
     Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword())
-    );
+        new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword()));
 
     User user = (User) authentication.getPrincipal();
-
 
     if (user != null) {
       if (!authentication.isAuthenticated()) {
@@ -64,13 +62,18 @@ public class AuthServiceImpl implements AuthService {
       String userAgent = httpServletRequest.getHeader("User-Agent");
       String ipAddress = getClientIp(httpServletRequest);
 
-      Session session = Session.builder()
-          .user(user).refreshToken(refreshToken).userAgent(userAgent).ipAddress(ipAddress).provider(LoginProviderType.EMAIL).build();
-      sessionRepository.save(session);
+      Session session = sessionRepository.findByUserAgentAndUser_UserId(userAgent, user.getUserId())
+          .orElseGet(() -> {
+            Session newSession = Session.builder()
+                .user(user).refreshToken(refreshToken).userAgent(userAgent).ipAddress(ipAddress)
+                .provider(LoginProviderType.EMAIL).build();
+            return sessionRepository.save(newSession);
+
+          });
 
       return AuthResponseDto.builder()
           .accessToken(accessToken)
-          .refreshToken(refreshToken)
+          .refreshToken(session.getRefreshToken())
           .build();
     }
 
@@ -83,9 +86,9 @@ public class AuthServiceImpl implements AuthService {
     if (userRepository.existsByEmail(request.getEmail())) {
       throw new RuntimeException("Email already exists");
     }
-    if (userRepository.existsByContact(request.getContact())) {
-      throw new RuntimeException("Contact already exists");
-    }
+    // if (userRepository.existsByContact(request.getContact())) {
+    // throw new RuntimeException("Contact already exists");
+    // }
 
     Role role = roleRepository.findByRole(RoleEnum.ROLE_USER).orElseThrow(() -> new RuntimeException("Role not found"));
 
@@ -129,25 +132,25 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public AuthResponseDto refresh(String refreshToken) {
 
-  if(!jwtUtil.isTokenValid(refreshToken)) {
-    throw new RuntimeException("Invalid refresh token");
-  }
-  if (!jwtUtil.isRefreshToken(refreshToken)) {
+    if (!jwtUtil.isTokenValid(refreshToken)) {
+      throw new RuntimeException("Invalid refresh token");
+    }
+    if (!jwtUtil.isRefreshToken(refreshToken)) {
       throw new RuntimeException("Token is not refresh token");
-  }
+    }
 
-  Session session = sessionRepository.findByRefreshToken(refreshToken).orElseThrow(() ->
-      new IllegalArgumentException("Refresh token not founded"));
+    Session session = sessionRepository.findByRefreshToken(refreshToken)
+        .orElseThrow(() -> new IllegalArgumentException("Refresh token not founded"));
 
-  if (session.getRevoked()) {
-    throw new RuntimeException("Refresh token has been revoked");
-  }
+    if (session.getRevoked()) {
+      throw new RuntimeException("Refresh token has been revoked");
+    }
 
-  String email = jwtUtil.getUserEmailFromToken(refreshToken);
-  String newAccessToken = jwtUtil.generateAccessToken(email);
-  String newRefreshToken = jwtUtil.generateRefreshToken(email);
+    String email = jwtUtil.getUserEmailFromToken(refreshToken);
+    String newAccessToken = jwtUtil.generateAccessToken(email);
+    String newRefreshToken = jwtUtil.generateRefreshToken(email);
 
-  session.setRefreshToken(newAccessToken);
+    session.setRefreshToken(newAccessToken);
     sessionRepository.save(session);
 
     return AuthResponseDto.builder()
@@ -156,10 +159,9 @@ public class AuthServiceImpl implements AuthService {
         .build();
   }
 
-//  Seller login
+  // Seller login
 
-
-//  Helper method
+  // Helper method
 
   private String getClientIp(HttpServletRequest request) {
     String remoteAddr = request.getHeader("X-Forwarded-For");
