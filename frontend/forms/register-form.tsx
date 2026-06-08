@@ -1,33 +1,68 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components//ui/button";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import z from "zod";
+import * as React from "react";
+import { Button } from "@/components/ui/button";
 import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@/components/ui/input";
+import { registerFormSchema } from "@/schemas/index";
+import z from "zod";
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
 } from "@/components/ui/field";
-import { registerFormSchema } from "@/schemas/index";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { contextPath } from "@/lib/utils";
+import { redirect } from "next/navigation";
+import { useAppStore } from "@/store/store";
+import { Spinner } from "@/components/ui/spinner";
 
 export function RegisterForm() {
   const form = useForm({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
       email: "",
+      firstName: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
-  const onSubmit = (data: z.infer<typeof registerFormSchema>) => {
-    console.log(data);
-    redirect("/register/verify");
+  const setLoading = useAppStore(state => state.setLoading);
+  const loading = useAppStore(state => state.loading);
+
+  const onSubmit = async (data: z.infer<typeof registerFormSchema>) => {
+    setLoading(true);
+
+    const submitData = {
+      email: data.email,
+      password: data.password,
+      firstName: data.firstName,
+    };
+
+    const res = await fetch(`${contextPath}/auth/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(submitData),
+    });
+
+
+    if (!res.ok) {
+      throw new Error("Failed to create account");
+    }
+
+    form.reset({
+      email: "",
+      firstName: "",
+      password: "",
+      confirmPassword: "",
+    });
+    setLoading(false);
+    redirect("/login");
   };
 
   return (
@@ -41,23 +76,84 @@ export function RegisterForm() {
                 fill="currentColor"
               />
             </svg>
-            <span>Register with Google</span>
+            Login with Google
           </Button>
         </Field>
         <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
           Or continue with
         </FieldSeparator>
+
         <Controller
           name="email"
+          disabled={loading}
           control={form.control}
           render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
+            <Field aria-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="email">
+                Email <span className="text-destructive">*</span>
+              </FieldLabel>
               <Input
                 {...field}
                 id="email"
-                aria-invalid={fieldState.invalid}
                 placeholder="m@example.com"
+              />
+              <FieldError>
+                {fieldState.error ? fieldState.error.message : null}
+              </FieldError>
+            </Field>
+          )}
+        />
+        <Controller
+          name="firstName"
+          disabled={loading}
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field aria-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="first-name">
+                First Name <span className="text-destructive">*</span>
+              </FieldLabel>
+              <Input {...field} id="first-name" placeholder="Hariom" />
+              <FieldError>
+                {fieldState.error ? fieldState.error.message : null}
+              </FieldError>
+            </Field>
+          )}
+        />
+        <Controller
+          name="password"
+          disabled={loading}
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field aria-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="password">
+                Password <span className="text-destructive">*</span>
+              </FieldLabel>
+              <Input
+                {...field}
+                id="password"
+                type="password"
+                placeholder="password"
+              />
+              <FieldError>
+                {fieldState.error ? fieldState.error.message : null}
+              </FieldError>
+            </Field>
+          )}
+        />
+        <Controller
+          name="confirmPassword"
+          disabled={loading}
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field aria-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="confirm-password">
+                Confirm Password <span className="text-destructive">*</span>
+              </FieldLabel>
+              <Input
+                {...field}
+                id="confirm-password"
+                type="password"
+                placeholder="password"
               />
               <FieldError>
                 {fieldState.error ? fieldState.error.message : null}
@@ -67,14 +163,9 @@ export function RegisterForm() {
         />
 
         <Field>
-          <Button type="submit">Send Verification Code</Button>
-        </Field>
-        <Field>
-          <FieldDescription className="text-center">
-            Already have an account? <Link href="/login">Login</Link>
-          </FieldDescription>
+          <Button type="submit" disabled={loading} aria-disabled={loading}>{loading && <Spinner />} Register</Button>
         </Field>
       </FieldGroup>
-    </form>
+    </form >
   );
 }

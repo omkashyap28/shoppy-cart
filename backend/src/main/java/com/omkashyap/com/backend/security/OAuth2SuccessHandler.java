@@ -22,7 +22,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
   private final OAuthService authService;
 
   @Override
-  public void onAuthenticationSuccess(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Authentication authentication) throws IOException {
+  public void onAuthenticationSuccess(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+      @NonNull Authentication authentication) throws IOException {
     OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
     OAuth2User user = ((OAuth2AuthenticationToken) authentication).getPrincipal();
 
@@ -30,15 +31,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     AuthResponseDto authResponseDto = authService.handleOAuth2LoginRequest(user, registrationId);
 
-
     Cookie cookie = new Cookie(
         "refreshToken",
-        authResponseDto.getRefreshToken()
-    );
+        authResponseDto.getRefreshToken());
     cookie.setHttpOnly(true);
     cookie.setSecure(false);
     cookie.setPath("/");
-    cookie.setMaxAge(7 * 24 * 60 * 60 * 1000);
+    cookie.setMaxAge(7 * 24 * 60 * 60);
 
     response.addCookie(cookie);
 

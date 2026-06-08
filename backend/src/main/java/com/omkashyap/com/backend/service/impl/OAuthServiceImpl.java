@@ -41,13 +41,14 @@ public class OAuthServiceImpl implements OAuthService {
     String lastName = oAuth2User.getAttribute("family_name");
     String avatar = oAuth2User.getAttribute("picture");
 
-
     if (email == null) {
       throw new IllegalArgumentException("Email is not provided by OAuth provider");
     }
 
-    if (firstName == null) firstName = "User";
-    if (lastName == null) lastName = "";
+    if (firstName == null)
+      firstName = "User";
+    if (lastName == null)
+      lastName = "";
 
     User userByProvider = userRepository
         .findByProviderIdAndProviderType(providerId, providerType)
@@ -85,8 +86,7 @@ public class OAuthServiceImpl implements OAuthService {
     emailUtil.sendUserWelcomeEmail(
         finalUser.getEmail(),
         finalUser.getFirstName(),
-        finalUser.getUserId()
-    );
+        finalUser.getUserId());
 
     String accessToken = jwtUtil.generateAccessToken(finalUser.getEmail());
     String refreshToken = jwtUtil.generateRefreshToken(finalUser.getEmail());
