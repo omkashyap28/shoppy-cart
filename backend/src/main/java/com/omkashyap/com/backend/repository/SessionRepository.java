@@ -8,6 +8,6 @@ import java.util.Optional;
 public interface SessionRepository extends JpaRepository<Session, Long> {
   Optional<Session> findByRefreshToken(String refreshToken);
 
-  Optional<Session> findByUserAgentAndUser_UserId(String userAgent, String userId);
+  Optional<Session> findByUser_UserId(String userId);
 
 }

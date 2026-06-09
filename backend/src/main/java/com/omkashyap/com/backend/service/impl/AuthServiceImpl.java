@@ -62,18 +62,23 @@ public class AuthServiceImpl implements AuthService {
       String userAgent = httpServletRequest.getHeader("User-Agent");
       String ipAddress = getClientIp(httpServletRequest);
 
-      Session session = sessionRepository.findByUserAgentAndUser_UserId(userAgent, user.getUserId())
-          .orElseGet(() -> {
-            Session newSession = Session.builder()
-                .user(user).refreshToken(refreshToken).userAgent(userAgent).ipAddress(ipAddress)
-                .provider(LoginProviderType.EMAIL).build();
-            return sessionRepository.save(newSession);
+      Session session = sessionRepository.findByUser_UserId(user.getUserId()).orElse(null);
 
-          });
+      Session newSession = null;
+
+      if(session != null) {
+        session.setRefreshToken(refreshToken);
+        newSession = sessionRepository.save(session);
+      } else {
+        Session.builder()
+           .user(user).refreshToken(refreshToken).userAgent(userAgent).ipAddress(ipAddress)
+           .provider(LoginProviderType.EMAIL).build();
+       newSession = sessionRepository.save(newSession);
+      }
 
       return AuthResponseDto.builder()
           .accessToken(accessToken)
-          .refreshToken(session.getRefreshToken())
+          .refreshToken(newSession.getRefreshToken())
           .build();
     }
 
@@ -150,7 +155,7 @@ public class AuthServiceImpl implements AuthService {
     String newAccessToken = jwtUtil.generateAccessToken(email);
     String newRefreshToken = jwtUtil.generateRefreshToken(email);
 
-    session.setRefreshToken(newAccessToken);
+    session.setRefreshToken(newRefreshToken);
     sessionRepository.save(session);
 
     return AuthResponseDto.builder()
