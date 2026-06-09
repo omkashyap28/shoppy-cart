@@ -3,6 +3,8 @@ package com.omkashyap.com.backend.controller;
 import com.omkashyap.com.backend.dto.requestDto.OtpRequestDto;
 import com.omkashyap.com.backend.service.OtpService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -12,20 +14,19 @@ public class OtpController {
 
   private final OtpService otpService;
 
-  @PostMapping("/generate")
-  public String generateOtp(@RequestHeader("Authorization") String authHeader) {
+  @GetMapping("/generate")
+  public ResponseEntity<String> generateOtp(@RequestHeader("Authorization") String authHeader) {
 
-    return otpService.generateOtp(authHeader);
+    return ResponseEntity.ok(otpService.generateOtp(authHeader));
   }
 
   @PostMapping("/verify")
-  public String verifyOtp(
+  public ResponseEntity<String> verifyOtp(
       @RequestHeader("Authorization") String authHeader,
-      @RequestBody OtpRequestDto requestDto
-  ) {
+      @RequestBody OtpRequestDto requestDto) {
 
     otpService.verifyOtp(authHeader, requestDto);
 
-    return "OTP verified successfully";
+    return ResponseEntity.ok("OTP verified successfully");
   }
 }
