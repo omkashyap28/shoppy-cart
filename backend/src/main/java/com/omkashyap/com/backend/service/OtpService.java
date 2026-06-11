@@ -1,9 +1,10 @@
 package com.omkashyap.com.backend.service;
 
 import com.omkashyap.com.backend.dto.requestDto.OtpRequestDto;
+import com.omkashyap.com.backend.dto.responseDto.OtpResponseDto;
 
 public interface OtpService {
-  String generateOtp(String user);
+  OtpResponseDto generateOtp(String user);
 
-  void verifyOtp(String user, OtpRequestDto enteredOtp);
+  OtpResponseDto verifyOtp(String user, OtpRequestDto enteredOtp);
 }

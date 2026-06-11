@@ -1,6 +1,7 @@
 package com.omkashyap.com.backend.service.impl;
 
 import com.omkashyap.com.backend.dto.requestDto.OtpRequestDto;
+import com.omkashyap.com.backend.dto.responseDto.OtpResponseDto;
 import com.omkashyap.com.backend.entity.Otp;
 import com.omkashyap.com.backend.entity.User;
 import com.omkashyap.com.backend.repository.OtpRepository;
@@ -25,11 +26,10 @@ public class OtpServiceImpl implements OtpService {
   private final AuthHeaderUtil authHeaderUtil;
   private final EmailUtil emailUtil;
 
-  public String generateOtp(String authHeader) {
+  public OtpResponseDto generateOtp(String authHeader) {
 
     String email = authHeaderUtil.getEmailFromAuthHeader(authHeader);
-    User user = userRepository.findByEmail(email).orElseThrow(() ->
-        new IllegalArgumentException("User not found"));
+    User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
     Otp latest = otpRepository
         .findTopByUserOrderByCreatedAtDesc(user)
@@ -55,17 +55,18 @@ public class OtpServiceImpl implements OtpService {
 
     emailUtil.sendOtpEmail(user.getEmail(), generatedOtp);
 
-    return "Otp sent successfully";
+    return OtpResponseDto.builder()
+        .message("Otp sent successfully")
+        .build();
   }
 
-  public void verifyOtp(String authHeader, OtpRequestDto requestDto) {
+  public OtpResponseDto verifyOtp(String authHeader, OtpRequestDto requestDto) {
 
     String email = authHeaderUtil.getEmailFromAuthHeader(authHeader);
 
     Otp otp = otpRepository
         .findByUser_EmailAndVerifiedFalse(email)
-        .orElseThrow(() ->
-            new IllegalArgumentException("OTP not exists for user"));
+        .orElseThrow(() -> new IllegalArgumentException("OTP not exists for user"));
 
     if (otp.isExpired()) {
       throw new IllegalArgumentException("OTP expired");
@@ -73,10 +74,15 @@ public class OtpServiceImpl implements OtpService {
 
     boolean isValid = otpUtil.decodeOtp(requestDto.getOtp(), otp.getOtp());
 
-    if (isValid) otp.setVerified(true);
-    else throw new IllegalArgumentException("Invalid OTP");
+    if (isValid)
+      otp.setVerified(true);
+    else
+      throw new IllegalArgumentException("Invalid OTP");
     otpRepository.save(otp);
 
+    return OtpResponseDto.builder()
+        .message("Otp verified successfully")
+        .build();
   }
 
   @Scheduled(fixedRate = 600000)

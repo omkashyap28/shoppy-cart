@@ -1,6 +1,7 @@
 package com.omkashyap.com.backend.controller;
 
 import com.omkashyap.com.backend.dto.requestDto.OtpRequestDto;
+import com.omkashyap.com.backend.dto.responseDto.OtpResponseDto;
 import com.omkashyap.com.backend.service.OtpService;
 import lombok.RequiredArgsConstructor;
 
@@ -15,18 +16,16 @@ public class OtpController {
   private final OtpService otpService;
 
   @GetMapping("/generate")
-  public ResponseEntity<String> generateOtp(@RequestHeader("Authorization") String authHeader) {
+  public ResponseEntity<OtpResponseDto> generateOtp(@RequestHeader("Authorization") String authHeader) {
 
     return ResponseEntity.ok(otpService.generateOtp(authHeader));
   }
 
   @PostMapping("/verify")
-  public ResponseEntity<String> verifyOtp(
+  public ResponseEntity<OtpResponseDto> verifyOtp(
       @RequestHeader("Authorization") String authHeader,
       @RequestBody OtpRequestDto requestDto) {
 
-    otpService.verifyOtp(authHeader, requestDto);
-
-    return ResponseEntity.ok("OTP verified successfully");
+    return ResponseEntity.ok(otpService.verifyOtp(authHeader, requestDto));
   }
 }
