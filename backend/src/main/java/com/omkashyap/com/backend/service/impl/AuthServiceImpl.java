@@ -66,19 +66,21 @@ public class AuthServiceImpl implements AuthService {
 
       Session newSession = null;
 
-      if(session != null) {
+      if (session != null) {
         session.setRefreshToken(refreshToken);
         newSession = sessionRepository.save(session);
       } else {
         Session.builder()
-           .user(user).refreshToken(refreshToken).userAgent(userAgent).ipAddress(ipAddress)
-           .provider(LoginProviderType.EMAIL).build();
-       newSession = sessionRepository.save(newSession);
+            .user(user).refreshToken(refreshToken).userAgent(userAgent).ipAddress(ipAddress)
+            .provider(LoginProviderType.EMAIL).build();
+        newSession = sessionRepository.save(newSession);
       }
 
       return AuthResponseDto.builder()
           .accessToken(accessToken)
           .refreshToken(newSession.getRefreshToken())
+          .userId(user.getUserId())
+          .email(user.getEmail())
           .build();
     }
 
@@ -158,9 +160,13 @@ public class AuthServiceImpl implements AuthService {
     session.setRefreshToken(newRefreshToken);
     sessionRepository.save(session);
 
+    User user = session.getUser();
+
     return AuthResponseDto.builder()
         .refreshToken(newRefreshToken)
         .accessToken(newAccessToken)
+        .userId(user.getUserId())
+        .email(user.getEmail())
         .build();
   }
 
