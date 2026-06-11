@@ -45,7 +45,9 @@ public class AuthController {
 
     return ResponseEntity.ok(
         new LoginResponseDto(
-            responseDto.getAccessToken()));
+            responseDto.getAccessToken(),
+            responseDto.getUserId(),
+            responseDto.getEmail()));
   }
 
   @PostMapping("/signup")
@@ -71,7 +73,9 @@ public class AuthController {
 
     return ResponseEntity.status(HttpStatus.OK).body(
         new LoginResponseDto(
-            authResponseDto.getAccessToken()));
+            authResponseDto.getAccessToken(),
+            authResponseDto.getUserId(),
+            authResponseDto.getEmail()));
   }
 
   @DeleteMapping("/logout")
