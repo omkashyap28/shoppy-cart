@@ -17,38 +17,43 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Slf4j
 public class WebSecurityConfiguration {
 
-    private final JwtFilterChain jwtFilterChain;
-    private final OAuth2SuccessHandler auth2SuccessHandler;
-    private final SecurityConfiguration securityConfiguration;
+        private final JwtFilterChain jwtFilterChain;
+        private final OAuth2SuccessHandler auth2SuccessHandler;
+        private final SecurityConfiguration securityConfiguration;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
-        return httpSecurity
-                .cors(cors -> cors.configurationSource(securityConfiguration.corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/search/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/user/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/seller/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/product/**").permitAll()
-                        .requestMatchers("/user/**").hasRole("USER")
-                        .requestMatchers("/otp/**").permitAll()
-                        .requestMatchers("/wallet/**").hasRole("USER")
-                        .requestMatchers("/seller/**").hasRole("SELLER")
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
-                .addFilterBefore(jwtFilterChain, UsernamePasswordAuthenticationFilter.class)
-                .oauth2Login(oauth -> oauth
-                        .authorizationEndpoint(
-                                authorizationEndpointConfig -> authorizationEndpointConfig.baseUri("/auth/login/oauth"))
-                        .successHandler(auth2SuccessHandler)
-                        .failureHandler((req, res, ex) -> log.error("OAuth2 error: {}", ex.getMessage()))
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
+                return httpSecurity
+                                .cors(cors -> cors.configurationSource(securityConfiguration.corsConfigurationSource()))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/auth/**").permitAll()
+                                                .requestMatchers("/otp/**").permitAll()
+                                                .requestMatchers("/search/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/user/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/seller/**").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/seller/register").hasRole("USER")
+                                                .requestMatchers(HttpMethod.GET, "/product/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/affiliate").hasRole("USER")
+                                                .requestMatchers("/user/**").hasRole("USER")
+                                                .requestMatchers("/wallet/**").hasRole("USER")
+                                                .requestMatchers("/seller/**").hasRole("SELLER")
+                                                .requestMatchers("/affiliate/**").hasRole("AFFILIATE")
+                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                .anyRequest().authenticated())
+                                .formLogin(AbstractHttpConfigurer::disable)
+                                .httpBasic(AbstractHttpConfigurer::disable)
+                                .csrf(AbstractHttpConfigurer::disable)
+                                .addFilterBefore(jwtFilterChain, UsernamePasswordAuthenticationFilter.class)
+                                .oauth2Login(oauth -> oauth
+                                                .authorizationEndpoint(
+                                                                authorizationEndpointConfig -> authorizationEndpointConfig
+                                                                                .baseUri("/auth/login/oauth"))
+                                                .successHandler(auth2SuccessHandler)
+                                                .failureHandler((req, res, ex) -> log.error("OAuth2 error: {}",
+                                                                ex.getMessage()))
 
-                )
-                .build();
-    }
+                                )
+                                .build();
+        }
 
 }

@@ -13,6 +13,7 @@ import com.omkashyap.com.backend.entity.User;
 import com.omkashyap.com.backend.repository.AffiliateUserProductRepository;
 import com.omkashyap.com.backend.repository.AffiliateUserRepository;
 import com.omkashyap.com.backend.repository.ProductRepository;
+import com.omkashyap.com.backend.repository.RoleRepository;
 import com.omkashyap.com.backend.repository.UserRepository;
 import com.omkashyap.com.backend.service.AffiliateUserService;
 import com.omkashyap.com.backend.util.AffiliateUtil;
@@ -20,9 +21,12 @@ import com.omkashyap.com.backend.util.EmailUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.omkashyap.com.backend.entity.Role;
+import com.omkashyap.com.backend.type.RoleEnum;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -35,23 +39,36 @@ public class AffiliateUserServiceImpl implements AffiliateUserService {
   private final UserRepository userRepository;
   private final ProductDtoMapper productDtoMapper;
   private final ProductRepository productRepository;
+  private final RoleRepository roleRepository;
   private final AffiliateUtil affiliateUtil;
   private final EmailUtil emailUtil;
 
   @Override
   public AffiliateUserResponseDto registerAffiliateUser(String email) {
-    User user = userRepository.findByEmail(email).orElseThrow(() ->
-        new IllegalArgumentException("User not founded with this email"));
-    boolean isExists = affiliateUserRepository.existsByUser(user);
+
+    boolean isExists = affiliateUserRepository.existsByUser_Email(email);
 
     if (isExists) {
       throw new IllegalArgumentException("Affiliate account already exists");
     }
+    
+    User user = userRepository.findByEmail(email).orElseThrow(() ->
+        new IllegalArgumentException("User not founded with this email"));
+
+    Role role = roleRepository.findByRole(RoleEnum.ROLE_AFFILIATE).orElseThrow(() ->
+        new IllegalArgumentException("Role not founded"));
+
     AffiliateUser affiliateUser = AffiliateUser.builder()
         .affiliateCode(generateAffiliateCode())
         .user(user)
         .build();
     affiliateUserRepository.save(affiliateUser);
+
+    if(user.getRoles() == null) {
+        user.setRoles(new HashSet<>());
+    }
+    user.getRoles().add(role);
+    userRepository.save(user);
 
     emailUtil.sendAffiliateWelcomeEmail(
         user.getEmail(),

@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.omkashyap.com.backend.security.JwtUtil;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class AuthController {
 
   private final AuthService authService;
   private final SellerService sellerService;
+  private final JwtUtil jwtUtil;
 
   @PostMapping("/login")
   ResponseEntity<LoginResponseDto> login(
@@ -44,10 +46,13 @@ public class AuthController {
     response.addCookie(cookie);
 
     return ResponseEntity.ok(
-        new LoginResponseDto(
-            responseDto.getAccessToken(),
-            responseDto.getUserId(),
-            responseDto.getEmail()));
+        LoginResponseDto.builder()
+            .token(responseDto.getAccessToken())
+            .userId(responseDto.getUserId())
+            .email(responseDto.getEmail())
+            .sellerId(responseDto.getSellerId())
+            .affiliateCode(responseDto.getAffiliateCode())
+            .build());
   }
 
   @PostMapping("/signup")
@@ -72,25 +77,38 @@ public class AuthController {
     response.addCookie(cookie);
 
     return ResponseEntity.status(HttpStatus.OK).body(
-        new LoginResponseDto(
-            authResponseDto.getAccessToken(),
-            authResponseDto.getUserId(),
-            authResponseDto.getEmail()));
+        LoginResponseDto.builder()
+            .token(authResponseDto.getAccessToken())
+            .userId(authResponseDto.getUserId())
+            .email(authResponseDto.getEmail())
+            .sellerId(authResponseDto.getSellerId())
+            .affiliateCode(authResponseDto.getAffiliateCode())
+            .build());
   }
 
   @DeleteMapping("/logout")
-  void logout(@CookieValue("refreshToken") String refreshToken) {
+  void logout(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
+    Cookie cookie = new Cookie("refreshToken", "");
+    cookie.setHttpOnly(true);
+    cookie.setSecure(false);
+    cookie.setPath("/");
+    cookie.setAttribute("SameSite", "Lax");
+    cookie.setMaxAge(0);
+    response.addCookie(cookie);
+    
     authService.logout(refreshToken);
   }
 
   @PostMapping("/seller/register")
-  ResponseEntity<SellerResponseDto> registerSeller(@Valid @RequestBody SellerRequestDto requestDto) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.registerSeller(requestDto));
-  }
-
-  @PostMapping("/seller/login")
-  ResponseEntity<LoginResponseDto> loginSeller(@RequestBody SellerRequestDto requestDto) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.loginSeller(requestDto));
+  ResponseEntity<SellerResponseDto> registerSeller(
+    @RequestHeader("Authorization") String authHeader,
+    @Valid @RequestBody SellerRequestDto requestDto
+  ) {
+    String token = authHeader.substring(7);
+    String email = jwtUtil.getUserEmailFromToken(token);
+    return ResponseEntity.status(HttpStatus.CREATED).body(
+      sellerService.registerSeller(email, requestDto)
+    );
   }
 
 }

@@ -13,7 +13,7 @@ public interface SellerService {
 
   SellerResponseDto updatePartialSellerDetails(String sellerId, Map<String, Object> updates);
 
-  SellerResponseDto registerSeller(SellerRequestDto requestDto);
+  SellerResponseDto registerSeller(String email, SellerRequestDto requestDto);
 
   SellerResponseDto getSellerBySellerId(String sellerId);
 

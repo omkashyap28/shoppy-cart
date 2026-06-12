@@ -61,13 +61,13 @@ public class SellerServiceImpl implements SellerService {
   }
 
   @Override
-  public SellerResponseDto registerSeller(SellerRequestDto requestDto) {
+  public SellerResponseDto registerSeller(String email,SellerRequestDto requestDto) {
 
     if (sellerRepository.existsByUser_UserId(requestDto.getUserId())) {
       throw new IllegalArgumentException("Seller already exists");
     }
 
-    User user = userRepository.findByUserId(requestDto.getUserId()).orElseThrow(() -> new IllegalArgumentException("USer not exists with this id"));
+    User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("USer not exists with this id"));
     Role role = roleRepository.findByRole(RoleEnum.ROLE_SELLER).orElseThrow(() -> new RuntimeException("Role not found"));
 
     Seller seller = Seller.builder()

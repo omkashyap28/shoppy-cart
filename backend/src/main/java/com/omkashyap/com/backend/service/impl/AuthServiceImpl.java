@@ -4,12 +4,8 @@ import com.omkashyap.com.backend.dto.requestDto.LoginRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.SignUpRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.AuthResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.SignUpResponseDto;
-import com.omkashyap.com.backend.entity.Role;
-import com.omkashyap.com.backend.entity.Session;
-import com.omkashyap.com.backend.entity.User;
-import com.omkashyap.com.backend.repository.RoleRepository;
-import com.omkashyap.com.backend.repository.SessionRepository;
-import com.omkashyap.com.backend.repository.UserRepository;
+import com.omkashyap.com.backend.entity.*;
+import com.omkashyap.com.backend.repository.*;
 import com.omkashyap.com.backend.security.JwtUtil;
 import com.omkashyap.com.backend.service.AuthService;
 import com.omkashyap.com.backend.type.LoginProviderType;
@@ -18,7 +14,6 @@ import com.omkashyap.com.backend.util.EmailUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,9 +33,10 @@ public class AuthServiceImpl implements AuthService {
   private final PasswordEncoder passwordEncoder;
   private final SessionRepository sessionRepository;
   private final RoleRepository roleRepository;
-  @Autowired
-  private HttpServletRequest httpServletRequest;
+  private final HttpServletRequest httpServletRequest;
   private final EmailUtil emailUtil;
+  private final SellerRepository sellerRepository;
+  private final AffiliateUserRepository affiliateUserRepository;
 
   @Override
   @Transactional
@@ -58,29 +54,35 @@ public class AuthServiceImpl implements AuthService {
       String accessToken = jwtUtil.generateAccessToken(user.getEmail());
       String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
 
+      
       userRepository.save(user);
       String userAgent = httpServletRequest.getHeader("User-Agent");
       String ipAddress = getClientIp(httpServletRequest);
 
       Session session = sessionRepository.findByUser_UserId(user.getUserId()).orElse(null);
 
-      Session newSession = null;
+      Session latestSession;
 
       if (session != null) {
         session.setRefreshToken(refreshToken);
-        newSession = sessionRepository.save(session);
+        latestSession = sessionRepository.save(session);
       } else {
-        Session.builder()
+        Session newSession = Session.builder()
             .user(user).refreshToken(refreshToken).userAgent(userAgent).ipAddress(ipAddress)
             .provider(LoginProviderType.EMAIL).build();
-        newSession = sessionRepository.save(newSession);
+        latestSession = sessionRepository.save(newSession);
       }
+
+      Seller seller = sellerRepository.findByUser_UserId(user.getUserId()).orElse(null);
+      AffiliateUser affiliateUser = affiliateUserRepository.findByUser_UserId(user.getUserId()).orElse(null);
 
       return AuthResponseDto.builder()
           .accessToken(accessToken)
-          .refreshToken(newSession.getRefreshToken())
+          .refreshToken(latestSession.getRefreshToken())
           .userId(user.getUserId())
           .email(user.getEmail())
+          .sellerId(seller != null ? seller.getSellerId() : null)
+          .affiliateCode(affiliateUser != null ? affiliateUser.getAffiliateCode() : null)
           .build();
     }
 
@@ -131,7 +133,7 @@ public class AuthServiceImpl implements AuthService {
   public void logout(String refreshToken) {
     Session session = sessionRepository.findByRefreshToken(refreshToken).orElse(null);
     assert session != null;
-    session.setRevoked(false);
+    session.setRevoked(true);
     sessionRepository.save(session);
     SecurityContextHolder.clearContext();
   }
@@ -153,6 +155,9 @@ public class AuthServiceImpl implements AuthService {
       throw new RuntimeException("Refresh token has been revoked");
     }
 
+    Seller seller = sellerRepository.findByUser_UserId(session.getUser().getUserId()).orElse(null);
+    AffiliateUser affiliateUser = affiliateUserRepository.findByUser_UserId(session.getUser().getUserId()).orElse(null);
+        
     String email = jwtUtil.getUserEmailFromToken(refreshToken);
     String newAccessToken = jwtUtil.generateAccessToken(email);
     String newRefreshToken = jwtUtil.generateRefreshToken(email);
@@ -167,10 +172,10 @@ public class AuthServiceImpl implements AuthService {
         .accessToken(newAccessToken)
         .userId(user.getUserId())
         .email(user.getEmail())
+        .sellerId(seller != null ? seller.getSellerId() : null)
+        .affiliateCode(affiliateUser != null ? affiliateUser.getAffiliateCode() : null)
         .build();
   }
-
-  // Seller login
 
   // Helper method
 
