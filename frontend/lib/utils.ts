@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useAppStore } from "@/store/store";
+import { clear } from "console";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -9,17 +10,16 @@ export function cn(...inputs: ClassValue[]) {
 export const contextPath = "http://localhost:8080/api/v1";
 
 export async function apiFetch(url: string, options: RequestInit = {}) {
-  const { accessToken, setAccessToken, setIsAuth, setEmail, setUserId } =
-    useAppStore.getState();
+  const { accessToken } = useAppStore.getState();
 
   const makeRequest = async (token?: string) => {
     const headers = new Headers(options.headers);
 
-    if (token !== "") {
+    if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     }
 
-    const { cancel, signal } = requestTimeout();
+    const { signal } = requestTimeout();
 
     return await fetch(`${contextPath}/${url}`, {
       ...options,
@@ -29,51 +29,40 @@ export async function apiFetch(url: string, options: RequestInit = {}) {
     });
   };
 
-  if (accessToken === "") {
+  if (!accessToken) {
     try {
-      setIsAuth(false);
       const newResponse = await refreshAccessToken();
-      setAccessToken(newResponse.token);
-      setUserId(newResponse.userId);
-      setEmail(newResponse.email);
-      setIsAuth(true);
+      updateStore(newResponse);
 
       return await makeRequest(newResponse.token);
     } catch (e) {
-      setAccessToken("");
-      setUserId("");
-      setEmail("");
-      setIsAuth(false);
+      clearStore();
       throw e;
     }
   }
 
   let response = await makeRequest(accessToken);
 
-  if (response.status !== 401) {
-    return response;
-  }
+  if (response.status === 401) {
+    try {
+      const newToken = await refreshAccessTokenOnce();
+      updateStore(newToken);
+      return await makeRequest(newToken);
 
-  try {
-    const newToken = await refreshAccessTokenOnce();
-
-    setAccessToken(newToken);
-
-    return await makeRequest(newToken);
-  } catch (error) {
-    setAccessToken("");
-    setIsAuth(false);
-    if (typeof window !== "undefined") {
-      window.location.href = "/login";
+    } catch (error) {
+      clearStore();
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
+      throw error;
     }
-
-    throw error;
   }
 }
-let refreshPromise: Promise<string> | null = null;
+
+let refreshPromise: Promise<any> | null = null;
 
 async function refreshAccessToken() {
-  const { cancel, signal } = requestTimeout();
+  const { signal } = requestTimeout();
 
   try {
     const response = await fetch(`${contextPath}/auth/refresh`, {
@@ -91,6 +80,7 @@ async function refreshAccessToken() {
     if (e instanceof DOMException && e.name === "AbortError") {
       throw new Error("Server is not responding. Please try again later.");
     }
+    throw e;
   }
 }
 
@@ -110,4 +100,66 @@ export function requestTimeout(timeout: number = 15000) {
   const id = setTimeout(() => controller.abort(), timeout);
 
   return { signal, cancel: () => clearTimeout(id) };
+}
+
+export async function logout() {
+  const { signal } = requestTimeout();
+
+  try {
+    const response = await fetch(`${contextPath}/auth/logout`, {
+      method: "DELETE",
+      credentials: "include",
+      signal,
+    });
+
+    if (!response.ok) {
+      throw new Error("Logout failed");
+    }
+
+    clearStore();
+
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "AbortError") {
+      throw new Error("Server is not responding. Please try again later.");
+    }
+  }
+}
+
+export function updateStore(data: any) {
+  const {
+    setAccessToken,
+    setIsAuth,
+    setEmail,
+    setUserId,
+    setSellerId,
+    setAffiliateCode,
+  } = useAppStore.getState();
+
+  setAccessToken(data.token);
+  setUserId(data.userId);
+  setEmail(data.email);
+  setSellerId(data.sellerId || "");
+  setAffiliateCode(data.affiliateCode || "");
+  setIsAuth(true);
+}
+
+export function clearStore() {
+  const {
+    setAccessToken,
+    setIsAuth,
+    setEmail,
+    setUserId,
+    setSellerId,
+    setAffiliateCode,
+  } = useAppStore.getState();
+
+  setAccessToken("");
+  setUserId("");
+  setEmail("");
+  setSellerId("");
+  setAffiliateCode("");
+  setIsAuth(false);
 }

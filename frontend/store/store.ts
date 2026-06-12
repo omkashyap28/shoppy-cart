@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { devtools } from "zustand/middleware"
+import { devtools } from "zustand/middleware";
 
 type AppStore = {
   loading: boolean;
@@ -9,21 +9,30 @@ type AppStore = {
   userId: string;
   setUserId: (userId: string) => void;
   email: string;
-  setEmail: (email: string) => void
+  setEmail: (email: string) => void;
+  sellerId: string;
+  setSellerId: (sellerId: string) => void;
+  affiliateCode: string;
+  setAffiliateCode: (affiliateCode: string) => void;
   isAuth: boolean;
   setIsAuth: (isAuth: boolean) => void;
 };
 
-export const useAppStore = create<AppStore>()(devtools(set => ({
-  loading: false,
-  setLoading: (loading: boolean) => set({ loading }),
-  accessToken: "",
-  setAccessToken: (accessToken: string) => set({ accessToken }),
-  userId: "",
-  setUserId: (userId: string) => set({ userId }),
-  email: "",
-  setEmail: (email: string) => set({ email }),
-  isAuth: false,
-  setIsAuth: (isAuth: boolean) => set({ isAuth }),
-}))
+export const useAppStore = create<AppStore>()(
+  devtools((set) => ({
+    loading: false,
+    setLoading: (loading) => set({ loading }),
+    accessToken: "",
+    setAccessToken: (accessToken) => set({ accessToken }),
+    userId: "",
+    setUserId: (userId) => set({ userId }),
+    email: "",
+    setEmail: (email) => set({ email }),
+    sellerId: "",
+    setSellerId: (sellerId) => set({ sellerId }),
+    affiliateCode: "",
+    setAffiliateCode: (affiliateCode) => set({ affiliateCode }),
+    isAuth: false,
+    setIsAuth: (isAuth) => set({ isAuth }),
+  }))
 );
