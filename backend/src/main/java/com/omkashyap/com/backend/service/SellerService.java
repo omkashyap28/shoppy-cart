@@ -2,6 +2,7 @@ package com.omkashyap.com.backend.service;
 
 import com.omkashyap.com.backend.dto.requestDto.*;
 import com.omkashyap.com.backend.dto.responseDto.LoginResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.SellerAuthResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.SellerResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ShopAddressResponseDto;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ public interface SellerService {
 
   SellerResponseDto updatePartialSellerDetails(String sellerId, Map<String, Object> updates);
 
-  SellerResponseDto registerSeller(String email, SellerRequestDto requestDto);
+  SellerAuthResponseDto registerSeller(String email, SellerRequestDto requestDto);
 
   SellerResponseDto getSellerBySellerId(String sellerId);
 

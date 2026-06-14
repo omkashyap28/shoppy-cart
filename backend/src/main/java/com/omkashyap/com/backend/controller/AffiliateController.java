@@ -1,11 +1,7 @@
 package com.omkashyap.com.backend.controller;
 
 import com.omkashyap.com.backend.dto.requestDto.AffiliateProductRequestDto;
-import com.omkashyap.com.backend.dto.responseDto.AffiliateAllProductAnalyticsResponseDto;
-import com.omkashyap.com.backend.dto.responseDto.AffiliateProductAnalyticsResponseDto;
-import com.omkashyap.com.backend.dto.responseDto.AffiliateUserResponseDto;
-import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
-import com.omkashyap.com.backend.security.JwtUtil;
+import com.omkashyap.com.backend.dto.responseDto.*;
 import com.omkashyap.com.backend.service.AffiliateUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,15 +15,7 @@ import java.util.List;
 @RequestMapping("/affiliate")
 public class AffiliateController {
 
-  private final JwtUtil jwtUtil;
   private final AffiliateUserService affiliateUserService;
-
-  @PostMapping
-  ResponseEntity<?> registerAffiliateUser(@RequestHeader("Authorization") String authHeader) {
-    String token = authHeader.substring(7);
-    String email = jwtUtil.getUserEmailFromToken(token);
-    return ResponseEntity.status(HttpStatus.CREATED).body(affiliateUserService.registerAffiliateUser(email));
-  }
 
   @GetMapping("/{affiliateCode}")
   ResponseEntity<AffiliateUserResponseDto> getAffiliateUserById(@PathVariable String affiliateCode) {

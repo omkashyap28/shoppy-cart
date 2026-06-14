@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -51,26 +52,29 @@ public class AuthServiceImpl implements AuthService {
       if (!authentication.isAuthenticated()) {
         throw new IllegalArgumentException("User not authenticated");
       }
-      String accessToken = jwtUtil.generateAccessToken(user.getEmail());
-      String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
 
-      
+      List<String> roles = user.getRoles().stream()
+          .map(role -> role.getRole().name())
+          .toList();
+
+      String accessToken = jwtUtil.generateAccessToken(user.getEmail());
+      String refreshToken = jwtUtil.generateRefreshToken(user.getEmail(), roles);
+
       userRepository.save(user);
       String userAgent = httpServletRequest.getHeader("User-Agent");
       String ipAddress = getClientIp(httpServletRequest);
 
       Session session = sessionRepository.findByUser_UserId(user.getUserId()).orElse(null);
 
-      Session latestSession;
-
       if (session != null) {
         session.setRefreshToken(refreshToken);
-        latestSession = sessionRepository.save(session);
+        session.setUserAgent(userAgent);
+        sessionRepository.save(session);
       } else {
         Session newSession = Session.builder()
             .user(user).refreshToken(refreshToken).userAgent(userAgent).ipAddress(ipAddress)
             .provider(LoginProviderType.EMAIL).build();
-        latestSession = sessionRepository.save(newSession);
+        sessionRepository.save(newSession);
       }
 
       Seller seller = sellerRepository.findByUser_UserId(user.getUserId()).orElse(null);
@@ -78,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
 
       return AuthResponseDto.builder()
           .accessToken(accessToken)
-          .refreshToken(latestSession.getRefreshToken())
+          .refreshToken(refreshToken)
           .userId(user.getUserId())
           .email(user.getEmail())
           .sellerId(seller != null ? seller.getSellerId() : null)
@@ -148,6 +152,10 @@ public class AuthServiceImpl implements AuthService {
       throw new RuntimeException("Token is not refresh token");
     }
 
+    if (jwtUtil.isTokenExpired(refreshToken)) {
+      throw new RuntimeException("Token is expired");
+    }
+
     Session session = sessionRepository.findByRefreshToken(refreshToken)
         .orElseThrow(() -> new IllegalArgumentException("Refresh token not founded"));
 
@@ -159,8 +167,9 @@ public class AuthServiceImpl implements AuthService {
     AffiliateUser affiliateUser = affiliateUserRepository.findByUser_UserId(session.getUser().getUserId()).orElse(null);
         
     String email = jwtUtil.getUserEmailFromToken(refreshToken);
+    List<String> roles = jwtUtil.getRoles(refreshToken);
     String newAccessToken = jwtUtil.generateAccessToken(email);
-    String newRefreshToken = jwtUtil.generateRefreshToken(email);
+    String newRefreshToken = jwtUtil.generateRefreshToken(email, roles);
 
     session.setRefreshToken(newRefreshToken);
     sessionRepository.save(session);

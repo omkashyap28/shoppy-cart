@@ -5,10 +5,13 @@ import com.omkashyap.com.backend.dto.requestDto.SellerAccountRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.SellerRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.SellerVerificationRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.LoginResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.SellerAuthResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.SellerResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ShopAddressResponseDto;
+import com.omkashyap.com.backend.dtoMapper.ProductDtoMapper;
 import com.omkashyap.com.backend.entity.*;
 import com.omkashyap.com.backend.repository.*;
+import com.omkashyap.com.backend.security.JwtUtil;
 import com.omkashyap.com.backend.service.SellerService;
 import com.omkashyap.com.backend.type.CategoryEnum;
 import com.omkashyap.com.backend.type.RoleEnum;
@@ -33,6 +36,8 @@ public class SellerServiceImpl implements SellerService {
   private final SellerVerificationRepository sellerVerificationRepository;
   private final SellerBankRepository sellerBankRepository;
   private final EmailUtil emailUtil;
+  private final JwtUtil jwtUtil;
+  private final ProductDtoMapper productDtoMapper;
 
   @Override
   @Transactional
@@ -61,13 +66,13 @@ public class SellerServiceImpl implements SellerService {
   }
 
   @Override
-  public SellerResponseDto registerSeller(String email,SellerRequestDto requestDto) {
+  public SellerAuthResponseDto registerSeller(String email, SellerRequestDto requestDto) {
 
-    if (sellerRepository.existsByUser_UserId(requestDto.getUserId())) {
+    if (sellerRepository.existsByUser_Email(email)) {
       throw new IllegalArgumentException("Seller already exists");
     }
 
-    User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("USer not exists with this id"));
+    User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not exists with this id"));
     Role role = roleRepository.findByRole(RoleEnum.ROLE_SELLER).orElseThrow(() -> new RuntimeException("Role not found"));
 
     Seller seller = Seller.builder()
@@ -80,12 +85,15 @@ public class SellerServiceImpl implements SellerService {
         .isVerified(false)
         .build();
 
+    Seller savedSeller = sellerRepository.save(seller);
+
     if (user.getRoles() == null) {
       user.setRoles(new HashSet<>());
     }
     user.getRoles().add(role);
+    userRepository.save(user);
 
-    Seller savedSeller = sellerRepository.save(seller);
+    String refreshToken = jwtUtil.generateRefreshToken(user.getEmail(), user.getRoles().stream().map(userRole -> userRole.getRole().name()).toList());
 
     emailUtil.sendSellerWelcomeEmail(
         user.getEmail(),
@@ -93,7 +101,27 @@ public class SellerServiceImpl implements SellerService {
         seller.getSellerId()
     );
 
-    return modelMapper.map(savedSeller, SellerResponseDto.class);
+    return SellerAuthResponseDto.builder()
+        .refreshToken(refreshToken)
+        .sellerId(savedSeller.getSellerId())
+        .shopName(savedSeller.getShopName())
+        .description(seller.getDescription())
+        .averageRating(savedSeller.getAverageRating())
+        .ratingCount(savedSeller.getRatingCount())
+        .category(savedSeller.getCategory())
+        .products(savedSeller.getProducts().stream().map(productDtoMapper::mapToDto).toList())
+        .shopAddress(seller.getShopAddress() != null ? ShopAddressResponseDto.builder()
+            .address(savedSeller.getShopAddress().getAddress())
+            .street(savedSeller.getShopAddress().getStreet())
+            .city(savedSeller.getShopAddress().getCity())
+            .state(savedSeller.getShopAddress().getState())
+            .postalCode(savedSeller.getShopAddress().getPostalCode())
+            .country(savedSeller.getShopAddress().getCountry())
+            .build() : null
+        )
+        .isVerified(savedSeller.getIsVerified())
+        .createdAt(savedSeller.getCreatedAt())
+        .build();
   }
 
   @Override

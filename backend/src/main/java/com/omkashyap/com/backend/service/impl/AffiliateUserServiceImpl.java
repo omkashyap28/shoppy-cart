@@ -1,10 +1,7 @@
 package com.omkashyap.com.backend.service.impl;
 
 import com.omkashyap.com.backend.dto.requestDto.AffiliateProductRequestDto;
-import com.omkashyap.com.backend.dto.responseDto.AffiliateAllProductAnalyticsResponseDto;
-import com.omkashyap.com.backend.dto.responseDto.AffiliateProductAnalyticsResponseDto;
-import com.omkashyap.com.backend.dto.responseDto.AffiliateUserResponseDto;
-import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.*;
 import com.omkashyap.com.backend.dtoMapper.ProductDtoMapper;
 import com.omkashyap.com.backend.entity.AffiliateUser;
 import com.omkashyap.com.backend.entity.AffiliateUserProduct;
@@ -15,6 +12,7 @@ import com.omkashyap.com.backend.repository.AffiliateUserRepository;
 import com.omkashyap.com.backend.repository.ProductRepository;
 import com.omkashyap.com.backend.repository.RoleRepository;
 import com.omkashyap.com.backend.repository.UserRepository;
+import com.omkashyap.com.backend.security.JwtUtil;
 import com.omkashyap.com.backend.service.AffiliateUserService;
 import com.omkashyap.com.backend.util.AffiliateUtil;
 import com.omkashyap.com.backend.util.EmailUtil;
@@ -42,9 +40,10 @@ public class AffiliateUserServiceImpl implements AffiliateUserService {
   private final RoleRepository roleRepository;
   private final AffiliateUtil affiliateUtil;
   private final EmailUtil emailUtil;
+  private final JwtUtil jwtUtil;
 
   @Override
-  public AffiliateUserResponseDto registerAffiliateUser(String email) {
+  public AffiliateUserAuthResponseDto registerAffiliateUser(String email) {
 
     boolean isExists = affiliateUserRepository.existsByUser_Email(email);
 
@@ -70,13 +69,19 @@ public class AffiliateUserServiceImpl implements AffiliateUserService {
     user.getRoles().add(role);
     userRepository.save(user);
 
+    String refreshToken = jwtUtil.generateRefreshToken(email, user.getRoles().stream()
+        .map(userRole -> userRole.getRole().name())
+        .toList()
+    );
+
     emailUtil.sendAffiliateWelcomeEmail(
         user.getEmail(),
         user.getFirstName(),
         affiliateUser.getAffiliateCode()
     );
 
-    return AffiliateUserResponseDto.builder()
+    return AffiliateUserAuthResponseDto.builder()
+        .refreshToken(refreshToken)
         .affiliateCode(affiliateUser.getAffiliateCode())
         .userId(affiliateUser.getUser().getUserId())
         .build();

@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class OAuthServiceImpl implements OAuthService {
@@ -89,7 +91,7 @@ public class OAuthServiceImpl implements OAuthService {
         finalUser.getUserId());
 
     String accessToken = jwtUtil.generateAccessToken(finalUser.getEmail());
-    String refreshToken = jwtUtil.generateRefreshToken(finalUser.getEmail());
+    String refreshToken = jwtUtil.generateRefreshToken(finalUser.getEmail(), List.of("ROLE_USER"));
     String userAgent = httpServletRequest.getHeader("User-Agent");
     String ipAddress = getClientIp(httpServletRequest);
 

@@ -6,7 +6,7 @@ import com.omkashyap.com.backend.dto.responseDto.*;
 import java.util.List;
 
 public interface AffiliateUserService {
-  AffiliateUserResponseDto registerAffiliateUser(String email);
+  AffiliateUserAuthResponseDto registerAffiliateUser(String email);
 
   AffiliateUserResponseDto getAffiliateUserById(String affiliateCode);
 
