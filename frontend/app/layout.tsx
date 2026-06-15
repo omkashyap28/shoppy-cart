@@ -4,6 +4,10 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import React from "react";
 import { Metadata } from "next";
+import "../node_modules/react-pings/dist/index.css";
+import QueryProvider from "@/providers/query-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { PingsProvider } from "@/providers/pings-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -14,7 +18,7 @@ const fontMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    template: "Shoppy Cart - %s",
+    template: "%s - Shoppy Cart",
     default: "Shoppy Cart",
   },
   description:
@@ -22,6 +26,7 @@ export const metadata: Metadata = {
   applicationName: "Shoppy Cart",
   creator: "Hariom Kashyap",
   category: "e-commerce",
+  keywords: ["e-commerce", "shopping", "online", "online-shop", "shoppy-cart"]
 };
 
 export default function RootLayout({
@@ -40,7 +45,15 @@ export default function RootLayout({
         inter.variable
       )}
     >
-      <body cz-shortcut-listen="true">{children}</body>
+      <body cz-shortcut-listen="true">
+        <QueryProvider>
+          <TooltipProvider>
+            <PingsProvider>
+              {children}
+            </PingsProvider>
+          </TooltipProvider>
+        </QueryProvider>
+      </body>
     </html>
   );
 }
