@@ -1,13 +1,10 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useAppStore } from "@/store/store";
-import { clear } from "console";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-
-export const contextPath = "http://localhost:8080/api/v1";
 
 export async function apiFetch(url: string, options: RequestInit = {}) {
   const { accessToken } = useAppStore.getState();
@@ -21,7 +18,7 @@ export async function apiFetch(url: string, options: RequestInit = {}) {
 
     const { signal } = requestTimeout();
 
-    return await fetch(`${contextPath}/${url}`, {
+    return await fetch(`/api/${url}`, {
       ...options,
       credentials: "include",
       headers,
@@ -47,8 +44,14 @@ export async function apiFetch(url: string, options: RequestInit = {}) {
     try {
       const newToken = await refreshAccessTokenOnce();
       updateStore(newToken);
-      return await makeRequest(newToken);
+      response = await makeRequest(newToken.token);
 
+      if (response.status === 401) {
+        clearStore();
+        if (typeof window !== undefined) {
+          window.location.href = "/login";
+        }
+      }
     } catch (error) {
       clearStore();
       if (typeof window !== "undefined") {
@@ -57,6 +60,8 @@ export async function apiFetch(url: string, options: RequestInit = {}) {
       throw error;
     }
   }
+
+  return response;
 }
 
 let refreshPromise: Promise<any> | null = null;
@@ -65,7 +70,7 @@ async function refreshAccessToken() {
   const { signal } = requestTimeout();
 
   try {
-    const response = await fetch(`${contextPath}/auth/refresh`, {
+    const response = await fetch(`/api/auth/refresh`, {
       method: "POST",
       credentials: "include",
       signal,
@@ -106,7 +111,7 @@ export async function logout() {
   const { signal } = requestTimeout();
 
   try {
-    const response = await fetch(`${contextPath}/auth/logout`, {
+    const response = await fetch(`api/auth/logout`, {
       method: "DELETE",
       credentials: "include",
       signal,
@@ -162,4 +167,26 @@ export function clearStore() {
   setSellerId("");
   setAffiliateCode("");
   setIsAuth(false);
+}
+
+export function debounce<Args extends any[]>(
+  fn: (...args: [...Args, AbortSignal]) => Promise<void>,
+  delay: number = 300
+) {
+  let timerId: ReturnType<typeof setTimeout> | undefined;
+  let controller: AbortController | undefined;
+  return function (...args: Args) {
+    if (timerId) clearTimeout(timerId);
+    controller?.abort();
+
+    controller = new AbortController();
+    const currentController = controller;
+
+    timerId = setTimeout(() => {
+      timerId = undefined;
+      fn(...args, currentController.signal).catch(err => {
+        if (err.name !== "AbortError") throw err;
+      });
+    }, delay);
+  }
 }
