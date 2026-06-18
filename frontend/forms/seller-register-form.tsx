@@ -75,7 +75,7 @@ export function SellerRegistrationForm() {
       localStorage.setItem("sellerId", responseData.sellerId);
       form.reset();
       pings.success("Shop registered successfully");
-      router.push("/seller")
+      router.push("/seller/dashboard")
     } catch (e) {
       throw e;
     } finally {

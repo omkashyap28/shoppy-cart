@@ -6,10 +6,12 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <Container>
+    <>
       <Header />
-      {children}
+      <Container>
+        {children}
+      </Container>
       <Footer />
-    </Container>
+    </>
   );
 }

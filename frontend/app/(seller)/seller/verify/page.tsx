@@ -5,28 +5,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-import { Logo } from "@/components/layout/index";
+import { Logo } from "@/components/layout";
+import { FieldDescription } from "@/components/ui/field";
 import Link from "next/link";
 import { Metadata } from "next";
-import { RegisterForm } from "@/forms/index";
-import { FieldDescription } from "@/components/ui/field";
+import { SellerVerificationForm } from "@/forms";
 
 export const metadata: Metadata = {
-  title: "Register",
-  description: "Register to shoppy cart",
+  title: "Verify Shop",
+  description: "Verify shop to create seller account",
   keywords: [
-    "Register",
+    "Verify Shop",
     "Shoppy Cart",
+    "Seller Account",
+    "Register Seller",
+    "Seller",
     "Account",
-    "Register to Shoppy Cart",
-    "Register to Account",
+    "Verify Shop",
   ],
 };
 
-export default function RegisterPage() {
+export default function SellerVerifyPage() {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
+    <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-10">
         <div className="flex flex-col gap-6">
           <Card>
@@ -34,10 +35,10 @@ export default function RegisterPage() {
               <CardTitle className="mb-4 text-xl">
                 <Logo />
               </CardTitle>
-              <CardDescription>Register to Shoppy Cart</CardDescription>
+              <CardDescription>Verify Shop</CardDescription>
             </CardHeader>
             <CardContent>
-              <RegisterForm />
+              <SellerVerificationForm />
             </CardContent>
           </Card>
           <FieldDescription className="px-6 text-center">

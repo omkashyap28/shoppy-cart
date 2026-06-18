@@ -1,6 +1,13 @@
 import { LoginForm } from "./login-form";
 import { RegisterForm } from "./register-form";
-import { CreateAccountForm } from "./create-account-form";
 import { VerifyForm } from "./verify-form";
+import { SellerRegistrationForm } from "./seller-register-form";
+import { SellerVerificationForm } from "./seller-verification-form";
 
-export { LoginForm, RegisterForm, CreateAccountForm, VerifyForm };
+export {
+  LoginForm,
+  RegisterForm,
+  VerifyForm,
+  SellerRegistrationForm,
+  SellerVerificationForm,
+};

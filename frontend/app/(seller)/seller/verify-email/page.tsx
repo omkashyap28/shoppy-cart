@@ -5,26 +5,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { LoginForm } from "@/forms";
-
 import { Logo } from "@/components/layout";
-import { FieldDescription } from "@/components/ui/field";
-import Link from "next/link";
 import { Metadata } from "next";
+import { VerifyForm } from "@/forms";
 
 export const metadata: Metadata = {
-  title: "Login - Shoppy Cart",
-  description: "Login to Shoppy Cart",
+  title: "Verify Email",
+  description: "Verify email to create seller account",
   keywords: [
-    "Login",
+    "Verify Email",
     "Shoppy Cart",
+    "Seller Account",
+    "Register Seller",
+    "Seller",
     "Account",
-    "Login to Shoppy Cart",
-    "Login to Account",
-  ]
+    "Verify Email",
+  ],
 };
 
-export default function LoginPage() {
+export default function AffiliateVerifyEmail() {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-10">
@@ -34,17 +33,12 @@ export default function LoginPage() {
               <CardTitle className="mb-4 text-xl">
                 <Logo />
               </CardTitle>
-              <CardDescription>Login to Shoppy Cart</CardDescription>
+              <CardDescription>Verify Your Email</CardDescription>
             </CardHeader>
             <CardContent>
-              <LoginForm />
+              <VerifyForm redirectUrl="seller/setup" />
             </CardContent>
           </Card>
-          <FieldDescription className="px-6 text-center">
-            By clicking continue, you agree to our{" "}
-            <Link href="#">Terms of Service</Link> and{" "}
-            <Link href="#">Privacy Policy</Link>.
-          </FieldDescription>
         </div>
       </div>
     </div>

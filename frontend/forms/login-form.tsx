@@ -15,10 +15,12 @@ import {
   FieldLabel,
   FieldSeparator,
 } from "@/components/ui/field";
-import { contextPath } from "@/lib/utils";
+import { requestTimeout, updateStore } from "@/lib/utils";
 import { redirect } from "next/navigation";
 import { useAppStore } from "@/store/store";
 import { Spinner } from "@/components/ui/spinner";
+import { usePings } from "react-pings";
+import {useRouter} from "next/navigation";
 
 export function LoginForm({ }) {
   const form = useForm<z.infer<typeof loginFormSchema>>({
@@ -29,57 +31,61 @@ export function LoginForm({ }) {
     },
   });
 
-  const setAccessToken = useAppStore((state) => state.setAccessToken)
-  const setIsAuth = useAppStore((state) => state.setIsAuth)
-  const loading = useAppStore(state => state.loading)
-  const setLoading = useAppStore(state => state.setLoading)
+  const loading = useAppStore((state) => state.loading);
+  const setLoading = useAppStore((state) => state.setLoading);
+  const pings = usePings();
+  const router = useRouter();
 
   const onSubmit = async (data: z.infer<typeof loginFormSchema>) => {
-    setLoading(true);
 
-    const formData = {
-      email: data.email,
-      password: data.password
+    try {
+      setLoading(true);
+
+      const formData = {
+        email: data.email,
+        password: data.password,
+      };
+
+      const res = await fetch(`/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
+
+      const responseData = await res.json();
+
+      if (!res.ok) {
+        pings.error(responseData.message)
+        throw new Error(`Failed to login: ${res.statusText}`);
+      }
+
+
+      if (!responseData.token) {
+        throw new Error(`Token not found`);
+      }
+
+      updateStore(responseData);
+      pings.success("Login Successfull");
+      form.reset();
+      redirect("/");
+    } catch (e) {
+      throw e;
+    } finally {
+      setLoading(false);
     }
-
-    const res = await fetch(`${contextPath}/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: "include",
-      body: JSON.stringify(formData)
-    })
-
-    const responseData = await res.json();
-
-    if (!res.ok) {
-      throw new Error(`Failed to login: ${responseData.message}`)
-    }
-
-    form.reset({
-      email: "",
-      password: ""
-    })
-
-    if (!responseData.token) {
-      throw new Error(`Token not found`);
-    }
-
-    setAccessToken(responseData.token);
-    setIsAuth(true);
-    setLoading(false);
-
-    redirect("/");
-
   };
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>
         <Field>
-          <Button variant="outline" type="button"
-            onClick={() => window.location.href = `http://localhost:8080/api/v1/auth/login/oauth/google`}
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => window.location.href = `api/auth/login/oauth/google`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
@@ -133,7 +139,9 @@ export function LoginForm({ }) {
           )}
         />
         <Field>
-          <Button type="submit" disabled={loading}>{loading && <Spinner />} Login</Button>
+          <Button type="submit" disabled={loading}>
+            {loading && <Spinner />} Login
+          </Button>
           <FieldDescription className="text-center">
             Don&apos;t have an account? <Link href="/register">Sign up</Link>
           </FieldDescription>
