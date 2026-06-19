@@ -10,8 +10,9 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandShortcut,
 } from "@/components/ui/command";
-import { History, SearchIcon, TextSearch, TrendingUp } from "lucide-react";
+import { CornerDownLeft, History, SearchIcon, TextSearch, TrendingUp } from "lucide-react";
 import { apiFetch, debounce } from "@/lib/utils";
 import { useAppStore } from "@/store/store";
 
@@ -58,21 +59,22 @@ export function Search() {
   }
 
   async function getUserSearches() {
-
     if (!userId) return;
 
-    const response = await apiFetch(`search/recent/${userId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await apiFetch(`search/recent/${userId}`);
+
+    if (!response.ok) {
+      throw new Error("Unable to fetch user recent searches")
+    }
 
     const data = await response.json();
-
-    if (data) {
-      const searchData = data.map((item: any) => item.searchText);
-      setUserSearches(searchData);
+    if (data.length > 0) {
+      setUserSearches(data.map((item: {
+        searchId: string;
+        searchText: string;
+        searchedAt: string;
+      }) => item.searchText
+      ));
     } else {
       setUserSearches([]);
     }
@@ -90,13 +92,21 @@ export function Search() {
           "Content-Type": "application/json",
         },
       });
-      const data = await response.json();
 
-      if (data) setTrendingSearches(data);
-      else setTrendingSearches([]);
+      if (!response.ok) {
+        throw new Error("Unable to fetch trending searches");
+      }
+
+      const data = await response.json();
+      if (data) {
+        setTrendingSearches(data);
+      } else {
+        setTrendingSearches([]);
+      }
     }
     getTrendingSearches();
-  }, [])
+  }, []);
+
 
   // handle search here
   const handleSearch = useMemo(() => debounce(async (query: string, signal: AbortSignal) => {
@@ -155,7 +165,7 @@ export function Search() {
                 </div>
               }>
                 <CommandItem
-                  className="cursor-pointer"
+                  className="cursor-pointer group"
                   value={`search-${searchValue}`}
                   onSelect={() => {
                     setSearchValueToUser(searchValue);
@@ -164,12 +174,15 @@ export function Search() {
                   }
                   }>
                   {searchValue}
+                  <CommandShortcut className="opacity-0 group-focus:opacity-100">
+                    <CornerDownLeft className="size-4" />
+                  </CommandShortcut>
                 </CommandItem>
                 {
                   searchResults.map((item, index) =>
                     <CommandItem
                       key={index}
-                      className="cursor-pointer"
+                      className="cursor-pointer group"
                       value={`search-${item}`}
                       onSelect={() => {
                         setOpen(false);
@@ -178,6 +191,9 @@ export function Search() {
                         setSearchValueToUser(item)
                       }}>
                       {item}
+                      <CommandShortcut className="opacity-0 group-hover:opacity-100">
+                        <CornerDownLeft className="size-4" />
+                      </CommandShortcut>
                     </CommandItem>
                   )
                 }
@@ -197,7 +213,7 @@ export function Search() {
                   userSearches.map((item, index) =>
                     <CommandItem
                       key={index}
-                      className="cursor-pointer"
+                      className="cursor-pointer group"
                       value={`recent-${item}`}
                       onSelect={() => {
                         setOpen(false);
@@ -206,6 +222,9 @@ export function Search() {
                         setSearchValueToUser(item)
                       }}>
                       {item}
+                      <CommandShortcut className="opacity-0 group-hover:opacity-100">
+                        <CornerDownLeft className="size-4" />
+                      </CommandShortcut>
                     </CommandItem>)
                 }
               </CommandGroup>
@@ -224,7 +243,7 @@ export function Search() {
                   trendingSearches.map((item, index) =>
                     <CommandItem
                       key={index}
-                      className="cursor-pointer"
+                      className="cursor-pointer group"
                       value={`trending-${item}`}
                       onSelect={() => {
                         setOpen(false);
@@ -233,6 +252,9 @@ export function Search() {
                         setSearchValueToUser(item)
                       }}>
                       {item}
+                      <CommandShortcut className="opacity-0 group-hover:opacity-100">
+                        <CornerDownLeft className="size-4" />
+                      </CommandShortcut>
                     </CommandItem>)
                 }
               </CommandGroup>
