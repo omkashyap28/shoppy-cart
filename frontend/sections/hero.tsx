@@ -48,9 +48,8 @@ export function Hero() {
       imageRefs.current.forEach((img) => {
         if (!img) return;
 
-        img.style.transform = `translate3d(${x * 40}px, ${
-          y * 40
-        }px, 0) scale(1.08)`;
+        img.style.transform = `translate3d(${x * 40}px, ${y * 40
+          }px, 0) scale(1.08)`;
       });
     });
   };
@@ -74,8 +73,8 @@ export function Hero() {
         className={`pointer-events-none absolute inset-0 z-1 h-full w-full bg-black/20`}
       >
         <div className="flex h-full w-full items-center justify-center">
-          <div className="flex flex-col items-center justify-center max-sm:gap-16 gap-10 px-4">
-            <h1 className="md:text-6vw text-center font-sans text-4xl font-semibold tracking-tight text-background text-shadow-lg sm:text-[6vw] lg:text-8xl 2xl:text-9xl ">
+          <div className="flex flex-col items-center justify-center gap-10 px-4 max-sm:gap-16">
+            <h1 className="md:text-6vw text-center font-sans text-4xl font-semibold tracking-tight text-background text-shadow-lg sm:text-[6vw] lg:text-8xl 2xl:text-9xl">
               Get upto 50% off on your first order
             </h1>
             <div className="pointer-events-auto flex w-full items-center justify-center gap-3 max-xs:flex-col sm:gap-7">

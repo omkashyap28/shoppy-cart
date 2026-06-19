@@ -1,17 +1,25 @@
 export const categories = [
   "Electronics",
-  "Fashion & Apparel",
-  "Home & Furniture",
-  "Beauty & Personal Care",
-  "Sports & Fitness",
-  "Books & Education",
-  "Grocery & Food",
+  "Fashion",
+  "Apparel",
+  "Home",
+  "Furniture",
+  "Beauty",
+  "Personal Care",
+  "Sports",
+  "Fitness",
+  "Books",
+  "Education",
+  "Grocery",
+  "Food",
   "Automotive",
-  "Baby & Kids",
+  "Baby",
+  "Kids",
   "Pet Supplies",
   "Office & Stationery",
   "Handmade & Eco-Friendly",
 ];
+
 export const navLinks = [
   {
     href: "/products",
@@ -60,38 +68,34 @@ export const footerLinksSection1 = [
 
 export const footerLinksSection2 = [
   {
-    href: "#",
+    href: "/cart",
     label: "Cart Items",
   },
   {
-    href: "#",
+    href: "/orders",
     label: "Orders",
   },
   {
-    href: "#",
+    href: "/returns",
     label: "Returns",
   },
   {
-    href: "#",
+    href: "/wallet",
     label: "Wallet",
   },
   {
-    href: "#",
-    label: "Recent Viewed",
-  },
-  {
-    href: "#",
+    href: "/track-order",
     label: "Track Order",
   },
 ];
 
 export const footerLinksSection3 = [
   {
-    href: "#",
+    href: "/seller/setup",
     label: "Seller",
   },
   {
-    href: "#",
+    href: "/affiliate/setup",
     label: "Affiliate",
   },
   {

@@ -10,6 +10,7 @@ import {
   footerLinksSection4,
 } from "@/constants";
 import React from "react";
+import { ArrowUp } from "lucide-react";
 
 export function Footer() {
   const handleClick = () => {
@@ -24,18 +25,20 @@ export function Footer() {
   };
 
   return (
-    <footer className="w-full">
-      <div className="w-full">
+    <footer className="w-full mx-auto max-w-640 px-4 py-8 sm:p-6 md:px-13 mt-18 shadow-xl bg-secondary rounded-t-4xl">
+      <div className="w-full flex items-center justify-center pb-10">
         <Button
+          variant="outline"
           onClick={handleClick}
-          className="mb-7 h-12 w-full rounded-none bg-input text-foreground hover:bg-transparent"
+          className="w-auto flex items-center gap-1.5 p-2! pr-3 rounded-full"
         >
-          Go to Top
+          <ArrowUp className="size-6" />
+          <span className="text-[15px] tracking-tighter">Back to Top</span>
         </Button>
       </div>
       <Logo />
-      <div className="py-8 md:px-5">
-        <div className="grid font-sans text-sm font-normal sm:grid-cols-2 md:grid-cols-4">
+      <div className="py-8">
+        <div className="grid font-sans text-sm font-normal sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <h4 className="mt-4 mb-2 text-[15px] font-semibold tracking-tight">
               Categories
