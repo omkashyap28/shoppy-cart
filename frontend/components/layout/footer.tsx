@@ -25,14 +25,14 @@ export function Footer() {
   };
 
   return (
-    <footer className="w-full mx-auto max-w-640 px-4 py-8 sm:p-6 md:px-13 mt-18 shadow-xl bg-secondary rounded-t-4xl">
+    <footer className="w-full mx-auto max-w-640 px-4 py-8 sm:p-6 md:px-13 mt-18 rounded-t-4xl bg-linear-120 from-background to-secondary">
       <div className="w-full flex items-center justify-center pb-10">
         <Button
           variant="outline"
           onClick={handleClick}
-          className="w-auto flex items-center gap-1.5 p-2! pr-3 rounded-full"
+          className="w-auto bg-secondary flex items-center justify-center gap-1.5 px-3 shadow-xs rounded-full"
         >
-          <ArrowUp className="size-6" />
+          <ArrowUp className="size-5" />
           <span className="text-[15px] tracking-tighter">Back to Top</span>
         </Button>
       </div>
@@ -88,7 +88,7 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-7 w-full border-t border-muted py-2 text-center text-sm font-light tracking-tight">
+        <div className="mt-7 w-full border-t border-border py-4 text-center text-sm font-light tracking-tight">
           &copy; All rights reserved for Shoppy Cart
         </div>
       </div>
