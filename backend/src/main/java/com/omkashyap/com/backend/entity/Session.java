@@ -16,67 +16,54 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(
-    indexes = {
-        @Index(name = "idx_session_userid", columnList = "user_id")
-    },
-    uniqueConstraints = {
-        @UniqueConstraint(name = "uk_session_refreshtoken", columnNames = "refresh_token"),
-        @UniqueConstraint(name = "uk_session_sessionid", columnNames = "session_id")
-    }
-)
+@Table(indexes = {
+		@Index(name = "idx_session_userid", columnList = "user_id")
+}, uniqueConstraints = {
+		@UniqueConstraint(name = "uk_session_refreshtoken", columnNames = "refresh_token"),
+		@UniqueConstraint(name = "uk_session_sessionid", columnNames = {"userId", "session_id"})
+})
 public class Session {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-  @ManyToOne(
-      fetch = FetchType.LAZY
-  )
-  @JoinColumn(
-      name = "user_id",
-      nullable = false,
-      foreignKey = @ForeignKey(
-          name = "fk_session_userid"
-      )
-  )
-  private User user;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_session_userid"))
+	private User user;
 
-  @Column(
-      nullable = false,
-      updatable = false
-  )
-  private String sessionId;
+	@Column(nullable = false, updatable = false)
+	private String sessionId;
 
-  @Column(
-      nullable = false
-  )
-  private String refreshToken;
+	@Column(nullable = false, updatable = false)
+	private String deviceId;
 
-  @Builder.Default
-  private Boolean revoked = false;
+	@Column(nullable = false, length = 500)
+	private String refreshToken;
 
-  private LocalDateTime expiresAt;
+	@Builder.Default
+	private Boolean revoked = false;
 
-  private String userAgent;
+	private LocalDateTime expiresAt;
 
-  private String ipAddress;
+	private String userAgent;
 
-  @Enumerated(EnumType.STRING)
-  private LoginProviderType provider;
+	private String ipAddress;
 
-  @CreationTimestamp
-  private LocalDateTime createdAt;
+	@Enumerated(EnumType.STRING)
+	private LoginProviderType provider;
 
-  @UpdateTimestamp
-  private LocalDateTime updatedAt;
+	@CreationTimestamp
+	private LocalDateTime createdAt;
 
-  @PrePersist
-  public void initializePublicId() {
-    if (this.sessionId == null) {
-      this.sessionId = UUID.randomUUID().toString();
-    }
-  }
+	@UpdateTimestamp
+	private LocalDateTime updatedAt;
+
+	@PrePersist
+	public void initializePublicId() {
+		if (this.sessionId == null) {
+			this.sessionId = UUID.randomUUID().toString();
+		}
+	}
 
 }

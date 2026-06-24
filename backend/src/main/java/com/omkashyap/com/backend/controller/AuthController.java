@@ -3,18 +3,24 @@ package com.omkashyap.com.backend.controller;
 import com.omkashyap.com.backend.dto.requestDto.LoginRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.SellerRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.SignUpRequestDto;
+import com.omkashyap.com.backend.dto.requestDto.ResetPasswordRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.*;
 import com.omkashyap.com.backend.service.AffiliateUserService;
 import com.omkashyap.com.backend.service.AuthService;
 import com.omkashyap.com.backend.service.SellerService;
+import com.omkashyap.com.backend.util.AuthHeaderUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.omkashyap.com.backend.security.JwtUtil;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +31,7 @@ public class AuthController {
   private final SellerService sellerService;
   private final JwtUtil jwtUtil;
   private final AffiliateUserService affiliateUserService;
+  private  final AuthHeaderUtil authHeaderUtil;
 
   @PostMapping("/login")
   ResponseEntity<LoginResponseDto> login(
@@ -42,6 +49,13 @@ public class AuthController {
     cookie.setAttribute("SameSite", "Lax");
     cookie.setMaxAge(7 * 24 * 60 * 60);
 
+    Cookie deviceCookie = new Cookie("shoppyDeviceId", responseDto.getDeviceId());
+    deviceCookie.setPath("/");
+    deviceCookie.setHttpOnly(true);
+    deviceCookie.setSecure(false);
+    deviceCookie.setAttribute("SameSite", "Lax");
+    deviceCookie.setMaxAge(30 * 24 * 60 * 60);
+
     Cookie userIdCookie = new Cookie("userId", responseDto.getUserId());
     userIdCookie.setHttpOnly(true);
     userIdCookie.setSecure(false);
@@ -57,6 +71,7 @@ public class AuthController {
     userEmailCookie.setMaxAge(7 * 24 * 60 * 60);
 
     response.addCookie(cookie);
+    response.addCookie(deviceCookie);
     response.addCookie(userIdCookie);
     response.addCookie(userEmailCookie);
 
@@ -73,6 +88,16 @@ public class AuthController {
   @PostMapping("/signup")
   ResponseEntity<SignUpResponseDto> signup(@Valid @RequestBody SignUpRequestDto signUpRequestDto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(authService.signup(signUpRequestDto));
+  }
+
+  @PatchMapping("/password/reset")
+  ResponseEntity<ResetPasswordResponseDto> resetPassword(
+      @RequestHeader("authorization") String authHeader,
+      @Valid @RequestBody ResetPasswordRequestDto requestDto
+  ) {
+
+    String email = authHeaderUtil.getEmailFromAuthHeader(authHeader);
+    return ResponseEntity.status(HttpStatus.OK).body(authService.resetPassword(email, requestDto));
   }
 
   @PostMapping("/refresh")
@@ -143,11 +168,43 @@ public class AuthController {
     cookie.setHttpOnly(true);
     cookie.setSecure(false);
     cookie.setPath("/");
-    cookie.setAttribute("SameSite", "Lax");
     cookie.setMaxAge(0);
     response.addCookie(cookie);
     
     authService.logout(refreshToken);
+  }
+
+  @DeleteMapping("/logout/all-devices")
+  ResponseEntity<Void> logoutAllSessions(@RequestHeader("Authorization") String authHeader) {
+    String email = authHeaderUtil.getEmailFromAuthHeader(authHeader);
+    authService.logoutAllSessions(email);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/logout/session/{sessionId}")
+  ResponseEntity<Void> logoutSessionBySessionId(
+      @RequestHeader("Authorization") String authHeader,
+      @PathVariable String sessionId
+  ) {
+    String email = authHeaderUtil.getEmailFromAuthHeader(authHeader);
+    authService.logoutSessionBySessionId(email, sessionId);
+    return ResponseEntity.noContent().build();
+  }
+
+  @GetMapping("/active-session")
+  ResponseEntity<List<SessionResponseDto>> getAllActiveSessions(
+      @RequestHeader("Authorization") String authHeader,
+      @CookieValue(name = "shoppyDeviceId", required = true) String deviceId
+  ) {
+    String email = authHeaderUtil.getEmailFromAuthHeader(authHeader);
+    return ResponseEntity.status(HttpStatus.OK).body(authService.getAllActiveSessions(email, deviceId));
+  }
+
+  @PostMapping("/clear-session")
+  public ResponseEntity<Void> clearSession(HttpServletResponse response) {
+    clearCookie(response, "accessToken");
+    clearCookie(response, "refreshToken");
+    return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/seller/register")
@@ -175,9 +232,9 @@ public class AuthController {
 
     Cookie otpCookie = new Cookie("otpVerified", null);
     otpCookie.setMaxAge(0);
-    cookie.setPath("/");
-    cookie.setHttpOnly(true);
-    cookie.setSecure(true);
+    otpCookie.setPath("/");
+    otpCookie.setHttpOnly(true);
+    otpCookie.setSecure(true);
 
     response.addCookie(cookie);
     response.addCookie(sellerCookie);
@@ -229,6 +286,19 @@ public class AuthController {
             .userId(responseDto.getUserId())
             .build()
     );
+  }
+
+
+  private void clearCookie(HttpServletResponse response, String name) {
+    ResponseCookie cookie = ResponseCookie.from(name, "")
+        .httpOnly(true)
+        .secure(true)
+        .path("/")
+        .maxAge(0)        // tells the browser to delete it immediately
+        .sameSite("Lax")  // match whatever you used when setting the cookie originally
+        .build();
+
+    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
   }
 
 }

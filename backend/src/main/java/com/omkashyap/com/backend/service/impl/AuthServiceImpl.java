@@ -1,8 +1,11 @@
 package com.omkashyap.com.backend.service.impl;
 
 import com.omkashyap.com.backend.dto.requestDto.LoginRequestDto;
+import com.omkashyap.com.backend.dto.requestDto.ResetPasswordRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.SignUpRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.AuthResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.ResetPasswordResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.SessionResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.SignUpResponseDto;
 import com.omkashyap.com.backend.entity.*;
 import com.omkashyap.com.backend.repository.*;
@@ -11,9 +14,11 @@ import com.omkashyap.com.backend.service.AuthService;
 import com.omkashyap.com.backend.type.LoginProviderType;
 import com.omkashyap.com.backend.type.RoleEnum;
 import com.omkashyap.com.backend.util.EmailUtil;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,9 +26,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -63,16 +71,18 @@ public class AuthServiceImpl implements AuthService {
       userRepository.save(user);
       String userAgent = httpServletRequest.getHeader("User-Agent");
       String ipAddress = getClientIp(httpServletRequest);
+      String deviceId = resolveDeviceId(httpServletRequest);
 
-      Session session = sessionRepository.findByUser_UserId(user.getUserId()).orElse(null);
+      Session session = sessionRepository.findByUser_UserIdAndDeviceId(user.getUserId(), deviceId).orElse(null);
 
       if (session != null) {
         session.setRefreshToken(refreshToken);
         session.setUserAgent(userAgent);
+        session.setRevoked(false);
         sessionRepository.save(session);
       } else {
         Session newSession = Session.builder()
-            .user(user).refreshToken(refreshToken).userAgent(userAgent).ipAddress(ipAddress)
+            .user(user).refreshToken(refreshToken).userAgent(userAgent).ipAddress(ipAddress).deviceId(deviceId)
             .provider(LoginProviderType.EMAIL).build();
         sessionRepository.save(newSession);
       }
@@ -83,6 +93,7 @@ public class AuthServiceImpl implements AuthService {
       return AuthResponseDto.builder()
           .accessToken(accessToken)
           .refreshToken(refreshToken)
+          .deviceId(deviceId)
           .userId(user.getUserId())
           .email(user.getEmail())
           .sellerId(seller != null ? seller.getSellerId() : null)
@@ -142,6 +153,10 @@ public class AuthServiceImpl implements AuthService {
     SecurityContextHolder.clearContext();
   }
 
+  public void logoutFromDevice(String sessionId) {
+
+  }
+
   @Override
   public AuthResponseDto refresh(String refreshToken) {
 
@@ -186,6 +201,56 @@ public class AuthServiceImpl implements AuthService {
         .build();
   }
 
+  @Override
+  public ResetPasswordResponseDto resetPassword(String email, ResetPasswordRequestDto requestDto) {
+    User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not exists"));
+
+    boolean isPasswordMatched = passwordEncoder.matches(requestDto.getPassword(), user.getPassword());
+    if(!isPasswordMatched) {
+      throw new IllegalArgumentException("Invalid password");
+    }
+    user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
+    userRepository.save(user);
+
+    return ResetPasswordResponseDto.builder()
+        .message("Password reset successfully")
+        .build();
+  }
+
+  @Override
+  public void logoutAllSessions(String email) {
+    List<Session> sessions = sessionRepository.findAllByUser_Email(email);
+
+    sessions.forEach(item -> {
+          item.setRevoked(true);
+          sessionRepository.save(item);
+        });
+  }
+
+  @Override
+  public void logoutSessionBySessionId(String email, String sessionId) {
+    Session session = sessionRepository.findByUser_EmailAndSessionId(email, sessionId).orElseThrow(() ->
+        new IllegalArgumentException("Session not exits"));
+    session.setRevoked(true);
+    sessionRepository.save(session);
+  }
+
+  @Override
+  public List<SessionResponseDto> getAllActiveSessions(String email, String deviceId) {
+    List<Session> sessions = sessionRepository.findAllByUser_Email(email);
+
+    log.info(deviceId);
+
+    return sessions.stream().map(session ->
+        SessionResponseDto.builder().
+            sessionId(session.getSessionId())
+            .deviceInformation(session.getUserAgent())
+            .isCurrent(session.getDeviceId().equals(deviceId))
+            .isActive(!session.getRevoked())
+            .build()
+        ).toList();
+  }
+
   // Helper method
 
   private String getClientIp(HttpServletRequest request) {
@@ -194,5 +259,20 @@ public class AuthServiceImpl implements AuthService {
       remoteAddr = request.getRemoteAddr();
     }
     return remoteAddr;
+  }
+
+
+  private String resolveDeviceId(HttpServletRequest request) {
+    String deviceId = Arrays.stream(request.getCookies() != null ? request.getCookies() : new Cookie[0])
+        .filter(c -> "shoppyDeviceId".equals(c.getName()))
+        .map(Cookie::getValue)
+        .findFirst()
+        .orElse(null);
+
+    if (deviceId == null) {
+      deviceId = UUID.randomUUID().toString();
+    }
+
+    return deviceId;
   }
 }
