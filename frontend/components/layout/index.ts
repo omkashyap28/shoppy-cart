@@ -9,7 +9,9 @@ import { Footer } from "./footer";
 import { MobileMenu } from "./mobile-menu";
 import { Heading2 } from "./heading-2";
 import { Heading3 } from "./heading-3";
-import { Auth } from "./auth"
+import { Auth } from "./auth";
+import { BackButton } from "./back-btn";
+import { CopyButton } from "./copy-btn";
 
 export {
   Header,
@@ -23,5 +25,7 @@ export {
   MobileMenu,
   Heading2,
   Heading3,
-  Auth
+  Auth,
+  CopyButton,
+  BackButton,
 };
