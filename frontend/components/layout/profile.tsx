@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { apiFetch, logout } from "@/lib/utils";
 import { useAppStore } from "@/store/store";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
@@ -32,36 +31,31 @@ export function Profile() {
   const isAuth = useAppStore((state) => state.isAuth);
   const sellerId = useAppStore((state) => state.sellerId);
   const affiliateCode = useAppStore((state) => state.affiliateCode);
-  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
   const router = useRouter();
 
-  const { data } = useQuery({
-    queryKey: ["user", userId],
+  const { data } = useQuery<string>({
+    queryKey: ["user-profile", userId],
     staleTime: Infinity,
     queryFn: async () => {
       const fetchResponse = await apiFetch(`user/${userId}`);
       const data = await fetchResponse.json();
-      return data;
+      return data?.avatarUrl;
     },
-    enabled: !!userId
+    enabled: !!userId,
   });
-
-  useEffect(() => {
-    if (data?.avatarUrl) setAvatarUrl(data.avatarUrl);
-  }, [data]);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
+          variant="outline"
           size="icon"
           className="rounded-full"
           type="button"
           title="Profile"
         >
           <Avatar>
-            <AvatarImage src={avatarUrl} alt="Avatar" />
+            <AvatarImage src={data} alt="Avatar" />
             <AvatarFallback>
               <User2Icon />
             </AvatarFallback>

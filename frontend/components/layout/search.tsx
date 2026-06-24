@@ -10,40 +10,47 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandEmpty,
   CommandShortcut,
 } from "@/components/ui/command";
-import { CornerDownLeft, History, SearchIcon, TextSearch, TrendingUp } from "lucide-react";
+import {
+  CornerDownLeft,
+  History,
+  Mic,
+  SearchIcon,
+  TextSearch,
+  TrendingUp,
+} from "lucide-react";
 import { apiFetch, debounce } from "@/lib/utils";
 import { useAppStore } from "@/store/store";
 
 export function Search() {
-
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [userSearches, setUserSearches] = useState([]);
   const [trendingSearches, setTrendingSearches] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
-  const userId = useAppStore(state => state.userId);
+  const userId = useAppStore((state) => state.userId);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if ((e.ctrlKey && e.key.toLowerCase() === "k")) {
+      if (e.ctrlKey && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setOpen(true);
       }
-    }
+    };
 
     window.addEventListener("keydown", down);
 
-    return () =>
-      window.removeEventListener("keydown", down)
-
+    return () => window.removeEventListener("keydown", down);
   }, []);
 
   useEffect(() => {
-    if (!searchValue.trim()) {
-      setSearchResults([]);
-    }
+    (() => {
+      if (!searchValue.trim()) {
+        setSearchResults([]);
+      }
+    })();
   }, [searchValue]);
 
   const setSearchValueToUser = async (value: string) => {
@@ -52,11 +59,11 @@ export function Search() {
     await apiFetch(`search?query=${value}&userId=${userId}`, {
       headers: {
         "Content-Type": "application/json",
-      }
+      },
     });
 
     getUserSearches();
-  }
+  };
 
   async function getUserSearches() {
     if (!userId) return;
@@ -64,17 +71,20 @@ export function Search() {
     const response = await apiFetch(`search/recent/${userId}`);
 
     if (!response.ok) {
-      throw new Error("Unable to fetch user recent searches")
+      throw new Error("Unable to fetch user recent searches");
     }
 
     const data = await response.json();
     if (data.length > 0) {
-      setUserSearches(data.map((item: {
-        searchId: string;
-        searchText: string;
-        searchedAt: string;
-      }) => item.searchText
-      ));
+      setUserSearches(
+        data.map(
+          (item: {
+            searchId: string;
+            searchText: string;
+            searchedAt: string;
+          }) => item.searchText
+        )
+      );
     } else {
       setUserSearches([]);
     }
@@ -107,17 +117,23 @@ export function Search() {
     getTrendingSearches();
   }, []);
 
-
   // handle search here
-  const handleSearch = useMemo(() => debounce(async (query: string, signal: AbortSignal) => {
-    if (!searchValue) return;
-    const response = await apiFetch(`search/autocomplete?keyword=${query}`, {
-      signal,
-    });
+  const handleSearch = useMemo(
+    () =>
+      debounce(async (query: string, signal: AbortSignal) => {
+        if (!searchValue) return;
+        const response = await apiFetch(
+          `search/autocomplete?keyword=${query}`,
+          {
+            signal,
+          }
+        );
 
-    const data = await response.json();
-    setSearchResults(data);
-  }, 400), []);
+        const data = await response.json();
+        setSearchResults(data);
+      }, 400),
+    []
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -128,8 +144,10 @@ export function Search() {
       >
         <div className="flex items-center gap-2">
           <SearchIcon />
-          <span className="text-sm font-normal tracking-normal text-input-muted">
-            {!searchValue ? `Search products, brands, categories...` : searchValue}
+          <span className="text-input-muted text-sm font-normal tracking-normal">
+            {!searchValue
+              ? `Search products, brands, categories...`
+              : searchValue}
           </span>
         </div>
         <kbd className="flex items-center gap-0.5 font-mono text-xs tracking-tighter text-neutral-500">
@@ -145,120 +163,129 @@ export function Search() {
       </Button>
       <CommandDialog className="md:min-w-xl" open={open} onOpenChange={setOpen}>
         <Command>
-          <CommandInput
-            className="h-12"
-            value={searchValue}
-            onValueChange={(value) => {
-              setSearchValue(value);
-              handleSearch(value);
-            }}
-            placeholder="Type something to search..."
-          />
+          <div className="relative">
+            <CommandInput
+              value={searchValue}
+              onValueChange={(value) => {
+                setSearchValue(value);
+                handleSearch(value);
+              }}
+              placeholder="Type something to search..."
+            />
+            <Button
+              variant="ghost"
+              className="absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            >
+              <Mic className="size-4.5 opacity-80" />
+            </Button>
+          </div>
 
           <CommandList className="mt-4">
-            {
-              searchValue &&
-              <CommandGroup className="py-2 border-t border-muted" heading={
-                <div className="flex items-center gap-1">
-                  <TextSearch className="size-4" />
-                  Related Results
-                </div>
-              }>
+            <CommandEmpty>No searches found.</CommandEmpty>
+            {searchValue && (
+              <CommandGroup
+                className="border-t border-muted py-2"
+                heading={
+                  <div className="flex items-center gap-1">
+                    <TextSearch className="size-4" />
+                    Related Results
+                  </div>
+                }
+              >
                 <CommandItem
-                  className="cursor-pointer group"
+                  className="group cursor-pointer"
                   value={`search-${searchValue}`}
                   onSelect={() => {
                     setSearchValueToUser(searchValue);
                     setSearchValue(searchValue);
                     setOpen(false);
-                  }
-                  }>
+                  }}
+                >
                   {searchValue}
                   <CommandShortcut className="opacity-0 group-focus:opacity-100">
                     <CornerDownLeft className="size-4" />
                   </CommandShortcut>
                 </CommandItem>
-                {
-                  searchResults.map((item, index) =>
-                    <CommandItem
-                      key={index}
-                      className="cursor-pointer group"
-                      value={`search-${item}`}
-                      onSelect={() => {
-                        setOpen(false);
-                        setSearchResults([]);
-                        setSearchValue(item);
-                        setSearchValueToUser(item)
-                      }}>
-                      {item}
-                      <CommandShortcut className="opacity-0 group-hover:opacity-100">
-                        <CornerDownLeft className="size-4" />
-                      </CommandShortcut>
-                    </CommandItem>
-                  )
-                }
+                {searchResults.map((item, index) => (
+                  <CommandItem
+                    key={index}
+                    className="group cursor-pointer"
+                    value={`search-${item}`}
+                    onSelect={() => {
+                      setOpen(false);
+                      setSearchResults([]);
+                      setSearchValue(item);
+                      setSearchValueToUser(item);
+                    }}
+                  >
+                    {item}
+                    <CommandShortcut className="opacity-0 group-hover:opacity-100">
+                      <CornerDownLeft className="size-4" />
+                    </CommandShortcut>
+                  </CommandItem>
+                ))}
               </CommandGroup>
-            }
-            {
-              userSearches.length > 0 &&
+            )}
+            {userSearches.length > 0 && (
               <CommandGroup
-                className="py-2 border-t border-muted"
+                className="border-t border-muted py-2"
                 heading={
                   <div className="flex items-center gap-1">
                     <History className="size-4" />
                     Recent Searches
                   </div>
-                }>
-                {
-                  userSearches.map((item, index) =>
-                    <CommandItem
-                      key={index}
-                      className="cursor-pointer group"
-                      value={`recent-${item}`}
-                      onSelect={() => {
-                        setOpen(false);
-                        setSearchResults([]);
-                        setSearchValue(item);
-                        setSearchValueToUser(item)
-                      }}>
-                      {item}
-                      <CommandShortcut className="opacity-0 group-hover:opacity-100">
-                        <CornerDownLeft className="size-4" />
-                      </CommandShortcut>
-                    </CommandItem>)
                 }
+              >
+                {userSearches.map((item, index) => (
+                  <CommandItem
+                    key={index}
+                    className="group cursor-pointer"
+                    value={`recent-${item}`}
+                    onSelect={() => {
+                      setOpen(false);
+                      setSearchResults([]);
+                      setSearchValue(item);
+                      setSearchValueToUser(item);
+                    }}
+                  >
+                    {item}
+                    <CommandShortcut className="opacity-0 group-hover:opacity-100">
+                      <CornerDownLeft className="size-4" />
+                    </CommandShortcut>
+                  </CommandItem>
+                ))}
               </CommandGroup>
-            }
-            {
-              trendingSearches.length > 0 &&
+            )}
+            {trendingSearches.length > 0 && (
               <CommandGroup
-                className="py-2 border-t border-muted"
+                className="border-t border-muted py-2"
                 heading={
                   <div className="flex items-center gap-1">
-                    <TrendingUp className="size-4 " />
+                    <TrendingUp className="size-4" />
                     Trendings
                   </div>
-                }>
-                {
-                  trendingSearches.map((item, index) =>
-                    <CommandItem
-                      key={index}
-                      className="cursor-pointer group"
-                      value={`trending-${item}`}
-                      onSelect={() => {
-                        setOpen(false);
-                        setSearchResults([]);
-                        setSearchValue(item);
-                        setSearchValueToUser(item)
-                      }}>
-                      {item}
-                      <CommandShortcut className="opacity-0 group-hover:opacity-100">
-                        <CornerDownLeft className="size-4" />
-                      </CommandShortcut>
-                    </CommandItem>)
                 }
+              >
+                {trendingSearches.map((item, index) => (
+                  <CommandItem
+                    key={index}
+                    className="group cursor-pointer"
+                    value={`trending-${item}`}
+                    onSelect={() => {
+                      setOpen(false);
+                      setSearchResults([]);
+                      setSearchValue(item);
+                      setSearchValueToUser(item);
+                    }}
+                  >
+                    {item}
+                    <CommandShortcut className="opacity-0 group-hover:opacity-100">
+                      <CornerDownLeft className="size-4" />
+                    </CommandShortcut>
+                  </CommandItem>
+                ))}
               </CommandGroup>
-            }
+            )}
           </CommandList>
         </Command>
       </CommandDialog>
