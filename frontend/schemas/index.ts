@@ -44,44 +44,77 @@ export const sellerRegistrationFormSchema = z.object({
     .string()
     .min(10, "Shop description must contains minimum 10 characters")
     .max(200, "Shop description must contains maximum 200 characters"),
-  category: z.enum([
-    "ELECTRONICS",
-    "FASHION",
-    "GROCERY",
-    "BOOKS",
-    "FURNITURE"
-  ])
-})
+  category: z.enum(["ELECTRONICS", "FASHION", "GROCERY", "BOOKS", "FURNITURE"]),
+});
 
 export const sellerVerificationFormSchema = z.object({
-  gstNo: z.string()
+  gstNo: z
+    .string()
     .regex(/^[0-9]{15}$/, "GST number must be exactly 15 digits")
     .min(15, "GST number must be 15 digits")
     .max(15, "GST number must be 15 digits"),
-  panNo: z.string()
+  panNo: z
+    .string()
     .regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Pan number must be exactly 10 digits")
     .min(10, "Pan number must be 10 digits")
     .max(10, "Pan number must be 10 digits"),
-})
+});
 
 export const addressFormSchema = z.object({
-  address: z.string()
+  address: z
+    .string()
     .min(10, "Address must contains minimum 10 characters")
     .max(200, "Address must contains maximum 200 characters"),
-  street: z.string()
+  street: z
+    .string()
     .min(5, "Street must contains minimum 5 characters")
     .max(100, "Street must contains maximum 100 characters"),
-  city: z.string()
+  city: z
+    .string()
     .min(3, "City must contains minimum 3 characters")
     .max(50, "City must contains maximum 50 characters"),
-  state: z.string()
+  state: z
+    .string()
     .min(3, "State must contains minimum 3 characters")
     .max(50, "State must contains maximum 50 characters"),
-  postalCode: z.string()
+  postalCode: z
+    .string()
     .regex(/^[0-9]{6}$/, "Postal code must be exactly 6 digits")
     .min(6, "Postal code must be 6 digits")
     .max(6, "Postal code must be 6 digits"),
-  country: z.string()
+  country: z
+    .string()
     .min(3, "Country must contains minimum 3 characters")
     .max(50, "Country must contains maximum 50 characters"),
-})
+});
+
+export const editUserDetails = z
+  .object({
+    firstName: z
+      .string()
+      .min(3, "First name must contains minimum 3 characters")
+      .max(50, "First name must contains maximum 50 characters"),
+    lastName: z
+      .string()
+      .min(3, "Last name must contains minimum 3 characters")
+      .max(50, "Last name must contains maximum 50 characters"),
+    contact: z
+      .string()
+      .regex(/^[6-9][0-9]{9}$/, "Contact number must be exactly 10 digits")
+      .min(10, "Contact number must be 10 digits")
+      .max(10, "Contact number must be 10 digits"),
+    gender: z.enum(["MALE", "FEMALE", "OTHER", ""]),
+    dateOfBirth: z.date().max(new Date(), "Date of birth cannot be in future"),
+  })
+  .partial();
+
+export const resetPasswordSchema = z
+  .object({
+    password: z.string().min(10, "Password must be at least 10 characters"),
+    newPassword: z.string().min(10, "Password must be at least 10 characters"),
+    confirmNewPassword: z.string().min(10, "Please confirm your password"),
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "Passwords do not match",
+    path: ["confirmNewPassword"],
+  });
