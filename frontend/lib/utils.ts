@@ -48,12 +48,14 @@ export async function apiFetch(url: string, options: RequestInit = {}) {
 
       if (response.status === 401) {
         clearStore();
+        clearCookie();
         if (typeof window !== undefined) {
           window.location.href = "/login";
         }
       }
     } catch (error) {
       clearStore();
+      clearCookie();
       if (typeof window !== "undefined") {
         window.location.href = "/login";
       }
@@ -64,9 +66,9 @@ export async function apiFetch(url: string, options: RequestInit = {}) {
   return response;
 }
 
-let refreshPromise: Promise<any> | null = null;
+let refreshPromise: Promise<unknown> | null = null;
 
-async function refreshAccessToken() {
+export async function refreshAccessToken() {
   const { signal } = requestTimeout();
 
   try {
@@ -95,11 +97,10 @@ async function refreshAccessTokenOnce() {
       refreshPromise = null;
     });
   }
-
   return refreshPromise;
 }
 
-export function requestTimeout(timeout: number = 15000) {
+export function requestTimeout(timeout: number = 60000) {
   const controller = new AbortController();
   const signal = controller.signal;
   const id = setTimeout(() => controller.abort(), timeout);
@@ -122,7 +123,6 @@ export async function logout() {
     }
 
     clearStore();
-
     if (typeof window !== "undefined") {
       window.location.href = "/login";
     }
@@ -133,7 +133,13 @@ export async function logout() {
   }
 }
 
-export function updateStore(data: any) {
+export function updateStore(data: {
+  token: string;
+  userId: string;
+  email: string;
+  sellerId?: string;
+  affiliateCode?: string;
+}) {
   const {
     setAccessToken,
     setIsAuth,
@@ -169,7 +175,11 @@ export function clearStore() {
   setIsAuth(false);
 }
 
-export function debounce<Args extends any[]>(
+async function clearCookie() {
+  await fetch("/api/auth/clear-session", { method: "POST" });
+}
+
+export function debounce<Args extends unknown[]>(
   fn: (...args: [...Args, AbortSignal]) => Promise<void>,
   delay: number = 300
 ) {
@@ -184,9 +194,9 @@ export function debounce<Args extends any[]>(
 
     timerId = setTimeout(() => {
       timerId = undefined;
-      fn(...args, currentController.signal).catch(err => {
+      fn(...args, currentController.signal).catch((err) => {
         if (err.name !== "AbortError") throw err;
       });
     }, delay);
-  }
+  };
 }
