@@ -1,24 +1,23 @@
 package com.omkashyap.com.backend.service.impl;
 
 import com.omkashyap.com.backend.dto.responseDto.AuthResponseDto;
-import com.omkashyap.com.backend.entity.Role;
-import com.omkashyap.com.backend.entity.Session;
-import com.omkashyap.com.backend.entity.User;
-import com.omkashyap.com.backend.repository.RoleRepository;
-import com.omkashyap.com.backend.repository.SessionRepository;
-import com.omkashyap.com.backend.repository.UserRepository;
+import com.omkashyap.com.backend.entity.*;
+import com.omkashyap.com.backend.repository.*;
 import com.omkashyap.com.backend.security.JwtUtil;
 import com.omkashyap.com.backend.service.OAuthService;
 import com.omkashyap.com.backend.type.LoginProviderType;
 import com.omkashyap.com.backend.type.RoleEnum;
 import com.omkashyap.com.backend.util.AuthUtil;
 import com.omkashyap.com.backend.util.EmailUtil;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +30,8 @@ public class OAuthServiceImpl implements OAuthService {
   private final RoleRepository roleRepository;
   private final EmailUtil emailUtil;
   private final SessionRepository sessionRepository;
+  private final SellerRepository sellerRepository;
+  private final AffiliateUserRepository affiliateUserRepository;
 
   @Override
   public AuthResponseDto handleOAuth2LoginRequest(OAuth2User oAuth2User, String registrationId) {
@@ -94,20 +95,34 @@ public class OAuthServiceImpl implements OAuthService {
     String refreshToken = jwtUtil.generateRefreshToken(finalUser.getEmail(), List.of("ROLE_USER"));
     String userAgent = httpServletRequest.getHeader("User-Agent");
     String ipAddress = getClientIp(httpServletRequest);
+    String deviceId = resolveDeviceId(httpServletRequest);
 
-    Session session = Session.builder()
-        .user(finalUser)
-        .refreshToken(refreshToken)
-        .userAgent(userAgent)
-        .ipAddress(ipAddress)
-        .provider(LoginProviderType.GOOGLE)
-        .build();
+    Session session = sessionRepository.findByUser_UserIdAndDeviceId(finalUser.getUserId(), deviceId).orElse(null);
 
-    sessionRepository.save(session);
+    if (session != null) {
+      session.setRefreshToken(refreshToken);
+      session.setUserAgent(userAgent);
+      session.setRevoked(false);
+      sessionRepository.save(session);
+    } else {
+      Session newSession = Session.builder()
+          .user(finalUser).refreshToken(refreshToken).userAgent(userAgent).ipAddress(ipAddress).deviceId(deviceId)
+          .provider(LoginProviderType.EMAIL).build();
+      sessionRepository.save(newSession);
+    }
+
+    Seller seller = sellerRepository.findByUser_UserId(finalUser.getUserId()).orElse(null);
+    AffiliateUser affiliateUser = affiliateUserRepository.findByUser_UserId(finalUser.getUserId()).orElse(null);
+
 
     return AuthResponseDto.builder()
-        .refreshToken(refreshToken)
         .accessToken(accessToken)
+        .refreshToken(refreshToken)
+        .deviceId(deviceId)
+        .userId(finalUser.getUserId())
+        .email(finalUser.getEmail())
+        .sellerId(seller != null ? seller.getSellerId() : null)
+        .affiliateCode(affiliateUser != null ? affiliateUser.getAffiliateCode() : null)
         .build();
   }
 
@@ -118,4 +133,19 @@ public class OAuthServiceImpl implements OAuthService {
     }
     return remoteAddr;
   }
+
+private String resolveDeviceId(HttpServletRequest request) {
+  String deviceId = Arrays.stream(request.getCookies() != null ? request.getCookies() : new Cookie[0])
+      .filter(c -> "shoppyDeviceId".equals(c.getName()))
+      .map(Cookie::getValue)
+      .findFirst()
+      .orElse(null);
+
+  if (deviceId == null) {
+    deviceId = UUID.randomUUID().toString();
+  }
+
+  return deviceId;
+}
+
 }
