@@ -206,7 +206,7 @@ public class AuthServiceImpl implements AuthService {
     User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not exists"));
 
     boolean isPasswordMatched = passwordEncoder.matches(requestDto.getPassword(), user.getPassword());
-    if(!isPasswordMatched) {
+    if (!isPasswordMatched) {
       throw new IllegalArgumentException("Invalid password");
     }
     user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
@@ -222,15 +222,15 @@ public class AuthServiceImpl implements AuthService {
     List<Session> sessions = sessionRepository.findAllByUser_Email(email);
 
     sessions.forEach(item -> {
-          item.setRevoked(true);
-          sessionRepository.save(item);
-        });
+      item.setRevoked(true);
+      sessionRepository.save(item);
+    });
   }
 
   @Override
   public void logoutSessionBySessionId(String email, String sessionId) {
-    Session session = sessionRepository.findByUser_EmailAndSessionId(email, sessionId).orElseThrow(() ->
-        new IllegalArgumentException("Session not exits"));
+    Session session = sessionRepository.findByUser_EmailAndSessionId(email, sessionId)
+        .orElseThrow(() -> new IllegalArgumentException("Session not exits"));
     session.setRevoked(true);
     sessionRepository.save(session);
   }
@@ -241,14 +241,11 @@ public class AuthServiceImpl implements AuthService {
 
     log.info(deviceId);
 
-    return sessions.stream().map(session ->
-        SessionResponseDto.builder().
-            sessionId(session.getSessionId())
-            .deviceInformation(session.getUserAgent())
-            .isCurrent(session.getDeviceId().equals(deviceId))
-            .isActive(!session.getRevoked())
-            .build()
-        ).toList();
+    return sessions.stream().map(session -> SessionResponseDto.builder().sessionId(session.getSessionId())
+        .deviceInformation(session.getUserAgent())
+        .isCurrent(session.getDeviceId().equals(deviceId))
+        .isActive(!session.getRevoked())
+        .build()).toList();
   }
 
   // Helper method
@@ -260,7 +257,6 @@ public class AuthServiceImpl implements AuthService {
     }
     return remoteAddr;
   }
-
 
   private String resolveDeviceId(HttpServletRequest request) {
     String deviceId = Arrays.stream(request.getCookies() != null ? request.getCookies() : new Cookie[0])
