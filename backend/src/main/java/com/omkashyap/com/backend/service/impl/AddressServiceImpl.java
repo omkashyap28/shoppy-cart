@@ -1,6 +1,5 @@
 package com.omkashyap.com.backend.service.impl;
 
-import com.omkashyap.com.backend.dto.requestDto.AddressRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.AllAddressResponseDto;
 import com.omkashyap.com.backend.entity.Address;
 import com.omkashyap.com.backend.repository.AddressRepository;
@@ -53,7 +52,7 @@ public class AddressServiceImpl implements AddressService {
           break;
         default:
           throw new IllegalStateException("Unexpected value: " + key);
-      };
+      }
       addressRepository.save(address);
     });
 

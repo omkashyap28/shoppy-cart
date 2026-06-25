@@ -21,4 +21,6 @@ public class AllAddressResponseDto {
 
   private Boolean isDefault;
 
+  private String postalCode;
+
 }

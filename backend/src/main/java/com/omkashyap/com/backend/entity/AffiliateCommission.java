@@ -36,5 +36,6 @@ public class AffiliateCommission {
   private BigDecimal commissionPercentage;
 
   @Column(nullable = false)
+  @Builder.Default
   private Boolean active = true;
 }
