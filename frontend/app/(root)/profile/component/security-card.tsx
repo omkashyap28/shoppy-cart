@@ -19,6 +19,7 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
@@ -195,6 +196,9 @@ export function SecurityCard() {
             <div className="mx-auto w-full max-w-md">
               <DrawerHeader>
                 <DrawerTitle>Change Password</DrawerTitle>
+                <DrawerDescription>
+                  Change your password
+                </DrawerDescription>
               </DrawerHeader>
               <form
                 id="resetPasswordForm"
@@ -227,15 +231,15 @@ export function SecurityCard() {
                     disabled={loading}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="confirm-password">
-                          Confirm Password
+                        <FieldLabel htmlFor="new-password">
+                          New Password
                         </FieldLabel>
                         <Input
                           {...field}
-                          // type="password"
-                          id="confirm-password"
+                          type="password"
+                          id="new-password"
                           aria-invalid={fieldState.invalid}
-                          placeholder="Confirm password"
+                          placeholder="New password"
                         />
                         <FieldError>
                           {fieldState.error ? fieldState.error.message : null}
@@ -254,7 +258,7 @@ export function SecurityCard() {
                         </FieldLabel>
                         <Input
                           {...field}
-                          // type="password"
+                          type="password"
                           id="confirm-new-password"
                           aria-invalid={fieldState.invalid}
                           placeholder="Confirm new password"
@@ -379,7 +383,7 @@ export function SecurityCard() {
                   <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
                     <AlertTriangle />
                   </AlertDialogMedia>
-                  <AlertDialogTitle>Alert</AlertDialogTitle>
+                  <AlertDialogTitle>Sign Out</AlertDialogTitle>
                   <AlertDialogDescription>
                     Are you sure to sign out from all the devices.
                   </AlertDialogDescription>
