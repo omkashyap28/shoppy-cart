@@ -153,10 +153,6 @@ public class AuthServiceImpl implements AuthService {
     SecurityContextHolder.clearContext();
   }
 
-  public void logoutFromDevice(String sessionId) {
-
-  }
-
   @Override
   public AuthResponseDto refresh(String refreshToken) {
 
