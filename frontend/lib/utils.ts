@@ -6,6 +6,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+let refreshFailed = false;
+
+interface TokenResponse {
+  token: string;
+  userId: string;
+  email: string;
+  sellerId?: string;
+  affiliateCode?: string;
+}
+
 export async function apiFetch(url: string, options: RequestInit = {}) {
   const { accessToken } = useAppStore.getState();
 
@@ -16,21 +26,24 @@ export async function apiFetch(url: string, options: RequestInit = {}) {
       headers.set("Authorization", `Bearer ${token}`);
     }
 
-    const { signal } = requestTimeout();
+    const { signal, cancel } = requestTimeout();
 
-    return await fetch(`/api/${url}`, {
-      ...options,
-      credentials: "include",
-      headers,
-      signal,
-    });
+    try {
+      return await fetch(`/api/${url}`, {
+        ...options,
+        credentials: "include",
+        headers,
+        signal,
+      });
+    } finally {
+      cancel();
+    }
   };
 
   if (!accessToken) {
     try {
       const newResponse = await refreshAccessToken();
       updateStore(newResponse);
-
       return await makeRequest(newResponse.token);
     } catch (e) {
       clearStore();
@@ -45,20 +58,7 @@ export async function apiFetch(url: string, options: RequestInit = {}) {
       const newToken = await refreshAccessTokenOnce();
       updateStore(newToken);
       response = await makeRequest(newToken.token);
-
-      if (response.status === 401) {
-        clearStore();
-        clearCookie();
-        if (typeof window !== undefined) {
-          window.location.href = "/login";
-        }
-      }
     } catch (error) {
-      clearStore();
-      clearCookie();
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
-      }
       throw error;
     }
   }
@@ -66,10 +66,10 @@ export async function apiFetch(url: string, options: RequestInit = {}) {
   return response;
 }
 
-let refreshPromise: Promise<unknown> | null = null;
+let refreshPromise: Promise<TokenResponse> | null = null;
 
-export async function refreshAccessToken() {
-  const { signal } = requestTimeout();
+export async function refreshAccessToken(): Promise<TokenResponse> {
+  const { signal, cancel } = requestTimeout();
 
   try {
     const response = await fetch(`/api/auth/refresh`, {
@@ -78,26 +78,34 @@ export async function refreshAccessToken() {
       signal,
     });
 
-    if (!response.ok) {
-      throw new Error("Refresh failed");
+    if(response.status === 401) {
+      refreshFailed = true;
+      clearStore()
+      await clearCookie()
     }
-
+    refreshFailed = false;
     return await response.json();
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") {
       throw new Error("Server is not responding. Please try again later.");
     }
     throw e;
+  } finally {
+    cancel();
   }
 }
 
-async function refreshAccessTokenOnce() {
+async function refreshAccessTokenOnce(): Promise<TokenResponse> {
+  if (refreshFailed) {
+    throw new Error("Sesison Expired");
+  }
+
   if (!refreshPromise) {
     refreshPromise = refreshAccessToken().finally(() => {
       refreshPromise = null;
     });
   }
-  return refreshPromise;
+  return await refreshPromise;
 }
 
 export function requestTimeout(timeout: number = 60000) {
@@ -109,7 +117,7 @@ export function requestTimeout(timeout: number = 60000) {
 }
 
 export async function logout() {
-  const { signal } = requestTimeout();
+  const { signal, cancel } = requestTimeout();
 
   try {
     const response = await fetch(`api/auth/logout`, {
@@ -123,13 +131,16 @@ export async function logout() {
     }
 
     clearStore();
-    if (typeof window !== "undefined") {
-      window.location.href = "/login";
+    if(typeof window !== "undefined") {
+      window.location.href = "/"
     }
+    
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") {
       throw new Error("Server is not responding. Please try again later.");
     }
+  } finally {
+    cancel();
   }
 }
 
