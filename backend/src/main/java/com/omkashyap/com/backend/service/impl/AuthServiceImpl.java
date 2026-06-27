@@ -8,6 +8,9 @@ import com.omkashyap.com.backend.dto.responseDto.ResetPasswordResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.SessionResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.SignUpResponseDto;
 import com.omkashyap.com.backend.entity.*;
+import com.omkashyap.com.backend.error.InvalidTokenException;
+import com.omkashyap.com.backend.error.SessionNotFoundException;
+import com.omkashyap.com.backend.error.TokenReusedException;
 import com.omkashyap.com.backend.repository.*;
 import com.omkashyap.com.backend.security.JwtUtil;
 import com.omkashyap.com.backend.service.AuthService;
@@ -157,21 +160,22 @@ public class AuthServiceImpl implements AuthService {
   public AuthResponseDto refresh(String refreshToken) {
 
     if (!jwtUtil.isTokenValid(refreshToken)) {
-      throw new RuntimeException("Invalid refresh token");
+      throw new InvalidTokenException("Invalid refresh token");
     }
     if (!jwtUtil.isRefreshToken(refreshToken)) {
-      throw new RuntimeException("Token is not refresh token");
+      throw new InvalidTokenException("Token is not refresh token");
     }
 
     if (jwtUtil.isTokenExpired(refreshToken)) {
-      throw new RuntimeException("Token is expired");
+      throw new InvalidTokenException("Token is expired");
     }
 
     Session session = sessionRepository.findByRefreshToken(refreshToken)
-        .orElseThrow(() -> new IllegalArgumentException("Refresh token not founded"));
+        .orElseThrow(() -> new SessionNotFoundException(
+            "Refresh token not founded"));
 
     if (session.getRevoked()) {
-      throw new RuntimeException("Refresh token has been revoked");
+      throw new TokenReusedException("Refresh token has been revoked");
     }
 
     Seller seller = sellerRepository.findByUser_UserId(session.getUser().getUserId()).orElse(null);
