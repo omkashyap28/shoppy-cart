@@ -1,22 +1,27 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-type AppStore = {
-  loading: boolean;
+export type AppStoreReducers = {
   setLoading: (loading: boolean) => void;
-  accessToken: string;
   setAccessToken: (accessToken: string) => void;
-  userId: string;
   setUserId: (userId: string) => void;
-  email: string;
   setEmail: (email: string) => void;
-  sellerId: string;
   setSellerId: (sellerId: string) => void;
-  affiliateCode: string;
   setAffiliateCode: (affiliateCode: string) => void;
-  isAuth: boolean;
   setIsAuth: (isAuth: boolean) => void;
 };
+
+export type AppStoreStates = {
+  loading: boolean;
+  isAuth: boolean;
+  userId: string;
+  accessToken: string;
+  email: string;
+  sellerId: string;
+  affiliateCode: string;
+}
+
+export  type AppStore = AppStoreStates & AppStoreReducers;
 
 export const useAppStore = create<AppStore>()(
   devtools((set) => ({
