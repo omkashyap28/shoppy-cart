@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +69,11 @@ public class CartServiceImpl implements CartService {
 
   @Override
   public List<CartItemResponseDto> getCartItemsFromCart(String userId) {
-    Cart cart = cartRepository.findByUser_UserId(userId).orElseThrow(() -> new IllegalArgumentException("No cart founded"));
+    Cart cart = cartRepository.findByUser_UserId(userId).orElse(null);
+
+    if(cart == null) {
+      return new ArrayList<>();
+    }
 
     List<CartItem> cartItems = cartItemRepository.findAllByCartId(cart.getId());
 
