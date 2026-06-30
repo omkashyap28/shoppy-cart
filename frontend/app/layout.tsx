@@ -8,6 +8,8 @@ import "../node_modules/react-pings/dist/index.css";
 import QueryProvider from "@/providers/query-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { PingsProvider } from "@/providers/pings-provider";
+import { Auth } from "@/components/layout";
+import { ThemeProvider } from "next-themes";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -26,7 +28,8 @@ export const metadata: Metadata = {
   applicationName: "Shoppy Cart",
   creator: "Hariom Kashyap",
   category: "e-commerce",
-  keywords: ["e-commerce", "shopping", "online", "online-shop", "shoppy-cart"]
+  keywords: ["e-commerce", "shopping", "online", "online-shop", "shoppy-cart"],
+  metadataBase: "http://localhost:3000",
 };
 
 export default function RootLayout({
@@ -47,11 +50,19 @@ export default function RootLayout({
     >
       <body cz-shortcut-listen="true">
         <QueryProvider>
-          <TooltipProvider>
-            <PingsProvider>
-              {children}
-            </PingsProvider>
-          </TooltipProvider>
+          <ThemeProvider
+            themes={["light", "dark"]}
+            attribute="class"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <TooltipProvider>
+              <PingsProvider>
+                <main>{children}</main>
+              </PingsProvider>
+            </TooltipProvider>
+            <Auth />
+          </ThemeProvider>
         </QueryProvider>
       </body>
     </html>
