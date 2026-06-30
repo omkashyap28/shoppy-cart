@@ -1,17 +1,17 @@
 import {
   Categories,
   Logo,
-  MobileMenu,
   Navbar,
   Profile,
   Search,
+  Theme,
 } from "@/components/layout";
 
 export function Header() {
   return (
     <>
-      <header className="mx-auto max-w-640 px-4 sm:px-6 md:px-8 flex h-auto flex-col items-center justify-center sticky top-0 inset-x-auto bg-background z-10">
-        <div className="flex items-center justify-between h-14 w-full">
+      <header className="sticky inset-x-auto top-0 z-10 mx-auto flex h-auto max-w-640 flex-col items-center justify-center bg-background px-4 sm:px-6 md:px-8">
+        <div className="flex h-14 w-full items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-6">
             {/* <MobileMenu /> */}
             <Logo />
@@ -19,6 +19,7 @@ export function Header() {
           </div>
           <div className="flex items-center gap-3">
             <Search />
+            <Theme />
             <Profile />
           </div>
         </div>

@@ -12,6 +12,7 @@ import { Heading3 } from "./heading-3";
 import { Auth } from "./auth";
 import { BackButton } from "./back-btn";
 import { CopyButton } from "./copy-btn";
+import { Theme } from "./theme";
 
 export {
   Header,
@@ -28,4 +29,5 @@ export {
   Auth,
   CopyButton,
   BackButton,
+  Theme,
 };
