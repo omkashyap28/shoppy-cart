@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { ProfileCard } from "./component/profile-card";
-import { BackButton } from "@/components/layout";
+import { PageComponent } from "@/components/layout";
 
 export const metadata: Metadata = {
   title: "Profile",
@@ -21,14 +21,8 @@ export const metadata: Metadata = {
 
 export default function ProfilePage() {
   return (
-    <div className="mx-auto w-full max-w-md py-4">
-      <div className="flex items-center gap-3">
-        <BackButton />
-        <h1 className="text-xl font-semibold tracking-tight">Profile</h1>
-      </div>
-      <div className="mt-6">
-        <ProfileCard />
-      </div>
-    </div>
+    <PageComponent heading="Profile">
+      <ProfileCard />
+    </PageComponent>
   );
 }

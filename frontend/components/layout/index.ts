@@ -12,6 +12,7 @@ import { Heading3 } from "./heading-3";
 import { Auth } from "./auth";
 import { BackButton } from "./back-btn";
 import { CopyButton } from "./copy-btn";
+import { PageComponent } from "./page-component";
 import { Theme } from "./theme";
 
 export {
@@ -29,5 +30,6 @@ export {
   Auth,
   CopyButton,
   BackButton,
+  PageComponent,
   Theme,
 };
