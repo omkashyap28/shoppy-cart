@@ -9,6 +9,8 @@ import com.omkashyap.com.backend.entity.User;
 import com.omkashyap.com.backend.repository.AddressRepository;
 import com.omkashyap.com.backend.repository.UserRepository;
 import com.omkashyap.com.backend.service.UserService;
+import com.omkashyap.com.backend.type.GenderEnum;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +49,8 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public UserResponseDto updatePartialUserDetails(String userId, Map<String, Object> updates) {
-    User user = userRepository.findByUserId(userId).orElseThrow(() -> new IllegalArgumentException("User not exits with this userid"));
+    User user = userRepository.findByUserId(userId)
+        .orElseThrow(() -> new IllegalArgumentException("User not exits with this userid"));
 
     updates.forEach((key, value) -> {
       switch (key) {
@@ -65,13 +69,35 @@ public class UserServiceImpl implements UserService {
         case "avatarUrl":
           user.setAvatarUrl((String) value);
           break;
+        case "fileId":
+          user.setFileId((String) value);
+          break;
         case "password":
           user.setPassword(passwordEncoder.encode((String) value));
           break;
-        default:
-          throw new IllegalArgumentException("Field not supported or not updatable");
-
+        case "gender":
+          GenderEnum existingGender = user.getGender();
+          String valueInString = (String) value;
+          if (existingGender == null) {
+            GenderEnum gender = null;
+            if (valueInString == "MALE") {
+              gender = GenderEnum.MALE;
+            } else if (valueInString == "FEMALE") {
+              gender = GenderEnum.FEMALE;
+            } else if (valueInString == "OTHER") {
+              gender = GenderEnum.OTHER;
+            }
+            user.setGender(gender);
+          }
+          break;
+        case "dateOfBirth":
+          LocalDate existingDateOfBirth = user.getDateOfBirth();
+          if (existingDateOfBirth == null) {
+            user.setDateOfBirth((LocalDate) value);
+          }
+          break;
       }
+      userRepository.save(user);
     });
 
     User updatedUser = userRepository.save(user);
@@ -99,6 +125,8 @@ public class UserServiceImpl implements UserService {
     address.setCountry(addressRequestDto.getCountry());
     address.setPostalCode(addressRequestDto.getPostalCode());
 
+    address.setIsDefault(user.getAddresses().isEmpty());
+
     address.setUser(user);
 
     user.getAddresses().add(address);
@@ -111,8 +139,7 @@ public class UserServiceImpl implements UserService {
     userResponseDto.setAddresses(
         user.getAddresses().stream()
             .map(add -> modelMapper.map(add, UserAddressResponseDto.class))
-            .toList()
-    );
+            .toList());
 
     return userResponseDto;
   }

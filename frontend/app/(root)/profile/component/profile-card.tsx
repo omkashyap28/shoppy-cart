@@ -27,11 +27,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
-import { ProfileCardSkeleton } from "@/components/sekeleton/profile-card-skeleton";
+import { ProfileCardSkeleton } from "@/components/sekeleton";
 import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
@@ -62,15 +63,13 @@ export interface UserResponse {
   email: string;
   contact: string | null;
   avatarUrl: string | null;
+  fileId: string | null;
   addresses: AddressResponse[] | [];
   createdAt: string;
 }
 
 export function ProfileCard() {
   const userId = useAppStore((state) => state.userId);
-  const [isNotEditable, setIsNotEditable] = useState<boolean>(true);
-
-  const pings = usePings();
 
   // Query
   const {
@@ -91,6 +90,45 @@ export function ProfileCard() {
     staleTime: 10 * 60 * 1000,
     enabled: !!userId,
   });
+
+  if (isLoading) {
+    return <ProfileCardSkeleton />;
+  }
+
+  if (isError) {
+    throw new Error("Failed to get user details");
+  }
+
+  if (!user) return;
+
+  return (
+    <div className="space-y-5">
+      <AvatarCard
+        userId={user.userId}
+        firstName={user.firstName}
+        lastName={user.lastName}
+        email={user.email}
+        avatarUrl={user.avatarUrl}
+        fileId={user.fileId}
+      />
+      <EditProfileForm user={user} />
+      <FieldGroup>
+        <UserAddresses />
+        <UserDetails user={user} />
+        <SecurityCard />
+        <DeleteAccountButton userId={user.userId} email={user.email} />
+      </FieldGroup>
+    </div>
+  );
+}
+
+interface EditProfileProps {
+  user: UserResponse;
+}
+
+function EditProfileForm({ user }: EditProfileProps) {
+  const [isNotEditable, setIsNotEditable] = useState<boolean>(true);
+  const pings = usePings();
 
   // form
   const form = useForm<z.infer<typeof editUserDetails>>({
@@ -136,7 +174,7 @@ export function ProfileCard() {
         }
       });
 
-      const response = await apiFetch(`user/${userId}`, {
+      const response = await apiFetch(`user/${user.userId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -149,7 +187,7 @@ export function ProfileCard() {
       return await response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user-data", userId] });
+      queryClient.invalidateQueries({ queryKey: ["user-data", user.userId] });
       pings.success("Profile updated successfully");
     },
     onError: (error: unknown) => {
@@ -163,194 +201,164 @@ export function ProfileCard() {
     updateUser(values);
   };
 
-  if (isLoading) {
-    return <ProfileCardSkeleton />;
-  }
-
-  if (isError) {
-    throw new Error("Failed to get user details");
-  }
-
-  if (!user) return;
-
   return (
-    <div className="space-y-5">
-      <AvatarCard
-        firstName={user.firstName}
-        lastName={user.lastName}
-        email={user.email}
-        avatarUrl={user.avatarUrl}
-      />
-      <Drawer direction="right">
-        <DrawerTrigger asChild>
+    <Drawer direction="right">
+      <DrawerTrigger asChild>
+        <Button
+          onClick={() => setIsNotEditable(false)}
+          variant="default"
+          className="w-full"
+        >
+          <Edit2Icon /> Edit Profile
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent className="border-none! pb-7">
+        <DrawerHeader>
+          <DrawerTitle>Update Profile</DrawerTitle>
+          <DrawerDescription>Update your profile</DrawerDescription>
+        </DrawerHeader>
+        <form id="editProfileForm" onSubmit={form.handleSubmit(onSubmit)}>
+          <FieldGroup className="p-4">
+            <Controller
+              name="firstName"
+              control={form.control}
+              disabled={isNotEditable || isSubmitting}
+              render={({ field, fieldState }) => (
+                <Field aria-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="first-name">First Name</FieldLabel>
+                  <Input
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    id="first-name"
+                  />
+                  {fieldState.error && (
+                    <FieldError>{fieldState.error.message}</FieldError>
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="lastName"
+              control={form.control}
+              disabled={isNotEditable || isSubmitting}
+              render={({ field, fieldState }) => (
+                <Field aria-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="last-name">Last Name</FieldLabel>
+                  <Input
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    id="last-name"
+                  />
+                  {fieldState.error && (
+                    <FieldError>{fieldState.error.message}</FieldError>
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="contact"
+              control={form.control}
+              disabled={isNotEditable || isSubmitting}
+              render={({ field, fieldState }) => (
+                <Field aria-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="contact">Contact</FieldLabel>
+                  <Input
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    id="contact"
+                  />
+                  {fieldState.error && (
+                    <FieldError>{fieldState.error.message}</FieldError>
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="gender"
+              control={form.control}
+              disabled={isNotEditable || isSubmitting}
+              render={({ field, fieldState }) => (
+                <Field aria-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="gender">Gender</FieldLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={field.disabled}
+                  >
+                    <SelectTrigger
+                      id="gender"
+                      aria-invalid={fieldState.invalid}
+                    >
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="MALE">Male</SelectItem>
+                      <SelectItem value="FEMALE">Female</SelectItem>
+                      <SelectItem value="OTHER">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {fieldState.error && (
+                    <FieldError>{fieldState.error.message}</FieldError>
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="dateOfBirth"
+              control={form.control}
+              disabled={isNotEditable || isSubmitting}
+              render={({ field, fieldState }) => (
+                <Field aria-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="dob">Date of Birth</FieldLabel>
+                  <Input
+                    type="date"
+                    id="dob"
+                    disabled={field.disabled}
+                    aria-invalid={fieldState.invalid}
+                    value={
+                      field.value ? field.value.toISOString().split("T")[0] : ""
+                    }
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value ? new Date(e.target.value) : undefined
+                      )
+                    }
+                  />
+                  {fieldState.error && (
+                    <FieldError>{fieldState.error.message}</FieldError>
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>
+        </form>
+        <DrawerFooter>
           <Button
-            onClick={() => setIsNotEditable(false)}
+            form="editProfileForm"
+            type="submit"
             variant="default"
-            className="w-full"
+            disabled={isSubmitting || isNotEditable}
+            aria-disabled={isSubmitting || isNotEditable}
           >
-            <Edit2Icon /> Edit Profile
+            {isSubmitting ? <Spinner /> : <SaveIcon />}
+            Save Changes
           </Button>
-        </DrawerTrigger>
-        <DrawerContent className="border-none! pb-7">
-          <div className="mx-auto w-full max-w-md">
-            <DrawerHeader>
-              <DrawerTitle>Update Profile</DrawerTitle>
-            </DrawerHeader>
-            <form id="editProfileForm" onSubmit={form.handleSubmit(onSubmit)}>
-              <FieldGroup className="p-4">
-                <Controller
-                  name="firstName"
-                  control={form.control}
-                  disabled={isNotEditable || isSubmitting}
-                  render={({ field, fieldState }) => (
-                    <Field aria-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="first-name">First Name</FieldLabel>
-                      <Input
-                        {...field}
-                        aria-invalid={fieldState.invalid}
-                        id="first-name"
-                      />
-                      {fieldState.error && (
-                        <FieldError>{fieldState.error.message}</FieldError>
-                      )}
-                    </Field>
-                  )}
-                />
-
-                <Controller
-                  name="lastName"
-                  control={form.control}
-                  disabled={isNotEditable || isSubmitting}
-                  render={({ field, fieldState }) => (
-                    <Field aria-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="last-name">Last Name</FieldLabel>
-                      <Input
-                        {...field}
-                        aria-invalid={fieldState.invalid}
-                        id="last-name"
-                      />
-                      {fieldState.error && (
-                        <FieldError>{fieldState.error.message}</FieldError>
-                      )}
-                    </Field>
-                  )}
-                />
-                <Controller
-                  name="contact"
-                  control={form.control}
-                  disabled={isNotEditable || isSubmitting}
-                  render={({ field, fieldState }) => (
-                    <Field aria-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="contact">Contact</FieldLabel>
-                      <Input
-                        {...field}
-                        aria-invalid={fieldState.invalid}
-                        id="contact"
-                      />
-                      {fieldState.error && (
-                        <FieldError>{fieldState.error.message}</FieldError>
-                      )}
-                    </Field>
-                  )}
-                />
-
-                <Controller
-                  name="gender"
-                  control={form.control}
-                  disabled={isNotEditable || isSubmitting}
-                  render={({ field, fieldState }) => (
-                    <Field aria-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="gender">Gender</FieldLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={field.disabled}
-                      >
-                        <SelectTrigger
-                          id="gender"
-                          aria-invalid={fieldState.invalid}
-                        >
-                          <SelectValue placeholder="Select gender" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="MALE">Male</SelectItem>
-                          <SelectItem value="FEMALE">Female</SelectItem>
-                          <SelectItem value="OTHER">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {fieldState.error && (
-                        <FieldError>{fieldState.error.message}</FieldError>
-                      )}
-                    </Field>
-                  )}
-                />
-
-                <Controller
-                  name="dateOfBirth"
-                  control={form.control}
-                  disabled={isNotEditable || isSubmitting}
-                  render={({ field, fieldState }) => (
-                    <Field aria-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="dob">Date of Birth</FieldLabel>
-                      <Input
-                        type="date"
-                        id="dob"
-                        disabled={field.disabled}
-                        aria-invalid={fieldState.invalid}
-                        value={
-                          field.value
-                            ? field.value.toISOString().split("T")[0]
-                            : ""
-                        }
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value
-                              ? new Date(e.target.value)
-                              : undefined
-                          )
-                        }
-                      />
-                      {fieldState.error && (
-                        <FieldError>{fieldState.error.message}</FieldError>
-                      )}
-                    </Field>
-                  )}
-                />
-              </FieldGroup>
-            </form>
-            <DrawerFooter>
-              <Button
-                form="editProfileForm"
-                type="submit"
-                variant="default"
-                disabled={isSubmitting || isNotEditable}
-                aria-disabled={isSubmitting || isNotEditable}
-              >
-                {isSubmitting ? <Spinner /> : <SaveIcon />}
-                Save Changes
-              </Button>
-              <DrawerClose asChild>
-                <Button
-                  onClick={() => {
-                    form.reset();
-                    setIsNotEditable(true);
-                  }}
-                  variant="outline"
-                >
-                  <RotateCcw /> Discard
-                </Button>
-              </DrawerClose>
-            </DrawerFooter>
-          </div>
-        </DrawerContent>
-      </Drawer>
-
-      <FieldGroup>
-        <UserAddresses userId={user.userId} />
-        <UserDetails user={user} />
-        <SecurityCard />
-        <DeleteAccountButton userId={user.userId} email={user.email} />
-      </FieldGroup>
-    </div>
+          <DrawerClose asChild>
+            <Button
+              onClick={() => {
+                form.reset();
+                setIsNotEditable(true);
+              }}
+              variant="outline"
+            >
+              Discard
+            </Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

@@ -1,12 +1,13 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { AddressCardSkeleton } from "./";
+import { AvatarSkeleton } from "./avatar-skeleton";
 
 export function ProfileCardSkeleton() {
   return (
-    <div className="space-y-5 animate-pulse">
+    <div className="animate-pulse space-y-5">
       {/* Profile Header */}
       <div className="flex items-center gap-5">
-        <Skeleton className="size-20 rounded-full md:size-24" />
+        <AvatarSkeleton />
 
         <div className="flex flex-col gap-2">
           <Skeleton className="h-7 w-48" />

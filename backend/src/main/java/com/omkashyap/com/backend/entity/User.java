@@ -22,195 +22,135 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(
-    indexes = {
+@Table(indexes = {
         @Index(name = "idx_user_email", columnList = "email"),
         @Index(name = "idx_user_contact", columnList = "contact")
-    },
-    uniqueConstraints = {
+}, uniqueConstraints = {
         @UniqueConstraint(name = "uk_user_contact", columnNames = "contact"),
         @UniqueConstraint(name = "uk_user_email", columnNames = "email")
-    }
-)
+})
 public class User implements UserDetails {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @Column(
-      nullable = false,
-      unique = true,
-      updatable = false,
-      length = 32
-  )
-  private String userId;
+    @Column(nullable = false, unique = true, updatable = false, length = 32)
+    private String userId;
 
-  @Column(
-      nullable = false,
-      length = 50
-  )
-  private String firstName;
+    @Column(nullable = false, length = 50)
+    private String firstName;
 
-  @Column(
-      length = 50
-  )
-  private String lastName;
+    @Column(length = 50)
+    private String lastName;
 
-  @Column(
-      nullable = false,
-      length = 100,
-      unique = true
-  )
-  private String email;
+    @Column(nullable = false, length = 100, unique = true)
+    private String email;
 
-  @Column(
-      nullable = true,
-      length = 15,
-      unique = true
-  )
-  private String contact;
+    @Column(nullable = true, length = 15)
+    @Builder.Default
+    private String contact = null;
 
-  @Enumerated(EnumType.STRING)
-  private GenderEnum gender;
+    @Enumerated(EnumType.STRING)
+    private GenderEnum gender;
 
-  private LocalDate dateOfBirth;
+    private LocalDate dateOfBirth;
 
-  private String providerId;
+    private String providerId;
 
-  @Enumerated(EnumType.STRING)
-  private LoginProviderType providerType;
+    @Enumerated(EnumType.STRING)
+    private LoginProviderType providerType;
 
-  @Builder.Default
-  @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(
-      name = "user_roles",
-      joinColumns = @JoinColumn(name = "user_id"),
-      inverseJoinColumns = @JoinColumn(name = "role_id")
-  )
-  private Set<Role> roles = new HashSet<>();
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
-  @Column(
-      length = 255
-  )
-  private String password;
+    @Column(length = 255)
+    private String password;
 
-  @Column(
-      unique = true
-  )
-  private String avatarUrl;
+    @Column(unique = true)
+    private String avatarUrl;
 
-  @OneToMany(
-      mappedBy = "user",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true
-  )
-  private List<Address> addresses = new ArrayList<>();
+    @Column(unique = true)
+    private String fileId;
 
-  @JsonIgnore
-  @OneToMany(
-      mappedBy = "user",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true
-  )
-  private List<Session> sessions = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Address> addresses = new ArrayList<>();
 
-  @JsonIgnore
-  @OneToOne(
-      mappedBy = "user",
-      orphanRemoval = true,
-      cascade = CascadeType.ALL
-  )
-  private WishList wishList;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Session> sessions = new ArrayList<>();
 
-  @JsonIgnore
-  @OneToMany(
-      mappedBy = "user",
-      orphanRemoval = true,
-      cascade = CascadeType.ALL
-  )
-  private List<Cart> cart = new ArrayList<>();
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private WishList wishList;
 
-  @JsonIgnore
-  @OneToMany(
-      mappedBy = "user",
-      orphanRemoval = true,
-      cascade = CascadeType.ALL
-  )
-  private List<Review> reviews = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Cart> cart = new ArrayList<>();
 
-  @OneToOne(
-      cascade = CascadeType.ALL,
-      orphanRemoval = true,
-      mappedBy = "user"
-  )
-  private Seller seller;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Review> reviews = new ArrayList<>();
 
-  @OneToOne(
-      mappedBy = "user",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true
-  )
-  private AffiliateUser affiliateUser;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user", fetch = FetchType.LAZY)
+    private Seller seller;
 
-  @OneToOne(
-      mappedBy = "user",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true
-  )
-  private UserWallet wallet;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private AffiliateUser affiliateUser;
 
-  @OneToMany(
-      mappedBy = "user",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true
-  )
-  private List<Invoice> invoice;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private UserWallet wallet;
 
-  @OneToMany(
-      mappedBy = "user",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true
-  )
-  @Builder.Default
-  private List<Otp> otp = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Invoice> invoice = new ArrayList<>();
 
-  @Column(updatable = false)
-  @CreationTimestamp
-  private LocalDateTime createdAt;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Otp> otp = new ArrayList<>();
 
-  @UpdateTimestamp
-  private LocalDateTime updatedAt;
+    @Column(updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
-  public User(String firstName, String lastName, String email, String contact, GenderEnum gender, LocalDate dateOfBirth, String password, String avatarUrl) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.email = email;
-    this.contact = contact;
-    this.gender = gender;
-    this.dateOfBirth = dateOfBirth;
-    this.password = password;
-    this.avatarUrl = avatarUrl;
-  }
-
-  @PrePersist
-  public void initializeUserId() {
-    if (this.userId == null) {
-      this.userId = UUID.randomUUID().toString().replace("-", "");
+    public User(String firstName, String lastName, String email, String contact, GenderEnum gender,
+            LocalDate dateOfBirth, String password, String avatarUrl) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.contact = contact;
+        this.gender = gender;
+        this.dateOfBirth = dateOfBirth;
+        this.password = password;
+        this.avatarUrl = avatarUrl;
     }
-  }
 
-  @Override
-  public @NonNull Collection<? extends GrantedAuthority> getAuthorities() {
-    return roles.stream()
-        .map(role -> new SimpleGrantedAuthority(role.getRole().toString()))
-        .toList();
-  }
+    @PrePersist
+    public void initializeUserId() {
+        if (this.userId == null) {
+            this.userId = UUID.randomUUID().toString().replace("-", "");
+        }
+    }
 
-  @Override
-  public @NonNull String getUsername() {
-    return email;
-  }
+    @Override
+    public @NonNull Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getRole().toString()))
+                .toList();
+    }
+
+    @Override
+    public @NonNull String getUsername() {
+        return email;
+    }
 
 }
