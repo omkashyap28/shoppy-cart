@@ -29,7 +29,7 @@ export async function apiFetch(url: string, options: RequestInit = {}) {
     const { signal, cancel } = requestTimeout();
 
     try {
-      return await fetch(`/api/${url}`, {
+      return await fetch(`/backend/${url}`, {
         ...options,
         credentials: "include",
         headers,
@@ -72,7 +72,7 @@ export async function refreshAccessToken(): Promise<TokenResponse> {
   const { signal, cancel } = requestTimeout();
 
   try {
-    const response = await fetch(`/api/auth/refresh`, {
+    const response = await fetch(`/backend/auth/refresh`, {
       method: "POST",
       credentials: "include",
       signal,
@@ -187,7 +187,7 @@ export function clearStore() {
 }
 
 async function clearCookie() {
-  await fetch("/api/auth/clear-session", { method: "POST" });
+  await fetch("/backend/auth/clear-session", { method: "POST" });
 }
 
 export function debounce<Args extends unknown[]>(

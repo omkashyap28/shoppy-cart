@@ -8,8 +8,9 @@ import "../node_modules/react-pings/dist/index.css";
 import QueryProvider from "@/providers/query-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { PingsProvider } from "@/providers/pings-provider";
+import { ImageKitProvider } from "@/providers/imagekit-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
 import { Auth } from "@/components/layout";
-import { ThemeProvider } from "next-themes";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -50,17 +51,12 @@ export default function RootLayout({
     >
       <body cz-shortcut-listen="true">
         <QueryProvider>
-          <ThemeProvider
-            themes={["light", "dark"]}
-            attribute="class"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <TooltipProvider>
-              <PingsProvider>
-                <main>{children}</main>
-              </PingsProvider>
-            </TooltipProvider>
+          <ThemeProvider>
+            <ImageKitProvider>
+              <TooltipProvider>
+                <PingsProvider>{children}</PingsProvider>
+              </TooltipProvider>
+            </ImageKitProvider>
             <Auth />
           </ThemeProvider>
         </QueryProvider>
