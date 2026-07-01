@@ -1,6 +1,5 @@
 package com.omkashyap.com.backend.dto.responseDto;
 
-import com.omkashyap.com.backend.entity.Address;
 import com.omkashyap.com.backend.type.GenderEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +20,7 @@ public class UserResponseDto {
   private String email;
   private String contact;
   private String avatarUrl;
+  private String fileId;
   private List<UserAddressResponseDto> addresses;
   private LocalDateTime createdAt;
 
