@@ -1,4 +1,10 @@
-import { Field, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSeparator,
+} from "@/components/ui/field";
 import {
   Carousel,
   CarouselContent,
@@ -11,7 +17,16 @@ import { Plus } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addressFormSchema } from "@/schemas";
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import z from "zod";
@@ -21,7 +36,6 @@ import { usePings } from "react-pings";
 import { Badge } from "@/components/ui/badge";
 import { AddressCardSkeleton } from "@/components/sekeleton";
 import { useAppStore } from "@/store/store";
-import React from "react";
 
 export interface UserAddressResponse {
   addressId: string;
@@ -35,12 +49,14 @@ export interface UserAddressResponse {
 }
 
 export function UserAddresses() {
+  const userId = useAppStore((state) => state.user?.userId);
 
-  const userId = useAppStore(state => state.userId);
   const queryClient = useQueryClient();
   const pings = usePings();
 
-  const { data: addresses, isLoading: loadingUserAddress } = useQuery<UserAddressResponse[] | []>({
+  const { data: addresses, isLoading: loadingUserAddress } = useQuery<
+    UserAddressResponse[] | []
+  >({
     queryKey: ["user-addresses", userId],
     queryFn: async () => {
       try {
@@ -58,7 +74,7 @@ export function UserAddresses() {
     },
     enabled: !!userId,
     staleTime: 10 * 60 * 1000,
-  })
+  });
 
   const { mutate: changeDefaultAddress } = useMutation({
     mutationFn: async (addressId: string) => {
@@ -66,13 +82,12 @@ export function UserAddresses() {
       const response = await apiFetch(`user/${userId}/address/${addressId}`, {
         method: "PATCH",
         headers: {
-          "Content-Type": "Application/json"
+          "Content-Type": "Application/json",
         },
-        body: JSON.stringify({"isDefault": true})
-      })
+        body: JSON.stringify({ isDefault: true }),
+      });
 
-      if(!response.ok) {
-        
+      if (!response.ok) {
         throw new Error("Failed to set default address");
       }
 
@@ -80,19 +95,17 @@ export function UserAddresses() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["user-addresses", userId]
-      })
+        queryKey: ["user-addresses", userId],
+      });
       pings.success("Default address changed successfully");
     },
     onError: () => {
       pings.error("Failed to set default address");
-    }
-  })
+    },
+  });
 
   if (loadingUserAddress) {
-    return (
-      <AddressCardSkeleton />
-    );
+    return <AddressCardSkeleton />;
   }
 
   if (!addresses) {
@@ -122,47 +135,71 @@ export function UserAddresses() {
       <FieldSeparator className="my-4 *:data-[slot=field-separator-content]:bg-background">
         Delivery Addresses
       </FieldSeparator>
-      <Carousel opts={{
-        align: "start"
-      }}>
+      <Carousel
+        opts={{
+          align: "start",
+        }}
+      >
         <CarouselContent>
-          {addresses.map(({ address, addressId, city, country, isDefault, postalCode, state, street }) => (
-            <CarouselItem key={addressId} className="max-w-fit">
-              <div className="relative rounded-md h-28 aspect-rectangle border border-primary/20 bg-linear-140 from-transparent to-primary/10 flex flex-col justify-center">
-                <div className="p-3">
-                  <div className="flex items-start gap-2">
-                    <Input
-                     type="radio"
-                      name="defaultAddress" 
-                      className="size-4 accent-primary outline-primary"
-                       checked={isDefault}
-                       onChange={() => {
-                        if(!isDefault) {
-                          changeDefaultAddress(addressId);
-                        }
-                       }}
-                       />
-                    <div className="text-sm font-semibold tracking-tight">
-                      {address},{" "}{street}
+          {addresses.map(
+            ({
+              address,
+              addressId,
+              city,
+              country,
+              isDefault,
+              postalCode,
+              state,
+              street,
+            }) => (
+              <CarouselItem key={addressId} className="max-w-fit">
+                <div className="aspect-rectangle relative flex h-28 flex-col justify-center rounded-md border border-primary/50 bg-linear-140 from-transparent from-20% via-primary/20 to-transparent dark:via-primary/40">
+                  <div className="p-3">
+                    <div className="flex items-start gap-2">
+                      <label htmlFor={addressId}>
+                        <Input
+                          type="radio"
+                          id={addressId}
+                          name="defaultAddress"
+                          className="peer size-4 accent-primary"
+                          checked={isDefault}
+                          hidden
+                          onChange={() => {
+                            if (!isDefault) {
+                              changeDefaultAddress(addressId);
+                            }
+                          }}
+                        />
+                        <div className="size-4 rounded-full border-2 border-background outline-2 outline-primary peer-checked:bg-primary"></div>
+                      </label>
+                      <div className="text-sm font-semibold tracking-tight">
+                        {address}, {street}
+                      </div>
+                    </div>
+                    <div className="mt-2 text-xs font-light text-muted-foreground">
+                      {city}, {state}-{postalCode}
+                    </div>
+                    <div className="text-sm font-semibold text-muted-foreground">
+                      {country}
                     </div>
                   </div>
-                  <div className="mt-2 text-xs text-muted-foreground font-light">
-                    {city},{" "}
-                    {state}-
-                    {postalCode}
-                  </div>
-                  <div className="text-sm font-semibold text-muted-foreground">
-                    {country}
-                  </div>
+                  {isDefault && (
+                    <Badge className="absolute right-2 bottom-2 border-primary/30 shadow-md backdrop-blur-sm">
+                      Default
+                    </Badge>
+                  )}
                 </div>
-                {isDefault && <Badge variant="secondary" className="border-primary/30 text-primary shadow-md absolute right-2 bottom-2">Default</Badge>}
-              </div>
-            </CarouselItem>
-          ))}
+              </CarouselItem>
+            )
+          )}
           <CarouselItem className="max-w-fit">
-            <div className="relative h-28 aspect-square rounded-md flex items-center justify-center border border-primary/20 bg-linear-140 from-transparent to-primary/10 flex flex-col justify-center">
+            <div className="relative flex aspect-square h-28 flex-col items-center justify-center rounded-md border border-primary/20 bg-linear-140 from-transparent to-primary/10">
               <AddressForm>
-                <Button variant="default" className="rounded-full shadow" size="icon-lg">
+                <Button
+                  variant="default"
+                  className="rounded-full shadow"
+                  size="icon-lg"
+                >
                   <Plus size="6" />
                 </Button>
               </AddressForm>
@@ -171,15 +208,14 @@ export function UserAddresses() {
         </CarouselContent>
         <CarouselNext className="hidden md:flex" />
         <CarouselPrevious className="hidden md:flex" />
-      </Carousel >
+      </Carousel>
     </>
   );
 }
 
 function AddressForm({ children }: { children: React.ReactNode }) {
-
   const queryClient = useQueryClient();
-  const userId = useAppStore(state => state.userId);
+  const userId = useAppStore((state) => state.userId);
   const pings = usePings();
 
   const form = useForm({
@@ -191,8 +227,8 @@ function AddressForm({ children }: { children: React.ReactNode }) {
       state: "",
       postalCode: "",
       country: "",
-    }
-  })
+    },
+  });
 
   const { mutate: mutateUserAddress, isPending: loading } = useMutation({
     mutationFn: async (values: z.infer<typeof addressFormSchema>) => {
@@ -203,38 +239,37 @@ function AddressForm({ children }: { children: React.ReactNode }) {
         state: values.state,
         postalCode: values.postalCode,
         country: values.country,
-      }
+      };
 
       try {
         const resposne = await apiFetch(`user/${userId}/address`, {
           method: "POST",
           body: JSON.stringify(formData),
           headers: {
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         });
 
         if (resposne.status !== 201) {
           throw new Error("Failed to create address for this user");
         }
 
-        const data = await resposne.json()
+        const data = await resposne.json();
         form.reset();
         return data;
-
       } catch (e) {
         throw e;
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["user-addresses", userId]
-      })
+        queryKey: ["user-addresses", userId],
+      });
       pings.success("Address added successfully");
     },
     onError: () => {
       pings.error("Failed to set address");
-    }
+    },
   });
 
   async function onSubmit(values: z.infer<typeof addressFormSchema>) {
@@ -243,40 +278,37 @@ function AddressForm({ children }: { children: React.ReactNode }) {
 
   return (
     <Drawer direction="right">
-      <DrawerTrigger asChild>
-        {children}
-      </DrawerTrigger>
+      <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerContent className="border-none">
         <DrawerHeader>
-          <DrawerTitle>
-            Add Address
-          </DrawerTitle>
-          <DrawerDescription>
-            Add your delivery address
-          </DrawerDescription>
+          <DrawerTitle>Add Address</DrawerTitle>
+          <DrawerDescription>Add your delivery address</DrawerDescription>
         </DrawerHeader>
         <form id="userAddressForm" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup className="p-4">
             <Controller
               name="address"
               control={form.control}
+              disabled={loading}
               render={({ field, fieldState }) => (
                 <Field aria-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="address">Address</FieldLabel>
-                  <Input {...field}
+                  <Input
+                    {...field}
                     aria-invalid={fieldState.invalid}
                     id="address"
-                    placeholder="Enter address" />
-                  {
-                    fieldState.error &&
+                    placeholder="Enter address"
+                  />
+                  {fieldState.error && (
                     <FieldError>{fieldState.error.message}</FieldError>
-                  }
+                  )}
                 </Field>
               )}
             />
             <Controller
               name="street"
               control={form.control}
+              disabled={loading}
               render={({ field, fieldState }) => (
                 <Field aria-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="street">Street</FieldLabel>
@@ -285,30 +317,31 @@ function AddressForm({ children }: { children: React.ReactNode }) {
                     aria-invalid={fieldState.invalid}
                     id="street"
                     type="text"
-                    placeholder="Enter street" />
-                  {
-                    fieldState.error &&
+                    placeholder="Enter street"
+                  />
+                  {fieldState.error && (
                     <FieldError>{fieldState.error.message}</FieldError>
-                  }
+                  )}
                 </Field>
               )}
             />
             <Controller
               name="city"
               control={form.control}
+              disabled={loading}
               render={({ field, fieldState }) => (
                 <Field aria-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="city">City</FieldLabel>
                   <Input
                     {...field}
-                    aria-invaid={fieldState.invalid}
+                    aria-invalid={fieldState.invalid}
                     id="city"
                     type="text"
-                    placeholder="Enter city" />
-                  {
-                    fieldState.error &&
+                    placeholder="Enter city"
+                  />
+                  {fieldState.error && (
                     <FieldError>{fieldState.error.message}</FieldError>
-                  }
+                  )}
                 </Field>
               )}
             />
@@ -316,6 +349,7 @@ function AddressForm({ children }: { children: React.ReactNode }) {
             <Controller
               name="state"
               control={form.control}
+              disabled={loading}
               render={({ field, fieldState }) => (
                 <Field aria-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="state">State</FieldLabel>
@@ -324,36 +358,38 @@ function AddressForm({ children }: { children: React.ReactNode }) {
                     aria-invalid={fieldState.invalid}
                     id="state"
                     type="text"
-                    placeholder="Enter state" />
-                  {
-                    fieldState.error &&
+                    placeholder="Enter state"
+                  />
+                  {fieldState.error && (
                     <FieldError>{fieldState.error.message}</FieldError>
-                  }
+                  )}
                 </Field>
               )}
             />
             <Controller
               name="country"
               control={form.control}
+              disabled={loading}
               render={({ field, fieldState }) => (
                 <Field aria-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="country">Country</FieldLabel>
                   <Input
                     {...field}
-                    aria-invaid={fieldState.invalid}
+                    aria-invalid={fieldState.invalid}
                     id="country"
                     type="text"
-                    placeholder="Enter country" />
-                  {
-                    fieldState.error &&
+                    placeholder="Enter country"
+                  />
+                  {fieldState.error && (
                     <FieldError>{fieldState.error.message}</FieldError>
-                  }
+                  )}
                 </Field>
               )}
             />
             <Controller
               name="postalCode"
               control={form.control}
+              disabled={loading}
               render={({ field, fieldState }) => (
                 <Field aria-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="postalCode">Postal Code</FieldLabel>
@@ -362,29 +398,32 @@ function AddressForm({ children }: { children: React.ReactNode }) {
                     aria-invalid={fieldState.invalid}
                     id="postalCode"
                     type="text"
-                    placeholder="Enter postal code" />
-                  {
-                    fieldState.error &&
+                    placeholder="Enter postal code"
+                  />
+                  {fieldState.error && (
                     <FieldError>{fieldState.error.message}</FieldError>
-                  }
+                  )}
                 </Field>
               )}
             />
           </FieldGroup>
         </form>
         <DrawerFooter>
-          <Button form="userAddressForm" type="submit">
+          <Button disabled={loading} form="userAddressForm" type="submit">
             {loading && <Spinner />}
             Add Address
           </Button>
           <DrawerClose>
-            <Button onClick={() => form.reset()} variant="outline" className="w-full">
+            <Button
+              onClick={() => form.reset()}
+              variant="outline"
+              className="w-full"
+            >
               Discard
             </Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-  )
-
+  );
 }

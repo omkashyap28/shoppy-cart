@@ -4,7 +4,7 @@ import { apiFetch } from "@/lib/utils";
 import { useAppStore } from "@/store/store";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Edit2Icon, RotateCcw, SaveIcon } from "lucide-react";
+import { Edit2Icon, SaveIcon } from "lucide-react";
 import {
   Field,
   FieldError,
@@ -42,64 +42,14 @@ import { DeleteAccountButton } from "./delete-account-btn";
 import { UserDetails } from "./user-details";
 import { AvatarCard } from "./avatar-card";
 import { UserAddresses } from "./user-addresses";
+import { UserResponse } from "@/types/user";
 
-export interface AddressResponse {
-  addressId: string;
-  address: string;
-  street: string;
-  city: string;
-  state: string;
-  country: string;
-  isDefault: boolean;
-  postalCode: string;
-}
-
-export interface UserResponse {
-  userId: string;
-  firstName: string;
-  lastName: string | null;
-  dateOfBirth: string | null;
-  gender: string | null;
-  email: string;
-  contact: string | null;
-  avatarUrl: string | null;
-  fileId: string | null;
-  addresses: AddressResponse[] | [];
-  createdAt: string;
-}
 
 export function ProfileCard() {
-  const userId = useAppStore((state) => state.userId);
+  
+  const user = useAppStore(state => state.user);
 
-  // Query
-  const {
-    data: user,
-    isError,
-    isLoading,
-  } = useQuery<UserResponse>({
-    queryKey: ["user-data", userId],
-    queryFn: async () => {
-      const response = await apiFetch(`user/${userId}`);
-
-      if (!response.ok) {
-        throw new Error("Unabel to fetch user details");
-      }
-
-      return await response.json();
-    },
-    staleTime: 10 * 60 * 1000,
-    enabled: !!userId,
-  });
-
-  if (isLoading) {
-    return <ProfileCardSkeleton />;
-  }
-
-  if (isError) {
-    throw new Error("Failed to get user details");
-  }
-
-  if (!user) return;
+  if(!user) return;
 
   return (
     <div className="space-y-5">
@@ -122,11 +72,8 @@ export function ProfileCard() {
   );
 }
 
-interface EditProfileProps {
-  user: UserResponse;
-}
 
-function EditProfileForm({ user }: EditProfileProps) {
+function EditProfileForm({ user }: { user: UserResponse }) {
   const [isNotEditable, setIsNotEditable] = useState<boolean>(true);
   const pings = usePings();
 
@@ -187,7 +134,7 @@ function EditProfileForm({ user }: EditProfileProps) {
       return await response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user-data", user.userId] });
+      queryClient.invalidateQueries({ queryKey: ["user-data"] });
       pings.success("Profile updated successfully");
     },
     onError: (error: unknown) => {

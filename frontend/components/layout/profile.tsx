@@ -20,29 +20,26 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { apiFetch, logout } from "@/lib/utils";
+import { logout } from "@/lib/utils";
 import { useAppStore } from "@/store/store";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { AvatarSkeleton } from "../sekeleton/avatar-skeleton";
 
 export function Profile() {
-  const userId = useAppStore((state) => state.userId);
+  const user = useAppStore(state => state.user);
   const isAuth = useAppStore((state) => state.isAuth);
   const sellerId = useAppStore((state) => state.sellerId);
   const affiliateCode = useAppStore((state) => state.affiliateCode);
   const router = useRouter();
 
-  const { data } = useQuery<string>({
-    queryKey: ["user-profile", userId],
-    staleTime: Infinity,
-    queryFn: async () => {
-      const fetchResponse = await apiFetch(`user/${userId}`);
-      const data = await fetchResponse.json();
-      return data?.avatarUrl;
-    },
-    enabled: !!userId,
-  });
+  if(isAuth && !user) {
+    return (
+      <Button onClick={() => router.push("/login")}>
+        Login
+      </Button>
+    );
+  }
 
   return (
     <DropdownMenu>
@@ -52,20 +49,18 @@ export function Profile() {
           size="icon"
           className="rounded-full"
           type="button"
-          title="Profile"
+          title="Avatar"
         >
           <Avatar>
-            <AvatarImage src={data} alt="Avatar" />
+            <AvatarImage src={user?.avatarUrl || "/user.png"} alt="Avatar" />
             <AvatarFallback>
-              <User2Icon />
+              <AvatarSkeleton className="size-8!" />
             </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-fit!">
-        {isAuth && userId ? (
-          <>
-            <DropdownMenuGroup>
+        <DropdownMenuGroup>
               {menuItems.map(({ title, icon, titleProp, href }) => (
                 <Link href={href} key={title} title={titleProp}>
                   <DropdownMenuItem>
@@ -101,13 +96,6 @@ export function Profile() {
               <LogOutIcon />
               Sign Out
             </DropdownMenuItem>
-          </>
-        ) : (
-          <DropdownMenuItem onClick={() => router.push("/login")} title="Login">
-            <LogInIcon />
-            Login
-          </DropdownMenuItem>
-        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

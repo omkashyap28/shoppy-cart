@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/utils";
 import { AvatarSkeleton } from "@/components/sekeleton/avatar-skeleton";
+import { usePings } from "react-pings";
 
 export function AvatarCard({
   userId,
@@ -30,18 +31,19 @@ export function AvatarCard({
 }) {
   const [fullScreenPreview, setFullScreenPreview] = useState(false);
   const [existingFileId, setFileId] = useState<string | null>(null);
-  const { fileInputRef, handleUpload, progress, data, uploading, status } =
-    useImageKitUpload({
-      imageType: "avatars",
-      selectType: "single",
-      fileType: "image",
-    });
+  const pings = usePings();
 
-    useEffect(() => {
-      (() => {
-        setFileId(fileId);
-      })();
-    }, [fileId]);
+  const { fileInputRef, handleUpload, uploads, uploading } = useImageKitUpload({
+    fileType: "image",
+    selectType: "single",
+    imageType: "avatar"
+  });
+
+  useEffect(() => {
+    (() => {
+      setFileId(fileId);
+    })();
+  }, [fileId]);
 
   const queryClient = useQueryClient();
 
@@ -81,19 +83,26 @@ export function AvatarCard({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["user-data", userId],
+        queryKey: ["user-data"],
       });
     },
+    onError: () => {
+      pings.error("Failed to update profile");
+    }
   });
 
   useEffect(() => {
-    if (data?.url && data.fileId && status === "success") {
+    if(uploads.length === 0) return;
+    const { data, status } = uploads[0];
+    
+    if(!data) return;
+    if (data.url && data.fileId && status === "success") {
       mutate({
         avatarUrl: data.url,
         fileId: data.fileId,
       });
     }
-  }, [data?.url, data?.fileId, mutate, status]);
+  }, [uploads, mutate]);
 
   return (
     <>
@@ -113,14 +122,6 @@ export function AvatarCard({
       )}
       <div className="flex items-center gap-5">
         <Avatar className="relative size-20 border-3 border-background outline-3 outline-transparent md:size-24">
-          {uploading && (
-            <div
-              className="absolute top-1/2 left-1/2 -z-1 size-22 -translate-1/2 rotate-135 rounded-full transition-all duration-150 md:size-26"
-              style={{
-                background: `conic-gradient(var(--primary) ${(progress / 100) * 360}deg, transparent ${(progress / 100) * 360}deg)`,
-              }}
-            />
-          )}
           <AvatarImage
             src={avatarUrl ?? "/user.png"}
             alt="Profile Image"
@@ -130,7 +131,9 @@ export function AvatarCard({
           <AvatarFallback>
             <AvatarSkeleton />
           </AvatarFallback>
-          <label htmlFor="user-profile-input">
+          {
+            !uploading && (
+              <label htmlFor="user-profile-input">
             <AvatarBadge className="z-2 size-6.5! cursor-pointer transition-all duration-150 active:scale-90">
               <Plus className="size-4!" />
             </AvatarBadge>
@@ -147,6 +150,8 @@ export function AvatarCard({
               onChange={handleUpload}
             />
           </label>
+            )
+          }
         </Avatar>
         <div className="flex flex-col items-start">
           <h2 className="-mb-1 text-2xl font-semibold tracking-tight">

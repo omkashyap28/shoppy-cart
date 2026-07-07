@@ -120,7 +120,7 @@ export async function logout() {
   const { signal, cancel } = requestTimeout();
 
   try {
-    const response = await fetch(`api/auth/logout`, {
+    const response = await fetch(`backend/auth/logout`, {
       method: "DELETE",
       credentials: "include",
       signal,
@@ -147,14 +147,12 @@ export async function logout() {
 export function updateStore(data: {
   token: string;
   userId: string;
-  email: string;
   sellerId?: string;
   affiliateCode?: string;
 }) {
   const {
     setAccessToken,
     setIsAuth,
-    setEmail,
     setUserId,
     setSellerId,
     setAffiliateCode,
@@ -162,7 +160,6 @@ export function updateStore(data: {
 
   setAccessToken(data.token);
   setUserId(data.userId);
-  setEmail(data.email);
   setSellerId(data.sellerId || "");
   setAffiliateCode(data.affiliateCode || "");
   setIsAuth(true);
@@ -172,7 +169,6 @@ export function clearStore() {
   const {
     setAccessToken,
     setIsAuth,
-    setEmail,
     setUserId,
     setSellerId,
     setAffiliateCode,
@@ -180,7 +176,6 @@ export function clearStore() {
 
   setAccessToken("");
   setUserId("");
-  setEmail("");
   setSellerId("");
   setAffiliateCode("");
   setIsAuth(false);
