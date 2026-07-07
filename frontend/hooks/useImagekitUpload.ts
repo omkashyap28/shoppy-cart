@@ -1,113 +1,191 @@
+"use client";
+
 import {
-  upload,
   ImageKitAbortError,
   ImageKitServerError,
   ImageKitInvalidRequestError,
   ImageKitUploadNetworkError,
-  UploadResponse,
 } from "@imagekit/next";
 import { useRef, useState } from "react";
+import { FileType, ImageType, SelectType, UploadItem } from "@/types/imagekitUpload"
+import { authenticate } from "@/lib/imagekit/authenticator";
+import { uploadFile } from "@/lib/imagekit/uploadFile";
+import { getFolder } from "@/lib/imagekit/getFolder";
 
-export function useImageKitUpload() {
-  const [progress, setProgress] = useState<number>(0);
-  const [data, setData] = useState<UploadResponse>();
-  const [uploading, setUploading] = useState<boolean>(false);
-  const [status, setStatus] = useState<
-    "idle" | "success" | "error" | "pending"
-  >("idle");
+
+interface ImagekitUploadProps {
+  selectType: SelectType;
+  fileType: FileType;
+  imageType: ImageType
+}
+
+export function useImageKitUpload({
+  selectType = "single",
+  fileType = "image",
+  imageType,
+}: ImagekitUploadProps) {
+
+  const [uploads, setUploads] = useState<UploadItem[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const abortController = new AbortController();
+  const controllerRef = useRef(new Map<string, AbortController>());
 
-  const authenticatore = async () => {
-    try {
-      const response = await fetch("/api/upload-auth");
-      if (!response.ok) {
-        const errorText = response.text;
-        throw new Error(
-          `Request failed with status ${response.status}: ${errorText}`
-        );
-      }
 
-      const data = await response.json();
-      const { signature, expire, token, publicKey } = data;
-      return {
-        signature,
-        expire,
-        token,
-        publicKey,
-      };
-    } catch (error) {
-      console.error(`Authentication error: `, error);
-      throw new Error(`Authentication request failed`);
-    }
-  };
+  const uploading = uploads.some(
+    (u) => u.status === "pending"
+  );
 
-  const handleUpload = async () => {
-    const fileInput = fileInputRef.current;
+  const updateUpload = (
+    id: string,
+    values: Partial<UploadItem>
+  ) => {
+    setUploads(
+      (prev) =>
+        prev.map(
+          (u) => u.id === id ? {
+            ...u,
+            ...values
+          } : u
+        )
+    )
+  }
 
-    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-      return;
-    }
+  const uploadOne = async (item: UploadItem) => {
+    const controller = new AbortController();
 
-    const file = fileInput.files[0];
+    controllerRef.current.set(
+      item.id,
+      controller
+    );
 
-    let authParams;
+    updateUpload(item.id, { status: "pending" })
 
     try {
-      authParams = await authenticatore();
-    } catch (error) {
-      console.error(`Failed to authenticate for upload`, error);
-      return;
-    }
+      console.log("SDasdkjasdkjalsddasd")
+      const auth = await authenticate();
 
-    const { expire, publicKey, signature, token } = authParams;
+      const response = await uploadFile({
+        file: item.file,
+        folder: getFolder(
+          fileType,
+          imageType
+        ),
+        auth,
+        signal: controller.signal,
+        onProgress(progress) {
+          updateUpload(item.id, {
+            progress
+          })
+        }
+      })
 
-    try {
-      setUploading(true);
-      setStatus("pending");
+      console.log("SDasdasd")
 
-      const uploadResponse = await upload({
-        expire,
-        token,
-        signature,
-        publicKey,
-        file,
-        fileName: file.name,
-        folder: "avatar_images",
-        onProgress: (e) => {
-          setProgress(Math.round((e.loaded / e.total) * 100));
-        },
-        abortSignal: abortController.signal,
+      updateUpload(item.id, {
+        progress: 100,
+        status: "success",
+        data: response,
       });
 
-      setStatus("success");
-      setData(uploadResponse);
-    } catch (error) {
-      setStatus("error");
-      if (error instanceof ImageKitAbortError) {
-        console.error("Upload aborted:", error.reason);
-      } else if (error instanceof ImageKitInvalidRequestError) {
-        console.error("Invalid request:", error.message);
-      } else if (error instanceof ImageKitUploadNetworkError) {
-        console.error("Network error:", error.message);
-      } else if (error instanceof ImageKitServerError) {
-        console.error("Server error:", error.message);
+    } catch (e) {
+      let errorMessage;
+      if (e instanceof ImageKitAbortError) {
+        errorMessage = e.message;
+      } else if (e instanceof ImageKitServerError) {
+        errorMessage = e.message;
+      } else if (e instanceof ImageKitInvalidRequestError) {
+        errorMessage = e.message;
+      } else if (e instanceof ImageKitUploadNetworkError) {
+        errorMessage = e.message;
       } else {
-        console.error("Upload error:", error);
+        errorMessage = "Something went wrong!!";
       }
+      updateUpload(item.id, {
+        status: "error",
+        error: errorMessage
+      })
     } finally {
-      setUploading(false);
+      controllerRef.current.delete(item.id);
     }
-  };
+  }
+
+  const handleUpload = async () => {
+    const files = fileInputRef.current?.files;
+
+    if (!files) return;
+
+    const fileList = Array.from(files)
+
+    const selected = selectType === "single" ? fileList.slice(0, 1) : fileList;
+
+    const uploadItems: UploadItem[] = selected.map(file => ({
+      id: crypto.randomUUID(),
+      file,
+      progress: 0,
+      status: "idle",
+    }))
+    setUploads(uploadItems);
+
+    try {
+      await Promise.all(
+        uploadItems.map((item) => uploadOne(item))
+      );
+    } finally {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+    
+  }
+  
+  const retry = async (id: string) => {
+    const upload = uploads.find((u) => u.id === id);
+    
+    if (!upload) return;
+
+    try {
+      uploadOne({
+        ...upload,
+        status: "idle",
+        progress: 0,
+        error: "",
+      });
+    } catch(e) {
+      console.error("Fail to upload item", e);
+    }
+  }
+
+  const abort = (id: string) => {
+    controllerRef.current.get(id)?.abort();
+    updateUpload(id, {
+      status: "error",
+      error: "Upload aborted by user"
+    });
+  }
+
+  const remove = (id: string) => {
+    abort(id);
+
+    setUploads(
+      (prev) => prev.filter(u => u.id !== id)
+    );
+  }
+
+  const clear = () => {
+    controllerRef.current.forEach(controller => controller.abort());
+    controllerRef.current.clear();
+    setUploads([]);
+  }
 
   return {
-    fileInputRef,
-    progress,
-    handleUpload,
-    data,
+    uploads,
     uploading,
-    status,
-  };
+    fileInputRef,
+    handleUpload,
+    retry,
+    abort,
+    remove,
+    clear,
+  }
 }
