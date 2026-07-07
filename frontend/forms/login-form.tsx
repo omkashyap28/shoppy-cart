@@ -15,14 +15,13 @@ import {
   FieldLabel,
   FieldSeparator,
 } from "@/components/ui/field";
-import { requestTimeout, updateStore } from "@/lib/utils";
-import { redirect } from "next/navigation";
+import { updateStore } from "@/lib/utils";
 import { useAppStore } from "@/store/store";
 import { Spinner } from "@/components/ui/spinner";
 import { usePings } from "react-pings";
-import {useRouter} from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export function LoginForm({ }) {
+export function LoginForm({}) {
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -35,9 +34,9 @@ export function LoginForm({ }) {
   const setLoading = useAppStore((state) => state.setLoading);
   const pings = usePings();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const onSubmit = async (data: z.infer<typeof loginFormSchema>) => {
-
     try {
       setLoading(true);
 
@@ -46,7 +45,7 @@ export function LoginForm({ }) {
         password: data.password,
       };
 
-      const res = await fetch(`/api/auth/login`, {
+      const res = await fetch(`/backend/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -58,10 +57,9 @@ export function LoginForm({ }) {
       const responseData = await res.json();
 
       if (!res.ok) {
-        pings.error(responseData.message)
+        pings.error(responseData.message);
         throw new Error(`Failed to login: ${res.statusText}`);
       }
-
 
       if (!responseData.token) {
         throw new Error(`Token not found`);
@@ -70,7 +68,8 @@ export function LoginForm({ }) {
       updateStore(responseData);
       pings.success("Login Successfull");
       form.reset();
-      redirect("/");
+
+      router.push(searchParams.get("redirect") || "/");
     } catch (e) {
       throw e;
     } finally {
@@ -85,7 +84,9 @@ export function LoginForm({ }) {
           <Button
             variant="outline"
             type="button"
-            onClick={() => window.location.href = `api/auth/login/oauth/google`}
+            onClick={() =>
+              (window.location.href = `backend/auth/login/oauth/google`)
+            }
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path

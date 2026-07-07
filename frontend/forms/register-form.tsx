@@ -46,7 +46,7 @@ export function RegisterForm() {
         firstName: data.firstName,
       };
 
-      const res = await fetch(`/api/auth/signup`, {
+      const res = await fetch(`/backend/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

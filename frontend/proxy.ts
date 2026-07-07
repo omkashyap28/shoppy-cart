@@ -30,8 +30,8 @@ export function proxy(request: NextRequest) {
 
   const refreshToken = request.cookies.get('refreshToken')?.value
   const otpId = request.cookies.get('otpVerified')?.value
-  const hasSellerAccount = request.cookies.get('hassellerAccount')?.value
-  const hasAffiliateAccount = request.cookies.get('hasaffiliateAccount')?.value
+  const hasSellerAccount = request.cookies.get('hasSellerAccount')?.value
+  const hasAffiliateAccount = request.cookies.get('hasAffiliateAccount')?.value
 
   const isLoggedIn = !!refreshToken
 
@@ -53,11 +53,15 @@ export function proxy(request: NextRequest) {
   if (otpVerifyRole) {
     if (!isLoggedIn) return toLogin()
 
-    const hasAccount =
-      otpVerifyRole === 'seller' ? hasSellerAccount : hasAffiliateAccount
-    if (hasAccount) {
+    if (hasSellerAccount === "true") {
       return NextResponse.redirect(
-        new URL(`/${otpVerifyRole}/dashboard`, request.url)
+        new URL(`/seller/dashboard`, request.url)
+      )
+    }
+
+    if (hasAffiliateAccount === "true") {
+      return NextResponse.redirect(
+        new URL(`/affiliate/dashboard`, request.url)
       )
     }
 
@@ -77,8 +81,7 @@ export function proxy(request: NextRequest) {
   if (setupRole) {
     if (!isLoggedIn) return toLogin()
 
-    const hasAccount =
-      setupRole === 'seller' ? hasSellerAccount : hasAffiliateAccount
+    const hasAccount = hasSellerAccount || hasAffiliateAccount
     if (hasAccount) {
       return NextResponse.redirect(
         new URL(`/${setupRole}/dashboard`, request.url)

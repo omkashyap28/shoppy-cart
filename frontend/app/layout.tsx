@@ -5,12 +5,8 @@ import { cn } from "@/lib/utils";
 import React from "react";
 import { Metadata } from "next";
 import "../node_modules/react-pings/dist/index.css";
-import QueryProvider from "@/providers/query-provider";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { PingsProvider } from "@/providers/pings-provider";
-import { ImageKitProvider } from "@/providers/imagekit-provider";
-import { ThemeProvider } from "@/providers/theme-provider";
 import { Auth } from "@/components/layout";
+import { GlobalProvider } from "@/providers/global-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -43,23 +39,17 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       className={cn(
-        "antialiased",
+        "antialiased selection:bg-foreground selection:text-background",
         fontMono.variable,
         "font-sans",
         inter.variable
       )}
     >
       <body cz-shortcut-listen="true">
-        <QueryProvider>
-          <ThemeProvider>
-            <ImageKitProvider>
-              <TooltipProvider>
-                <PingsProvider>{children}</PingsProvider>
-              </TooltipProvider>
-            </ImageKitProvider>
-            <Auth />
-          </ThemeProvider>
-        </QueryProvider>
+        <GlobalProvider>
+          {children}
+          <Auth />
+        </GlobalProvider>
       </body>
     </html>
   );

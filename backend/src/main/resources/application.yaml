@@ -2,13 +2,13 @@ spring:
   security.oauth2.client:
     registration:
       google:
-        client-id: ${GOOGLE_OAUTH_CLIENT_ID}
-        client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET}
+        client-id: 853872538696-dk1dfes9t86cko1o4rn7hppmf66n70jb.apps.googleusercontent.com
+        client-secret: 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
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${GMAIL_APP_USERNAME}
-    password: ${GMAIL_APP_PASSWORD}
+    username: om.kashyap2902@gmail.com
+    password: luaenmpubsataptp
     properties:
       mail:
         smtp:

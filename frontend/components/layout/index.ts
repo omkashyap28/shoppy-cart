@@ -14,6 +14,8 @@ import { BackButton } from "./back-btn";
 import { CopyButton } from "./copy-btn";
 import { PageComponent } from "./page-component";
 import { Theme } from "./theme";
+import { ShareModel } from "./share-model";
+import {ImageDrop} from "./image-drop";
 
 export {
   Header,

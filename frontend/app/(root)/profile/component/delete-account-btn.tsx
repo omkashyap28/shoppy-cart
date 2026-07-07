@@ -43,7 +43,7 @@ export function DeleteAccountButton({
   userId: string;
   email: string;
 }) {
-  const isBigScreen = useMediaQuery("min-width: 612px");
+  const isDesktop = useMediaQuery("(min-width: 640px)");
   const [open, setOpen] = useState(false);
 
   return (
@@ -51,7 +51,7 @@ export function DeleteAccountButton({
       <FieldSeparator className="my-4 *:data-[slot=field-separator-content]:bg-background">
         Delete Account
       </FieldSeparator>
-      {isBigScreen ? (
+      {isDesktop ? (
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button type="button" variant="destructive" className="h-10 w-full">
@@ -79,7 +79,7 @@ export function DeleteAccountButton({
               <Trash2Icon /> Delete Account
             </Button>
           </DrawerTrigger>
-          <DrawerContent className="pb-7">
+          <DrawerContent className="border-none pb-7">
             <DrawerHeader className="text-left">
               <DrawerTitle className="mb-5 text-xl text-destructive">
                 Delete Account
@@ -92,6 +92,13 @@ export function DeleteAccountButton({
             </DrawerHeader>
             <ConfirmationForm userId={userId} email={email} />
             <DrawerFooter>
+              <Button
+                type="submit"
+                form="deleteConfirmationForm"
+                variant="destructive"
+              >
+                <Trash2Icon /> Delete Account
+              </Button>
               <DrawerClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DrawerClose>
@@ -210,16 +217,6 @@ function ConfirmationForm({
             </Field>
           )}
         />
-
-        <Field>
-          <Button
-            type="submit"
-            form="deleteConfirmationForm"
-            variant="destructive"
-          >
-            <Trash2Icon /> Delete Account
-          </Button>
-        </Field>
       </FieldGroup>
     </form>
   );

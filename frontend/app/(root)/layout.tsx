@@ -1,4 +1,4 @@
-import { Container, Footer, Header } from "@/components/layout/index";
+import { Container, Footer, Categories, Header } from "@/components/layout/index";
 
 export default function Layout({
   children,
@@ -8,9 +8,10 @@ export default function Layout({
   return (
     <>
       <Header />
+      <Categories />
       <Container>
         {children}
-      </Container>
+        </Container>
       <Footer />
     </>
   );

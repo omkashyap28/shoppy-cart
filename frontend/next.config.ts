@@ -5,12 +5,11 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-      source: "/backend/:path*",
+        source: "/backend/:path*",
         destination: `${process.env.BACKEND_URI}/api/v1/:path*`,
       },
     ];
   },
-  allowedDevOrigins: ["10.86.101.120"],
   images: {
     remotePatterns: [
       {
@@ -20,6 +19,10 @@ const nextConfig: NextConfig = {
         pathname: "/a/**",
       },
     ],
+  },
+  allowedDevOrigins: ['10.81.97.120'],
+  turbopack: {
+    root: "../",
   },
 };
 

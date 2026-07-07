@@ -25,12 +25,12 @@ export function Footer() {
   };
 
   return (
-    <footer className="w-full mx-auto max-w-640 px-4 py-8 sm:p-6 md:px-13 mt-18 rounded-t-4xl bg-linear-120 from-background to-secondary">
-      <div className="w-full flex items-center justify-center pb-10">
+    <footer className="mx-auto mt-18 w-full max-w-640 rounded-t-4xl bg-linear-120 from-background to-primary/20 px-4 py-8 sm:p-6 md:px-13 dark:to-primary/40">
+      <div className="flex w-full items-center justify-center pb-10">
         <Button
           variant="outline"
           onClick={handleClick}
-          className="w-auto bg-secondary flex items-center justify-center gap-1.5 px-3 shadow-xs rounded-full"
+          className="flex w-auto items-center justify-center gap-1.5 rounded-full bg-secondary px-3 shadow-xs"
         >
           <ArrowUp className="size-5" />
           <span className="text-[15px] tracking-tighter">Back to Top</span>
