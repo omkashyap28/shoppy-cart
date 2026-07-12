@@ -34,4 +34,6 @@ export {
   BackButton,
   PageComponent,
   Theme,
+  ShareModel,
+  ImageDrop,
 };
