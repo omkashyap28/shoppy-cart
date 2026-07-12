@@ -1,11 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-
-import { NavDocuments } from "@/components/nav-documents"
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
-import { NavUser } from "@/components/nav-user"
+import * as React from "react";
+import { NavMain } from "@/components/nav-main";
 import {
   Sidebar,
   SidebarContent,
@@ -14,193 +10,82 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon } from "lucide-react"
-import { Logo } from "./layout"
-import Link from "next/link"
+  SidebarSeparator,
+} from "@/components/ui/sidebar";
+import {
+  LayoutDashboardIcon,
+  ListIcon,
+  ChartBarIcon,
+  FolderIcon,
+  Settings,
+  Plus,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const data = {
   user: {
     name: "shadcn",
     email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "/user.png",
   },
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
-      icon: (
-        <LayoutDashboardIcon
-        />
-      ),
+      url: "/seller/dashboard",
+      icon: <LayoutDashboardIcon className="size-5!" />,
     },
     {
-      title: "Lifecycle",
-      url: "#",
-      icon: (
-        <ListIcon
-        />
-      ),
+      title: "Products",
+      url: "/seller/products",
+      icon: <ListIcon className="size-5!" />,
     },
     {
-      title: "Analytics",
-      url: "#",
-      icon: (
-        <ChartBarIcon
-        />
-      ),
+      title: "Discussion",
+      url: "/seller/discussion",
+      icon: <ChartBarIcon className="size-5!" />,
     },
     {
-      title: "Projects",
-      url: "#",
-      icon: (
-        <FolderIcon
-        />
-      ),
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: (
-        <UsersIcon
-        />
-      ),
+      title: "Reviews",
+      url: "/seller/reviews",
+      icon: <FolderIcon className="size-5!" />,
     },
   ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: (
-        <CameraIcon
-        />
-      ),
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: (
-        <FileTextIcon
-        />
-      ),
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: (
-        <FileTextIcon
-        />
-      ),
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: (
-        <Settings2Icon
-        />
-      ),
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: (
-        <CircleHelpIcon
-        />
-      ),
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: (
-        <SearchIcon
-        />
-      ),
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: (
-        <DatabaseIcon
-        />
-      ),
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: (
-        <FileChartColumnIcon
-        />
-      ),
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: (
-        <FileIcon
-        />
-      ),
-    },
-  ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const router = useRouter();
+
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar
+      className="sticky! top-14.5! h-[calc(100vh-60px)]"
+      collapsible="icon"
+      {...props}
+    >
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:p-3!"
+              onClick={() => {
+                router.push("/seller/products/add");
+              }}
+              tooltip="Add Product"
+              className="bg-primary text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground active:bg-primary/80"
             >
-              <Logo />
+              <Plus className="size-5!" /> Add Product
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+      <SidebarSeparator />
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
+      <SidebarSeparator />
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <SidebarMenuButton>
+          <Settings className="size-5!" /> Settings
+        </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
