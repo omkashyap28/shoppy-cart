@@ -34,4 +34,27 @@ public class ProductImage {
   )
   private String imageUrl;
 
+  @Column(
+    nullable = false
+  )
+  private String thumbnailUrl;
+
+  @Column(
+    nullable = false,
+    unique = true
+  )
+  private String imageId;
+
+  @Column(
+    nullable = false
+  )
+  private Boolean isThumbnail;
+
+  @Column(
+    nullable = false
+  )
+  private Integer priority;
+
+  @Column
+  private String altText;
 }

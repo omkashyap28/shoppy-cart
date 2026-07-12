@@ -11,8 +11,9 @@ import java.util.Map;
 public class ProductResponseDto {
 
   private String productId;
+  private String brandName;
   private String description;
-  private List<String> productImages;
+  private List<ProductImageResponseDto> productImages;
   private Map<String, String> productAttributes;
   private String sellerId;
   private Boolean inStock;

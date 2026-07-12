@@ -1,5 +1,6 @@
 package com.omkashyap.com.backend.dtoMapper;
 
+import com.omkashyap.com.backend.dto.responseDto.ProductImageResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
 import com.omkashyap.com.backend.entity.AffiliateUserProduct;
 import com.omkashyap.com.backend.entity.Product;
@@ -17,6 +18,7 @@ public class ProductDtoMapper {
     ProductResponseDto dto = new ProductResponseDto();
 
     dto.setProductId(product.getProductId());
+    dto.setBrandName(product.getBrandName());
     dto.setDescription(product.getDescription());
     dto.setSellerId(product.getSeller().getSellerId());
     dto.setInStock(product.getInStock());
@@ -27,10 +29,18 @@ public class ProductDtoMapper {
     dto.setProductUrl(product.getProductUrl());
     dto.setCategoryId(product.getCategory().getId());
 
-    List<String> images = new ArrayList<>();
+    List<ProductImageResponseDto> images = new ArrayList<>();
     if (product.getProductImages() != null && !product.getProductImages().isEmpty()) {
       product.getProductImages()
-          .forEach(img -> images.add(img.getImageUrl()));
+          .forEach(img -> images.add(
+              ProductImageResponseDto.builder()
+                  .imageUrl(img.getImageUrl())
+                  .thumbnailUrl(img.getThumbnailUrl())
+                  .imageId(img.getImageId())
+                  .priority(img.getPriority())
+                  .altText(img.getAltText())
+                  .build())
+          );
       dto.setProductImages(images);
     }
 
@@ -60,6 +70,7 @@ public class ProductDtoMapper {
 
     ProductResponseDto dto = new ProductResponseDto();
     dto.setProductId(product.getProductId());
+    dto.setBrandName(product.getBrandName());
     dto.setDescription(product.getDescription());
     dto.setSellerId(product.getSeller().getSellerId());
     dto.setInStock(product.getInStock());
@@ -73,10 +84,18 @@ public class ProductDtoMapper {
       dto.setCategoryId(product.getCategory().getId());
     }
 
-    List<String> images = new ArrayList<>();
+    List<ProductImageResponseDto> images = new ArrayList<>();
     if (product.getProductImages() != null && !product.getProductImages().isEmpty()) {
       product.getProductImages()
-          .forEach(img -> images.add(img.getImageUrl()));
+          .forEach(img -> images.add(
+              ProductImageResponseDto.builder()
+                  .imageUrl(img.getImageUrl())
+                  .thumbnailUrl(img.getThumbnailUrl())
+                  .imageId(img.getImageId())
+                  .priority(img.getPriority())
+                  .altText(img.getAltText())
+                  .build())
+          );
       dto.setProductImages(images);
     }
 

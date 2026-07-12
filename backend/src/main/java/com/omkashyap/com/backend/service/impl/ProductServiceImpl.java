@@ -44,6 +44,7 @@ public class ProductServiceImpl implements ProductService {
     );
 
     Product product = Product.builder()
+        .brandName(productRequestDto.getBrandName())
         .description(productRequestDto.getDescription())
         .category(category)
         .quantity(productRequestDto.getQuantity())
@@ -95,6 +96,11 @@ public class ProductServiceImpl implements ProductService {
       productRequestDto.getProductImages().forEach(imgDto -> {
         ProductImage image = ProductImage.builder()
             .imageUrl(imgDto.getImageUrl())
+            .imageId(imgDto.getImageId())
+            .thumbnailUrl(imgDto.getThumbnailUrl())
+            .altText(imgDto.getAltText())
+            .priority(imgDto.getPriority())
+            .isThumbnail(imgDto.getIsThumbnail())
             .product(product)
             .build();
 

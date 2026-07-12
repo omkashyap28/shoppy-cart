@@ -36,6 +36,11 @@ public class Product {
   private String productId;
 
   @Column(
+    nullable = false
+  )
+  private String brandName;
+
+  @Column(
       nullable = false
   )
   private String description;
@@ -45,14 +50,16 @@ public class Product {
       orphanRemoval = true,
       cascade = CascadeType.ALL
   )
+  @Builder.Default
   private List<ProductImage> productImages = new ArrayList<>();
-
+  
   @OneToMany(
       mappedBy = "product",
       cascade = CascadeType.ALL,
       orphanRemoval = true
-  )
-  private List<Review> review = new ArrayList<>();
+    )
+    @Builder.Default
+    private List<Review> review = new ArrayList<>();
 
   @JsonIgnore
   @ManyToOne(
@@ -106,6 +113,7 @@ public class Product {
       cascade = CascadeType.ALL,
       orphanRemoval = true
   )
+  @Builder.Default
   private List<ProductDiscussion> discussions = new ArrayList<>();
 
   @OneToMany(
@@ -120,7 +128,8 @@ public class Product {
       mappedBy = "product",
       cascade = CascadeType.ALL,
       orphanRemoval = true
-  )
+    )
+  @Builder.Default
   private List<AffiliateUserProduct> affiliateUserProduct = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)

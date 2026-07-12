@@ -11,6 +11,7 @@ import java.util.List;
 @Builder
 public class ProductRequestDto {
 
+  private String brandName;
   private String description;
   private Integer quantity;
   private Long categoryId;

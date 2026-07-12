@@ -35,7 +35,7 @@ public class SellerController {
   }
 
   @PostMapping("/address")
-  ResponseEntity<ShopAddressResponseDto> addShopAddressBySellerId(@PathVariable String sellerId, @RequestBody AddressRequestDto addressRequestDto) {
+  ResponseEntity<ShopAddressResponseDto> addShopAddressBySellerId(@PathVariable String sellerId, @Valid @RequestBody AddressRequestDto addressRequestDto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.addAddressBySellerId(sellerId, addressRequestDto));
   }
 

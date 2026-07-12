@@ -1,6 +1,5 @@
 package com.omkashyap.com.backend.dto.responseDto;
 
-import com.omkashyap.com.backend.entity.Product;
 import com.omkashyap.com.backend.type.CategoryEnum;
 import lombok.*;
 
