@@ -2,7 +2,9 @@ package com.omkashyap.com.backend.service.impl;
 
 import com.omkashyap.com.backend.dto.requestDto.ProductRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.ProductsResponseDto;
 import com.omkashyap.com.backend.dtoMapper.ProductDtoMapper;
+import com.omkashyap.com.backend.dtoMapper.ProductsDtoMapper;
 import com.omkashyap.com.backend.entity.*;
 import com.omkashyap.com.backend.repository.*;
 import com.omkashyap.com.backend.service.ProductService;
@@ -29,6 +31,7 @@ public class ProductServiceImpl implements ProductService {
   private final AffiliateUserProductRepository affiliateUserProductRepository;
   private final TagsRepository tagsRepository;
   private final TagsUtil tagsUtil;
+  private final ProductsDtoMapper productsDtoMapper;
 
   @Override
   @Transactional
@@ -70,10 +73,6 @@ public class ProductServiceImpl implements ProductService {
       product.getTags().add(tags);
     });
 
-    productRepository.save(product);
-    product.setProductUrl("product/" + product.getProductId());
-
-
     if (productRequestDto.getProductAttributes() != null) {
 
       if (product.getProductAttributes() == null) product.setProductAttributes(new ArrayList<>());
@@ -104,12 +103,18 @@ public class ProductServiceImpl implements ProductService {
             .product(product)
             .build();
 
+        if (imgDto.getIsThumbnail().equals(true)) {
+          product.setProductThumbnail(imgDto.getThumbnailUrl());
+        }
+
         product.getProductImages().add(image);
       });
     }
 
-    seller.addProduct(product);
+    productRepository.save(product);
+    product.setProductUrl("/product/" + product.getProductId());
 
+    seller.addProduct(product);
 
     return productDtoMapper.mapToDto(product);
 
@@ -154,7 +159,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public List<ProductResponseDto> getAllProducts(String sellerId) {
+  public List<ProductsResponseDto> getAllProducts(String sellerId) {
 
     Seller seller = sellerRepository.findBySellerId(sellerId).orElseThrow(() -> new IllegalArgumentException("Seller with this id not exists"));
 
@@ -162,7 +167,7 @@ public class ProductServiceImpl implements ProductService {
 
     return products
         .stream()
-        .map(productDtoMapper::mapToDto)
+        .map(productsDtoMapper::mapToDto)
         .toList();
   }
 

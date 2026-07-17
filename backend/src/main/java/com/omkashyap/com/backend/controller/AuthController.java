@@ -224,11 +224,6 @@ public class AuthController {
     cookie.setMaxAge(7 * 24 * 60 * 60);
     cookie.setPath("/");
 
-    Cookie sellerCookie = new Cookie("hasSellerAccount", "true");
-    cookie.setSecure(false);
-    cookie.setHttpOnly(true);
-    cookie.setMaxAge(7 * 24 * 60 * 60);
-    cookie.setPath("/");
 
     Cookie otpCookie = new Cookie("otpVerified", null);
     otpCookie.setMaxAge(0);
@@ -237,7 +232,6 @@ public class AuthController {
     otpCookie.setSecure(true);
 
     response.addCookie(cookie);
-    response.addCookie(sellerCookie);
     response.addCookie(otpCookie);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(

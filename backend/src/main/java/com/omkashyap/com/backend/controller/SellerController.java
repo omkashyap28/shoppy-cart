@@ -4,15 +4,16 @@ import com.omkashyap.com.backend.dto.requestDto.AddressRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.ProductRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.SellerAccountRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.SellerVerificationRequestDto;
-import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
-import com.omkashyap.com.backend.dto.responseDto.ReviewResponseDto;
-import com.omkashyap.com.backend.dto.responseDto.SellerResponseDto;
-import com.omkashyap.com.backend.dto.responseDto.ShopAddressResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.*;
 import com.omkashyap.com.backend.service.ProductService;
 import com.omkashyap.com.backend.service.ReviewService;
 import com.omkashyap.com.backend.service.SellerService;
+
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import jakarta.servlet.http.Cookie;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +51,19 @@ public class SellerController {
   }
 
   @PostMapping("/verification")
-  ResponseEntity<SellerResponseDto> addSellerVerification(@PathVariable String sellerId, @Valid @RequestBody SellerVerificationRequestDto requestDto) {
+  ResponseEntity<SellerResponseDto> addSellerVerification(
+    @PathVariable String sellerId,
+    HttpServletResponse response,
+    @Valid @RequestBody SellerVerificationRequestDto requestDto) {
+
+      Cookie hasSellerAccountCookie = new Cookie("hasSellerAccount", "true");
+      hasSellerAccountCookie.setSecure(false);
+      hasSellerAccountCookie.setHttpOnly(true);
+      hasSellerAccountCookie.setMaxAge(7 * 24 * 60 * 60);
+      hasSellerAccountCookie.setPath("/");
+
+      response.addCookie(hasSellerAccountCookie);
+
     return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.addSellerVerification(sellerId, requestDto));
   }
 
@@ -81,7 +94,7 @@ public class SellerController {
   }
 
   @GetMapping("/products")
-  ResponseEntity<List<ProductResponseDto>> getAllProduct(@PathVariable String sellerId) {
+  ResponseEntity<List<ProductsResponseDto>> getAllProduct(@PathVariable String sellerId) {
     return ResponseEntity.status(HttpStatus.OK).body(productService.getAllProducts(sellerId));
   }
 
