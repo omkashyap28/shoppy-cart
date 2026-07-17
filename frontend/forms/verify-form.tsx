@@ -2,7 +2,7 @@
 
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
   InputOTP,
   InputOTPGroup,
@@ -13,21 +13,22 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { verifyFormSchema } from "@/schemas";
 import { apiFetch } from "@/lib/utils";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/store";
 import { useEffect, useRef, useState } from "react";
 import { usePings } from "react-pings";
 import { Spinner } from "@/components/ui/spinner";
+import { Input } from "@/components/ui/input";
 
-export function VerifyForm({ redirectUrl }: { redirectUrl: string }) {
+export function VerifyForm({ onSuccess }: { onSuccess: () => void }) {
+
   const loading = useAppStore((state) => state.loading);
   const setLoading = useAppStore((state) => state.setLoading);
+  const email = useAppStore(state => state.user?.email);
   const [formOpen, setFormOpen] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [timeLeft, setTimeLeft] = useState(30);
   const pings = usePings();
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof verifyFormSchema>>({
     resolver: zodResolver(verifyFormSchema),
@@ -56,10 +57,11 @@ export function VerifyForm({ redirectUrl }: { redirectUrl: string }) {
         throw new Error(`Failed to verify: ${responseData.message}`);
       }
 
-      // pings.success("OTP verified successfully");
-      router.push(redirectUrl);
+      pings.success("OTP verified successfully");
+      onSuccess();
+
     } catch (e) {
-      // pings.error("Failed to verify OTP or Invalid OTP");
+      pings.error("Failed to verify OTP or Invalid OTP");
       console.error(e);
     } finally {
       form.reset({
@@ -87,7 +89,7 @@ export function VerifyForm({ redirectUrl }: { redirectUrl: string }) {
         throw Error(`Failed to send OTP: ${res.statusText}`);
       }
 
-      // pings.success("OTP sent successfully");
+      pings.success("OTP sent successfully");
       setFormOpen(true);
 
       // Clear existing timer
@@ -108,7 +110,7 @@ export function VerifyForm({ redirectUrl }: { redirectUrl: string }) {
       }, 1000);
 
     } catch (error) {
-      // pings.error("Failed to sent OTP");
+      pings.error("Failed to sent OTP");
       console.error(error);
     } finally {
       setLoading(false);
@@ -126,9 +128,20 @@ export function VerifyForm({ redirectUrl }: { redirectUrl: string }) {
   if (!formOpen) {
     return (
       <FieldGroup>
-        <Button variant="default" onClick={sendOTP}>
-          Send OTP
-        </Button>
+        <Field>
+          <FieldLabel htmlFor="otpEmail">
+            Email
+          </FieldLabel>
+          <Input value={email} disabled id="otpEmail" />
+        </Field>
+        <Field>
+          <Button variant="default" onClick={sendOTP}>
+            Send OTP
+          </Button>
+          <FieldDescription>
+            By clicking send OTP, you agree to our terms and conditions.
+          </FieldDescription>
+        </Field>
       </FieldGroup>
     );
   } else {

@@ -23,18 +23,18 @@ import {
 } from "@/components/ui/select";
 import { useAppStore } from "@/store/store";
 import { apiFetch } from "@/lib/utils";
-import { useRouter } from "next/navigation";
 import { usePings } from "react-pings";
+import { Textarea } from "@/components/ui/textarea";
 
 const categories = ["ELECTRONICS", "FASHION", "GROCERY", "BOOKS", "FURNITURE"];
 
-export function SellerRegistrationForm() {
+export function SellerRegistrationForm({onSuccess}: {onSuccess: () => void}) {
 
   const userId = useAppStore((state) => state.userId);
   const pings = usePings();
-  const setLoading = useAppStore(state => state.setLoading)
+  const setLoading = useAppStore(state => state.setLoading);
   const loading = useAppStore(state => state.loading);
-  const router = useRouter();
+  const setSellerId = useAppStore(state => state.setSellerId);
 
   const form = useForm<z.infer<typeof sellerRegistrationFormSchema>>({
     resolver: zodResolver(sellerRegistrationFormSchema),
@@ -68,15 +68,16 @@ export function SellerRegistrationForm() {
       const responseData = await res.json();
 
       if (!res.ok) {
-        pings.error(responseData.message);
         throw new Error(responseData.message);
       }
 
-      localStorage.setItem("sellerId", responseData.sellerId);
+      setSellerId(responseData.sellerId);
+
+      pings.success("Shop Information add successfully");
+      onSuccess();
       form.reset();
-      pings.success("Shop registered successfully");
-      router.push("/seller/dashboard")
     } catch (e) {
+      pings.error("Failed to add shop information");
       throw e;
     } finally {
       setLoading(false);
@@ -112,7 +113,7 @@ export function SellerRegistrationForm() {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="description">Shop Description</FieldLabel>
-              <Input
+              <Textarea
                 {...field}
                 id="description"
                 aria-invalid={fieldState.invalid}
