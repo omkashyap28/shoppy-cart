@@ -13,6 +13,7 @@ public class ProductResponseDto {
   private String productId;
   private String brandName;
   private String description;
+  private String productThumbnail;
   private List<ProductImageResponseDto> productImages;
   private Map<String, String> productAttributes;
   private String sellerId;

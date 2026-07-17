@@ -45,6 +45,12 @@ public class Product {
   )
   private String description;
 
+  @Column(
+      nullable = false,
+      unique = true
+  )
+  private String productThumbnail;
+
   @OneToMany(
       mappedBy = "product",
       orphanRemoval = true,

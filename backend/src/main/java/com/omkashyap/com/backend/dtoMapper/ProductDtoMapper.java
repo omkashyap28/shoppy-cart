@@ -2,6 +2,7 @@ package com.omkashyap.com.backend.dtoMapper;
 
 import com.omkashyap.com.backend.dto.responseDto.ProductImageResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.ProductsResponseDto;
 import com.omkashyap.com.backend.entity.AffiliateUserProduct;
 import com.omkashyap.com.backend.entity.Product;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,7 @@ public class ProductDtoMapper {
     dto.setCoins(product.getCoins());
     dto.setProductUrl(product.getProductUrl());
     dto.setCategoryId(product.getCategory().getId());
+    dto.setProductThumbnail(product.getProductThumbnail());
 
     List<ProductImageResponseDto> images = new ArrayList<>();
     if (product.getProductImages() != null && !product.getProductImages().isEmpty()) {
