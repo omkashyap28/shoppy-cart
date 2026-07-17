@@ -18,9 +18,9 @@ import {
   ChartBarIcon,
   FolderIcon,
   Settings,
-  Plus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const data = {
   user: {
@@ -53,38 +53,45 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+
   const router = useRouter();
 
   return (
     <Sidebar
-      className="sticky! top-14.5! h-[calc(100vh-60px)]"
       collapsible="icon"
       {...props}
     >
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => {
-                router.push("/seller/products/add");
-              }}
-              tooltip="Add Product"
-              className="bg-primary text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground active:bg-primary/80"
-            >
-              <Plus className="size-5!" /> Add Product
+            <SidebarMenuButton onClick={() => router.push("/")}>
+              <Image
+                src="/logo.png"
+                alt=""
+                className="size-6 dark:invert"
+                height={24}
+                width={24}
+                fetchPriority="high"
+                loading="eager"
+              />
+              <span className="text-xl font-medium tracking-tighter">
+                Shoppy Cart
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarSeparator />
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarSeparator />
       <SidebarFooter>
-        <SidebarMenuButton>
-          <Settings className="size-5!" /> Settings
-        </SidebarMenuButton>
+        <SidebarMenu>
+          <SidebarMenuButton>
+            <Settings className="size-5!" />
+            <span>Settings</span>
+          </SidebarMenuButton>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

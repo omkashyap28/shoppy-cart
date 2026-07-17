@@ -1,5 +1,4 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import { Header } from "@/components/layout";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default function SellerLayout({
@@ -8,8 +7,6 @@ export default function SellerLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <Header />
       <SidebarProvider
         style={
           {
@@ -18,9 +15,8 @@ export default function SellerLayout({
           } as React.CSSProperties
         }
       >
-        <AppSidebar variant="sidebar" />
+        <AppSidebar variant="floating" />
         <SidebarInset>{children}</SidebarInset>
       </SidebarProvider>
-    </>
   );
 }

@@ -25,7 +25,7 @@ export function MobileMenu() {
             </div>
           </Button>
         </SheetTrigger>
-        <SheetContent side="right" className="w-90! px-6 pt-12">
+        <SheetContent side="right" className="w-45 px-6 pt-24 border-none">
           {/* Screen reader friendly title */}
           <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
@@ -34,7 +34,7 @@ export function MobileMenu() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-md px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                className="rounded-md px-4 py-2 text-xl font-medium text-muted-foreground hover:underline"
               >
                 {link.label}
               </Link>
