@@ -45,3 +45,16 @@ export const addProductSchema = z.object({
 
   tags: z.array(z.string()),
 });
+
+export const editProductSchema = z.object({
+  description: z
+    .string("Description is required")
+    .min(10, "Product description must be at least 10 characters")
+    .max(300, "Product description must not exceed 300 characters"),
+
+    quantity: z
+    .number("Quantity is required")
+    .int("Quantity must be a whole number")
+    .min(1, "Quantity must be greater than 0")
+    .max(99999, "Quantity must be less than 99999"),
+});

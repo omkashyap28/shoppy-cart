@@ -29,6 +29,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { productCategories } from "@/constants";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+
+type AddProductScehma = z.infer<typeof addProductSchema>;
 
 export function AddProductForm() {
   const loading = useAppStore((state) => state.loading);
@@ -36,8 +40,11 @@ export function AddProductForm() {
   const sellerId = useAppStore((state) => state.sellerId);
   const [uploadedItems, setUploadedItems] = useState<UploadedItems[]>([]);
   const pings = usePings();
+  const router = useRouter()
 
-  const form = useForm<z.infer<typeof addProductSchema>>({
+  const queryClient = useQueryClient();
+
+  const form = useForm<AddProductScehma>({
     resolver: zodResolver(addProductSchema),
     defaultValues: {
       brandName: "",
@@ -65,14 +72,15 @@ export function AddProductForm() {
     );
   }, [uploadedItems, form]);
 
-  async function onSubmit(data: z.infer<typeof addProductSchema>) {
-    const formData = {
-      ...data,
-      categoryId: Number(data.categoryId),
-      tags: data.tags.map((tag) => tag.trim()).filter(Boolean),
-    };
+  
+  const mutate = useMutation({
+    mutationFn: async (data: AddProductScehma) => {
+      const formData = {
+        ...data,
+        categoryId: Number(data.categoryId),
+        tags: data.tags.map((tag) => tag.trim()).filter(Boolean),
+      };
 
-    try {
       setLoading(true);
 
       const response = await apiFetch(`seller/${sellerId}/products`, {
@@ -87,16 +95,32 @@ export function AddProductForm() {
         throw new Error("Failed to create product");
       }
 
-      pings.success("Product created successfully");
-      localStorage.removeItem("uploadProductsImages");
-
       return await response.json();
-    } catch (e) {
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["seller-products", sellerId],
+      });
+      reset();
+      pings.success("Product created successfully");
+      router.push("/seller/products");
+    },
+    onError: () => {
       pings.error("Failed to add product");
-      throw e;
-    } finally {
+    },
+    onSettled: () => {
       setLoading(false);
     }
+  });
+
+  function onSubmit(data: AddProductScehma) {
+    mutate.mutate(data);
+  }
+
+  function reset() {
+    form.reset();
+    localStorage.removeItem("uploadProductsImages");
+    setUploadedItems([]);
   }
 
   return (
@@ -168,15 +192,18 @@ export function AddProductForm() {
                   onValueChange={field.onChange}
                   disabled={field.disabled}
                 >
-                  <SelectTrigger id="category" aria-invalid={fieldState.invalid}>
+                  <SelectTrigger
+                    id="category"
+                    aria-invalid={fieldState.invalid}
+                  >
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {
-                      productCategories.map(({value, title}, idx) => (
-                        <SelectItem value={value} key={idx}>{title}</SelectItem>
-                      ))
-                    }
+                    {productCategories.map(({ value, title }, idx) => (
+                      <SelectItem value={value} key={idx}>
+                        {title}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FieldError>
@@ -271,14 +298,7 @@ export function AddProductForm() {
               {loading && <Spinner />}
               Submit Product
             </Button>
-            <Button
-              onClick={() => {
-                form.reset();
-                setUploadedItems([]);
-              }}
-              type="button"
-              variant="outline"
-            >
+            <Button onClick={reset} type="button" variant="outline">
               Reset
             </Button>
           </Field>
