@@ -9,7 +9,7 @@ export function PageComponent({
 }) {
   return (
     <div className="mx-auto w-full max-w-md">
-      <div className="sticky inset-x-auto top-22 z-8 flex items-center gap-2 bg-background py-2">
+      <div className="sticky inset-x-auto top-14 z-8 flex items-center gap-2 bg-background py-2">
         <BackButton />
         <h1 className="font-heading text-lg tracking-tight text-secondary-foreground">
           {heading}

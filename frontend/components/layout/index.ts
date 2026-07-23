@@ -15,7 +15,8 @@ import { CopyButton } from "./copy-btn";
 import { PageComponent } from "./page-component";
 import { Theme } from "./theme";
 import { ShareModel } from "./share-model";
-import {ImageDrop} from "./image-drop";
+import { ImageDrop } from "./image-drop";
+import { MagnetButton } from "./magnet-button";
 
 export {
   Header,
@@ -36,4 +37,5 @@ export {
   Theme,
   ShareModel,
   ImageDrop,
+  MagnetButton
 };
