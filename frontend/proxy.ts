@@ -7,14 +7,8 @@ const STANDARD_PROTECTED = ['/cart', '/profile', '/wishlist', '/wallet', '/order
 
 // Needs refreshToken + otpId cookie (mid-setup flow)
 const SETUP_ROUTES: Record<string, string> = {
-  '/seller/setup': 'seller',
-  '/affiliate/setup': 'affiliate',
-}
-
-// Needs refreshToken + NO hasSellerAccount/hasAffiliateAccount yet
-const OTP_VERIFY_ROUTES: Record<string, string> = {
-  '/seller/verify-email': 'seller',
-  '/affiliate/verify-email': 'affiliate',
+  '/seller/register': 'seller',
+  '/affiliate/register': 'affiliate',
 }
 
 // Needs refreshToken + hasSellerAccount or hasAffiliateAccount cookie
@@ -28,8 +22,7 @@ const AUTH_ROUTES = ['/login', '/register']
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  const refreshToken = request.cookies.get('refreshToken')?.value
-  const otpId = request.cookies.get('otpVerified')?.value
+  const refreshToken = request.cookies.get('refreshToken')?.value;
   const hasSellerAccount = request.cookies.get('hasSellerAccount')?.value
   const hasAffiliateAccount = request.cookies.get('hasAffiliateAccount')?.value
 
@@ -46,34 +39,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  const otpVerifyRole = Object.entries(OTP_VERIFY_ROUTES).find(([r]) =>
-    pathname.startsWith(r)
-  )?.[1]
-
-  if (otpVerifyRole) {
-    if (!isLoggedIn) return toLogin()
-
-    if (hasSellerAccount === "true") {
-      return NextResponse.redirect(
-        new URL(`/seller/dashboard`, request.url)
-      )
-    }
-
-    if (hasAffiliateAccount === "true") {
-      return NextResponse.redirect(
-        new URL(`/affiliate/dashboard`, request.url)
-      )
-    }
-
-    if (otpId) {
-      return NextResponse.redirect(
-        new URL(`/${otpVerifyRole}/setup`, request.url)
-      )
-    }
-
-    return NextResponse.next()
-  }
-
+  
   const setupRole = Object.entries(SETUP_ROUTES).find(([r]) =>
     pathname.startsWith(r)
   )?.[1]
@@ -85,12 +51,6 @@ export function proxy(request: NextRequest) {
     if (hasAccount) {
       return NextResponse.redirect(
         new URL(`/${setupRole}/dashboard`, request.url)
-      )
-    }
-
-    if (!otpId) {
-      return NextResponse.redirect(
-        new URL(`/${setupRole}/verify-email`, request.url)
       )
     }
 
@@ -111,7 +71,7 @@ export function proxy(request: NextRequest) {
 
     if (!hasAccount) {
       return NextResponse.redirect(
-        new URL(`/${role}/verify-email`, request.url)
+        new URL(`/${role}/register`, request.url)
       )
     }
 

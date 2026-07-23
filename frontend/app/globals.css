@@ -135,3 +135,19 @@
     @apply font-sans;
   }
 }
+
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes border-spin {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+.animate-border-spin {
+  animation: border-spin 4s linear infinite;
+}
