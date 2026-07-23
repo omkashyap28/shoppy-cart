@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { UploadedItems } from "@/types/product";
 import { Image } from "@imagekit/next";
-import { Fullscreen, GripHorizontal, Trash2 } from "lucide-react";
+import { Fullscreen, Trash2 } from "lucide-react";
 import { ProductImageFullscreenPreview } from "./product-image-preview";
 import { deleteImage } from "@/lib/imagekit/delete";
 
@@ -152,7 +152,7 @@ export function ProductImageCarousel({
       </Carousel>
 
       <ProductImageFullscreenPreview
-        uploadedItems={uploadedItems}
+        items={uploadedItems}
         open={previewOpen}
         onOpenChange={setPreviewOpen}
         startIndex={previewIndex}

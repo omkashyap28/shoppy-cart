@@ -6,15 +6,15 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Image } from "@imagekit/next";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { UploadedItems } from "@/types/product";
+import { UploadedItems, ProductImage } from "@/types/product";
 
 export function ProductImageFullscreenPreview({
-  uploadedItems,
+  items,
   open,
   onOpenChange,
   startIndex = 0,
 }: {
-  uploadedItems: UploadedItems[];
+  items: UploadedItems[] | ProductImage[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   startIndex?: number;
@@ -39,18 +39,18 @@ export function ProductImageFullscreenPreview({
   }, [open, activeIndex]);
 
   function goNext() {
-    setActiveIndex((prev) => (prev + 1) % uploadedItems.length);
+    setActiveIndex((prev) => (prev + 1) % items.length);
   };
 
   function goPrev() {
-    setActiveIndex((prev) => (prev - 1 + uploadedItems.length) % uploadedItems.length);
+    setActiveIndex((prev) => (prev - 1 + items.length) % items.length);
   };
 
-  if (uploadedItems.length === 0) return null;
+  if (items.length === 0) return null;
 
-  const activeItem = uploadedItems[activeIndex];
+  const activeItem = items[activeIndex];
 
-  return (
+  return ( 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
@@ -66,7 +66,7 @@ export function ProductImageFullscreenPreview({
         </Button>
 
         <div className="relative flex h-full w-full items-center justify-center">
-          {uploadedItems.length > 1 && (
+          {items.length > 1 && (
             <Button
               variant="ghost"
               size="icon"
@@ -79,14 +79,14 @@ export function ProductImageFullscreenPreview({
 
           <div className="relative h-[80vh] w-[80vw]">
             <Image
-              src={activeItem.thumbnailUrl}
+              src={activeItem.imageUrl}
               alt=""
               fill
               className="object-contain"
             />
           </div>
 
-          {uploadedItems.length > 1 && (
+          {items.length > 1 && (
             <Button
               variant="ghost"
               size="icon"
@@ -98,9 +98,9 @@ export function ProductImageFullscreenPreview({
           )}
         </div>
 
-        {uploadedItems.length > 1 && (
+        {items.length > 1 && (
           <div className="absolute bottom-4 left-1/2 z-50 flex -translate-x-1/2 gap-2">
-            {uploadedItems.map((_, idx) => (
+            {items.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setActiveIndex(idx)}

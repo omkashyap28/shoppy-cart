@@ -76,7 +76,7 @@ export function ProductImageGallery({
   }, [mainApi, onSelect]);
 
   return (
-    <div className="grid aspect-square w-full gap-4 md:gap-3 lg:grid-cols-[90px_1fr]">
+    <div className="grid w-full gap-4 md:gap-3 lg:grid-cols-[90px_1fr] lg:sticky lg:top-20">
       <div
         className="relative w-full overflow-hidden rounded-xl lg:order-last"
         ref={mainRef}
