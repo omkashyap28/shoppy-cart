@@ -23,11 +23,12 @@ public interface ProductDiscussionRepository extends JpaRepository<ProductDiscus
 
   @Query(
       value = """
-          SELECT *
-          FROM product_discussion pd
-          WHERE pd.product_id = :product
-          ORDER BY RAND()
-          LIMIT :limit
+        SELECT *
+        FROM product_discussion pd
+        WHERE pd.product_id = :product
+          AND pd.parent_id IS NULL
+        ORDER BY pd.created_at DESC
+        LIMIT :limit;
           """,
       nativeQuery = true
   )

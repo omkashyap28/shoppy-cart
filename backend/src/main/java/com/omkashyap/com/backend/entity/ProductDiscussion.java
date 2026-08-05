@@ -22,11 +22,6 @@ import java.util.UUID;
         @Index(name = "idx_discussion_userid", columnList = "user_id"),
         @Index(name = "idx_discussion_productid", columnList = "product_id"),
         @Index(name = "idx_discussion_id", columnList = "discussion_id")
-    },
-    uniqueConstraints = {
-        @UniqueConstraint(
-            name = "uk_product_discussion", columnNames = {"user_id", "product_id"}
-        )
     }
 )
 public class ProductDiscussion {

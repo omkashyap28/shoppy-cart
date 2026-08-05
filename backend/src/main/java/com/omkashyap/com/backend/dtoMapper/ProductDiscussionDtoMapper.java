@@ -10,14 +10,26 @@ public class ProductDiscussionDtoMapper {
 
   public ProductDiscussionResponseDto mapToDto(ProductDiscussion productDiscussion) {
 
-    return ProductDiscussionResponseDto.builder()
+    ProductDiscussionResponseDto responseDto = ProductDiscussionResponseDto.builder()
         .discussionId(productDiscussion.getDiscussionId())
-        .productId(productDiscussion.getDiscussionId())
+        .productId(productDiscussion.getProduct().getProductId())
+        .profileImgUrl(productDiscussion.getUser().getAvatarUrl())
         .userId(productDiscussion.getUser().getUserId())
+        .createdAt(productDiscussion.getCreatedAt())
         .message(productDiscussion.getMessage())
         .likes((long) productDiscussion.getLikes().size())
         .isEdited(productDiscussion.getEdited())
+        .replies((long) productDiscussion.getReplies().size())
         .build();
+
+    if (productDiscussion.getUser().getLastName() != null) {
+      responseDto
+          .setUsername(productDiscussion.getUser().getFirstName() + " " + productDiscussion.getUser().getLastName());
+    } else {
+      responseDto.setUsername(productDiscussion.getUser().getFirstName());
+    }
+
+    return responseDto;
   }
 
   public ProductDiscussionRepliesResponseDto mapToReplyDto(ProductDiscussion productDiscussion) {
@@ -25,9 +37,12 @@ public class ProductDiscussionDtoMapper {
         .parentId(productDiscussion.getParent().getDiscussionId())
         .replyId(productDiscussion.getDiscussionId())
         .userId(productDiscussion.getUser().getUserId())
+        .username(productDiscussion.getUser().getFirstName() + " " + productDiscussion.getUser().getLastName())
+        .profileImgUrl(productDiscussion.getUser().getAvatarUrl())
         .message(productDiscussion.getMessage())
         .isEdited(productDiscussion.getEdited())
         .likes((long) productDiscussion.getLikes().size())
+        .createdAt(productDiscussion.getCreatedAt())
         .build();
   }
 }
