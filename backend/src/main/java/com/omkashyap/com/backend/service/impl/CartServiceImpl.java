@@ -1,5 +1,6 @@
 package com.omkashyap.com.backend.service.impl;
 
+import com.omkashyap.com.backend.dto.projection.CartItemProjection;
 import com.omkashyap.com.backend.dto.requestDto.CartRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.CartItemResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.CartResponseDto;
@@ -11,10 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -69,28 +67,29 @@ public class CartServiceImpl implements CartService {
 
   @Override
   public List<CartItemResponseDto> getCartItemsFromCart(String userId) {
-    Cart cart = cartRepository.findByUser_UserId(userId).orElse(null);
 
-    if(cart == null) {
-      return new ArrayList<>();
+    List<CartItemProjection> items = cartItemRepository.findCartItems(userId);
+
+    if (items.isEmpty()) {
+      return List.of();
     }
 
-    List<CartItem> cartItems = cartItemRepository.findAllByCartId(cart.getId());
-
-    return cartItems.stream()
-        .map(item -> {
-          CartItemResponseDto dto = new CartItemResponseDto();
-          dto.setCartItemId(item.getCartItemId());
-          dto.setQuantity(item.getQuantity());
-          dto.setProductId(item.getProduct().getProductId());
-          dto.setProductUrl(item.getProduct().getProductUrl());
-          Map<String, String> attributes = new HashMap<>();
-          item.getProductAttributes()
-              .forEach(attr -> attributes.put(attr.getAttributeName(), attr.getAttributeValue()));
-          dto.setProductAttributes(attributes);
-
-          return dto;
-        }).toList();
+    return items.stream().map(
+        item -> CartItemResponseDto.builder()
+            .cartItemId(item.getCartItemId())
+            .productId(item.getProductId())
+            .brandName(item.getBrandName())
+            .description(item.getDescription())
+            .productThumbnail(item.getProductThumbnail())
+            .inStock(item.getInStock())
+            .totalReviews(item.getTotalReviews())
+            .averageRating(item.getAverageRating())
+            .price(item.getPrice())
+            .coins(item.getCoins())
+            .productUrl(item.getProductUrl())
+            .quantity(item.getQuantity())
+            .build()
+    ).toList();
   }
 
   @Override

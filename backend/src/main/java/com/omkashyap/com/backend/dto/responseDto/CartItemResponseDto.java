@@ -1,16 +1,28 @@
 package com.omkashyap.com.backend.dto.responseDto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-
-import java.util.Map;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class CartItemResponseDto {
 
   private String cartItemId;
   private String productId;
-  private Integer quantity;
-  private Map<String, String> productAttributes;
+  private String brandName;
+  private String description;
+  private String productThumbnail;
+  private Boolean inStock;
+  private Integer totalReviews;
+  private Float averageRating;
+  private Float price;
+  private Integer coins;
   private String productUrl;
+  private Integer quantity;
 
 }
+
