@@ -33,16 +33,24 @@ public class ProductDiscussionDtoMapper {
   }
 
   public ProductDiscussionRepliesResponseDto mapToReplyDto(ProductDiscussion productDiscussion) {
-    return ProductDiscussionRepliesResponseDto.builder()
+    ProductDiscussionRepliesResponseDto responseDto = ProductDiscussionRepliesResponseDto.builder()
         .parentId(productDiscussion.getParent().getDiscussionId())
         .replyId(productDiscussion.getDiscussionId())
         .userId(productDiscussion.getUser().getUserId())
-        .username(productDiscussion.getUser().getFirstName() + " " + productDiscussion.getUser().getLastName())
         .profileImgUrl(productDiscussion.getUser().getAvatarUrl())
         .message(productDiscussion.getMessage())
         .isEdited(productDiscussion.getEdited())
         .likes((long) productDiscussion.getLikes().size())
         .createdAt(productDiscussion.getCreatedAt())
         .build();
+
+    if (productDiscussion.getUser().getLastName() != null) {
+      responseDto
+          .setUsername(productDiscussion.getUser().getFirstName() + " " + productDiscussion.getUser().getLastName());
+    } else {
+      responseDto.setUsername(productDiscussion.getUser().getFirstName());
+    }
+
+    return responseDto;
   }
 }

@@ -52,9 +52,13 @@ export const editProductSchema = z.object({
     .min(10, "Product description must be at least 10 characters")
     .max(300, "Product description must not exceed 300 characters"),
 
-    quantity: z
+  quantity: z
     .number("Quantity is required")
     .int("Quantity must be a whole number")
     .min(1, "Quantity must be greater than 0")
     .max(99999, "Quantity must be less than 99999"),
+});
+
+export const productDiscussionSchema = z.object({
+  message: z.string().max(255, "Message is required"),
 });

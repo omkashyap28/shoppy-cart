@@ -15,8 +15,6 @@ public interface ProductDiscussionRepository extends JpaRepository<ProductDiscus
 
   void deleteByDiscussionId(String discussionId);
 
-  List<ProductDiscussion> findAllByParentId(Long id);
-
   List<ProductDiscussion> findAllByUser_Email(String email, Pageable pageable);
 
   List<ProductDiscussion> findAllByUser_EmailAndIdLessThan(String email, Long cursor, Pageable pageable);
@@ -38,4 +36,14 @@ public interface ProductDiscussionRepository extends JpaRepository<ProductDiscus
   );
 
   List<ProductDiscussion> findAllByProduct_ProductIdAndIdLessThan(String productId, Long cursor, Pageable pageable);
+
+  @Query("""
+    SELECT d
+    FROM ProductDiscussion d
+    WHERE d.parent.discussionId = :discussionId
+    ORDER BY d.createdAt DESC
+  """)
+  List<ProductDiscussion> findRepliesByParentDiscussionId(String discussionId);
+
+
 }

@@ -17,6 +17,7 @@ import { Theme } from "./theme";
 import { ShareModel } from "./share-model";
 import { ImageDrop } from "./image-drop";
 import { MagnetButton } from "./magnet-button";
+import { Loader } from "./loader";
 
 export {
   Header,
@@ -37,5 +38,6 @@ export {
   Theme,
   ShareModel,
   ImageDrop,
-  MagnetButton
+  MagnetButton,
+  Loader,
 };

@@ -48,3 +48,28 @@ export interface Product {
   tags: string[];
   totalReviews: number;
 }
+
+export interface DiscussionType {
+  discussionId: string;
+  productId: string;
+  username: string;
+  profileImgUrl: string | null;
+  userId: string;
+  createdAt: unknown;
+  message: string;
+  isEdited: boolean;
+  likes: number;
+  replies: number;
+}
+
+export interface ReplyType {
+  parentId: string;
+  replyId: string;
+  username: string;
+  profileImgUrl: string | null;
+  userId: string;
+  message: string;
+  isEdited: boolean;
+  likes: number;
+  createdAt: unknown;
+}
