@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { Heart, PackageCheck, Star } from "lucide-react";
 
-import { ProductTags } from "./product-tags";
 import { ShareModel } from "@/components/layout";
-
 import { Toggle } from "@/components/ui/toggle";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +10,6 @@ interface ProductHeaderProps {
   productId: string;
   brandName: string;
   description: string;
-  tags: string[];
   averageRating?: number | string;
   totalReviews: number;
   sellerId: string;
@@ -25,7 +22,6 @@ export function ProductHeader({
   productId,
   brandName,
   description,
-  tags,
   averageRating,
   totalReviews,
   sellerId,
@@ -35,15 +31,7 @@ export function ProductHeader({
 }: ProductHeaderProps) {
   return (
     <div className="space-y-5">
-      <div className="hidden lg:block space-y-5">
-        <ProductTags
-          tags={tags}
-          variant="secondary"
-          className="flex flex-wrap gap-2"
-        />
-
-        <Separator />
-
+      <div className="hidden space-y-5 xl:block">
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <span>{brandName}</span>
@@ -70,9 +58,9 @@ export function ProductHeader({
               </span>
             </div>
 
-            <span className="text-muted-foreground">
+            <Link href="#customer-reviews" className="text-muted-foreground">
               ({totalReviews} Reviews)
-            </span>
+            </Link>
           </div>
         </div>
       </div>
@@ -96,9 +84,8 @@ export function ProductHeader({
           />
 
           <span
-            className={`text-sm font-medium ${
-              inStock ? "text-green-600" : "text-red-500"
-            }`}
+            className={`text-sm font-medium ${inStock ? "text-green-600" : "text-red-500"
+              }`}
           >
             {inStock ? "In Stock" : "Out of Stock"}
           </span>

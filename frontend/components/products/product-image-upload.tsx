@@ -62,7 +62,7 @@ export function ProductImageUpload({
       const filteredUploads = filterUploadResponse(uploads);
 
       localStorage.setItem(
-        "uploadProductsImages",
+        "reviewImages",
         JSON.stringify(filteredUploads)
       );
 
@@ -71,7 +71,7 @@ export function ProductImageUpload({
   }, [uploads, setUploadedItems]);
 
   useEffect(() => {
-    const storedImages = localStorage.getItem("uploadProductsImages");
+    const storedImages = localStorage.getItem("reviewImages");
     const parsedStoredImages = JSON.parse(storedImages || "[]");
     if (parsedStoredImages.length !== 0) {
       setUploadedItems(parsedStoredImages);

@@ -101,18 +101,18 @@ function DiscussionRepliesItem({
           <div className="flex items-start gap-3">
             <div className="flex flex-col">
               <span className="text-lg font-semibold tracking-tight text-foreground">
-                {discussion.username}
+                {reply.username}
               </span>
               <span className="text-xs text-muted-foreground">
                 {format(
                   new Date(
-                    discussion.createdAt as string
+                    reply.createdAt as string
                   ).toLocaleDateString(),
                   "PPP"
                 )}
               </span>
             </div>
-            {discussion.isEdited && (
+            {reply.isEdited && (
               <Badge
                 variant="secondary"
                 className="-4 px-1.5 py-0 text-[10px] leading-none"

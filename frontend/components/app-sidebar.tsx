@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Separator } from "./ui/separator";
 
 const data = {
   user: {
@@ -53,14 +54,10 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-
   const router = useRouter();
 
   return (
-    <Sidebar
-      collapsible="icon"
-      {...props}
-    >
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -81,6 +78,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+      <Separator className="mb-3" />
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>

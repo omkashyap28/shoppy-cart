@@ -4,7 +4,7 @@ import { Tag } from "lucide-react";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { cn } from "@/lib/utils";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface ProductTagsProps {
   tags: string[];

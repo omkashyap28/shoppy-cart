@@ -5,7 +5,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { UserResponse } from "./profile-card";
+import { UserResponse } from "@/types/user";
 
 export function UserDetails({ user }: { user: UserResponse }) {
   return (

@@ -36,7 +36,6 @@ export function Footer() {
           <span className="text-[15px] tracking-tighter">Back to Top</span>
         </Button>
       </div>
-      <Logo />
       <div className="py-8">
         <div className="grid font-sans text-sm font-normal sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
           <div>

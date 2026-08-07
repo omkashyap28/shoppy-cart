@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "../ui/button";
 import { useTheme } from "next-themes";
@@ -34,22 +34,36 @@ export function Theme() {
     meta.setAttribute("content", theme);
   }, [resolvedTheme]);
 
-  function toggleTheme() {
+  const toggleTheme = useCallback(function () {
     setTheme(theme === "dark" ? "light" : "dark");
-  }
-  if (!mounted) return <Skeleton className="size-7! rounded-full!" />;
+  }, [theme, setTheme]);
+
+  useEffect(() => {
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "d") {
+        toggleTheme();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeydown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeydown);
+    }
+  }, [toggleTheme]);
+
+  if (!mounted) return <Skeleton className="size-8! rounded-full!" />;
 
   return (
     <Button
-      variant="outline"
-      size="icon-sm"
-      className="rounded-full"
+      variant="ghost"
+      size="icon"
       onClick={toggleTheme}
     >
       {theme === "dark" ? (
-        <Moon className="size-4 opacity-40" />
+        <Moon className="size-4 opacity-60" />
       ) : (
-        <Sun className="size-4 opacity-40" />
+        <Sun className="size-4 opacity-60" />
       )}
     </Button>
   );

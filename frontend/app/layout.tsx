@@ -38,8 +38,9 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
       className={cn(
-        "antialiased selection:bg-primary selection:text-white",
+        "antialiased selection:bg-primary selection:text-white scroll-smooth",
         fontMono.variable,
         "font-sans",
         inter.variable

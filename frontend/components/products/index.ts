@@ -5,6 +5,7 @@ import { ProductPurchaseCard } from "./product-purchase-card";
 import { ExpressCheckoutCard } from "./express-checkout-card";
 import { ProductTags } from "./product-tags";
 import { AmountTab } from "./amount-tab";
+import { Product } from "./product";
 
 export {
   ProductImageUpload,
@@ -13,5 +14,6 @@ export {
   ProductPurchaseCard,
   ExpressCheckoutCard,
   ProductTags,
-  AmountTab
+  AmountTab,
+  Product
 };

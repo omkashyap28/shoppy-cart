@@ -9,7 +9,7 @@ export function Heading2({
 }) {
   return (
     <h2
-      className={cn("mb-4 text-2xl font-semibold text-foreground", className)}
+      className={cn("mb-4 text-2xl font-semibold text-foreground tracking-tight", className)}
     >
       {children}
     </h2>

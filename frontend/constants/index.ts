@@ -91,7 +91,7 @@ export const footerLinksSection2 = [
 
 export const footerLinksSection3 = [
   {
-    href: "/seller/setup",
+    href: "/seller/register",
     label: "Seller",
   },
   {
@@ -128,5 +128,40 @@ export const footerLinksSection4 = [
   {
     href: "#",
     label: "Best Selling Products",
+  },
+];
+
+export const productCategories = [
+  {
+    value: "1",
+    title: "ELECTRONICS",
+  },
+  {
+    value: "5",
+    title: "FASHION",
+  },
+  {
+    value: "9",
+    title: "GROCERY",
+  },
+  {
+    value: "13",
+    title: "BOOKS",
+  },
+  {
+    value: "14",
+    title: "FURNITURE",
+  },
+  {
+    value: "15",
+    title: "KITCHEN",
+  },
+  {
+    value: "16",
+    title: "APPAREL",
+  },
+  {
+    value: "17",
+    title: "BEAUTY",
   },
 ];
