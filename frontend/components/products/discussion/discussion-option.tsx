@@ -1,3 +1,5 @@
+"use client";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,18 +16,17 @@ interface DiscussionOptionProps {
   discussionId: string;
   productId: string;
   queryKey?: string[];
+  setEditable: (editable: boolean) => void;
 }
 
 export function DiscussionOption({
   discussionId,
   productId,
   queryKey,
+  setEditable
 }: DiscussionOptionProps) {
-  const queryClient = useQueryClient();
 
-  const { mutate: editMutation } = useMutation({
-    mutationFn: async () => {},
-  });
+  const queryClient = useQueryClient();
 
   const { mutate: deleteMutation } = useMutation({
     mutationFn: async (discussionId: string) => {
@@ -54,7 +55,9 @@ export function DiscussionOption({
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40" align="end">
         <DropdownMenuGroup>
-          <DropdownMenuItem disabled>
+          <DropdownMenuItem
+            onClick={() => setEditable(true)}
+          >
             <Pencil /> Edit
           </DropdownMenuItem>
           <DropdownMenuItem

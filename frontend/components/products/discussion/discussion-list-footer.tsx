@@ -11,11 +11,10 @@ interface DiscussionReplyProps {
   repliesCount: number;
   productId: string;
   discussionId: string;
-  likes: number
   userName: string
 }
 
-export function DiscussionListFooter({ repliesCount, productId, discussionId, likes, userName }: DiscussionReplyProps) {
+export function DiscussionListFooter({ repliesCount, productId, discussionId, userName }: DiscussionReplyProps) {
 
   const [open, setOpen] = useState(false);
 
@@ -35,11 +34,11 @@ export function DiscussionListFooter({ repliesCount, productId, discussionId, li
           />
         </div>
       </div>
-      <DiscussionReplies
+      {open && <DiscussionReplies
         productId={productId}
         discussionId={discussionId}
         open={open}
-      />
+      />}
     </>
   );
 }

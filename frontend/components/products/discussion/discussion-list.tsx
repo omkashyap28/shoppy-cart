@@ -8,6 +8,8 @@ import { DiscussionListFooter } from "./discussion-list-footer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DiscussionOption } from "./discussion-option";
 import { useAppStore } from "@/store/store";
+import { useState } from "react";
+import { DiscussionEditForm } from "./discussion-edit-form";
 
 export function DiscussionList({
   discussions,
@@ -15,6 +17,7 @@ export function DiscussionList({
   discussions: DiscussionType[];
 }) {
   const userId = useAppStore((state) => state.userId);
+  const [editable, setEditable] = useState(false);
 
   if (discussions.length === 0) {
     return (
@@ -46,22 +49,24 @@ export function DiscussionList({
                 </AvatarFallback>
               </Avatar>
 
-              <div className="flex flex-col">
-                <span className="text-lg font-semibold tracking-tight text-foreground">
-                  {discussion.username}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {format(
-                    new Date(
-                      discussion.createdAt as string
-                    ).toLocaleDateString(),
-                    "PPP"
-                  )}
-                </span>
+              <div className="flex items-start gap-3">
+                <div className="flex flex-col">
+                  <span className="text-lg font-semibold tracking-tight text-foreground">
+                    {discussion.username}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {format(
+                      new Date(
+                        discussion.createdAt as string
+                      ).toLocaleDateString(),
+                      "PPP"
+                    )}
+                  </span>
+                </div>
                 {discussion.isEdited && (
                   <Badge
                     variant="secondary"
-                    className="absolute top-4 right-4 h-4 px-1.5 py-0 text-[10px] leading-none"
+                    className="-4 px-1.5 py-0 text-[10px] leading-none"
                   >
                     Edited
                   </Badge>
@@ -72,21 +77,30 @@ export function DiscussionList({
               <DiscussionOption
                 discussionId={discussion.discussionId}
                 productId={discussion.productId}
+                setEditable={setEditable}
               />
             )}
           </div>
 
           <div className="mt-4 w-full">
-            <p className="wrap-break text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
-              {discussion.message}
-            </p>
+            {!editable ?
+              <p className="wrap-break text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
+                {discussion.message}
+              </p> :
+              <DiscussionEditForm
+                discussionId={discussion.discussionId}
+                message={discussion.message}
+                productId={discussion.productId}
+                setEditable={setEditable}
+                queryKey={["discussions", discussion.productId]}
+              />
+            }
 
             <div className="mt-4">
               <DiscussionListFooter
                 repliesCount={discussion.replies}
                 productId={discussion.productId}
                 discussionId={discussion.discussionId}
-                likes={discussion.likes}
                 userName={discussion.username}
               />
             </div>

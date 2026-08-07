@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 type ProductDiscussionReplySchema = z.infer<typeof productDiscussionSchema>;
 
@@ -50,7 +51,7 @@ export function DiscussionReplyForm({
     },
   });
 
-  const { mutate } = useMutation({
+  const { mutate, status } = useMutation({
     mutationFn: async (data: ProductDiscussionReplySchema) => {
       const payload = {
         message: data.message,
@@ -81,6 +82,7 @@ export function DiscussionReplyForm({
         queryKey: ["discussions", productId],
       });
       setOpen(false);
+      form.reset();
     },
     onError: (e: unknown) => {
       console.error(e);
@@ -122,13 +124,13 @@ export function DiscussionReplyForm({
                 />
                 <InputGroupAddon align="block-end">
                   <InputGroupButton
-                    disabled={!form.formState.isDirty}
+                    disabled={!form.formState.isDirty || status === "pending"}
                     variant="default"
                     size="sm"
                     className="ml-auto"
                     type="submit"
                   >
-                    <Send />
+                    {status === "pending" ? <Spinner /> : <Send />}
                   </InputGroupButton>
                 </InputGroupAddon>
               </InputGroup>

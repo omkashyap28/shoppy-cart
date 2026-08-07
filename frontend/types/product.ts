@@ -58,7 +58,6 @@ export interface DiscussionType {
   createdAt: unknown;
   message: string;
   isEdited: boolean;
-  likes: number;
   replies: number;
 }
 
