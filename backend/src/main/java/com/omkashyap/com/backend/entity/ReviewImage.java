@@ -39,6 +39,19 @@ public class ReviewImage {
   private Review review;
 
   @Column(
+      nullable = false,
+      unique = true,
+      updatable = false
+  )
+  private String imageId;
+
+  @Column(
+      nullable = false,
+      unique = true
+  )
+  private String thumbnailUrl;
+
+  @Column(
       unique = true,
       nullable = false
   )

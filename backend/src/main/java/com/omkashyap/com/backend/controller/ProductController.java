@@ -2,9 +2,7 @@ package com.omkashyap.com.backend.controller;
 
 import com.omkashyap.com.backend.dto.requestDto.OrderRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.ReviewRequestDto;
-import com.omkashyap.com.backend.dto.responseDto.OrderResponseDto;
-import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
-import com.omkashyap.com.backend.dto.responseDto.ReviewResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.*;
 import com.omkashyap.com.backend.service.OrderService;
 import com.omkashyap.com.backend.service.ProductService;
 import com.omkashyap.com.backend.service.ReviewService;
@@ -38,8 +36,12 @@ public class ProductController {
   }
 
   @GetMapping("/reviews")
-  ResponseEntity<List<ReviewResponseDto>> getAllProductReviewsByProductId(@PathVariable String productId) {
-    return ResponseEntity.status(HttpStatus.OK).body(reviewService.getAllProductReviewsByProductId(productId));
+  ResponseEntity<InfiniteScrollResponseDto<ReviewResponseDto>> getAllProductReviewsByProductId(
+    @PathVariable String productId,
+    @RequestParam(required = false, defaultValue = "10") int limit,
+    @RequestParam(required = false) Long cursor
+  ) {
+    return ResponseEntity.status(HttpStatus.OK).body(reviewService.getAllProductReviewsByProductId(productId, limit, cursor));
   }
 
   @DeleteMapping("/reviews")

@@ -1,6 +1,7 @@
 package com.omkashyap.com.backend.service.impl;
 
 import com.omkashyap.com.backend.dto.requestDto.ReviewRequestDto;
+import com.omkashyap.com.backend.dto.responseDto.InfiniteScrollResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ReviewResponseDto;
 import com.omkashyap.com.backend.dtoMapper.ReviewDtoMapper;
 import com.omkashyap.com.backend.entity.*;
@@ -11,6 +12,8 @@ import com.omkashyap.com.backend.repository.UserRepository;
 import com.omkashyap.com.backend.service.ReviewService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -52,8 +55,11 @@ public class ReviewServiceImpl implements ReviewService {
     if (requestDto.getReviewImages() != null) {
       requestDto.getReviewImages().forEach(img -> {
         ReviewImage image = ReviewImage.builder()
-            .imageUrl(img)
+            .imageId(img.getImageId())
+            .thumbnailUrl(img.getThumbnailUrl())
+            .imageUrl(img.getImageUrl())
             .review(review).build();
+
         reviewImageRepository.save(image);
         review.getReviewImages().add(image);
       });
@@ -68,11 +74,42 @@ public class ReviewServiceImpl implements ReviewService {
   }
 
   @Override
-  public List<ReviewResponseDto> getAllProductReviewsByProductId(String productId) {
-    List<Review> reviews = reviewRepository.findAllByProduct_ProductId(productId);
+  public InfiniteScrollResponseDto<ReviewResponseDto> getAllProductReviewsByProductId(
+      String productId,
+      int limit,
+      Long cursor
+  ) {
 
-    return reviews.stream()
-        .map(reviewDtoMapper::mapToDto).toList();
+    Pageable page = PageRequest.of(0, limit);
+
+    List<Review> reviews;
+
+    if (cursor == null) {
+      reviews = reviewRepository.findAllByProduct_ProductId(
+          productId,
+          page);
+    } else {
+      reviews = reviewRepository.findAllByProduct_ProductId(
+          productId,
+          cursor,
+          page);
+    }
+
+    List<ReviewResponseDto> responseDtos = reviews.stream()
+        .map(reviewDtoMapper::mapToDto)
+        .toList();
+
+    Long nextCursor = reviews.isEmpty()
+        ? null
+        : reviews.getLast().getId();
+
+    boolean hasMore = reviews.size() == limit;
+
+    return InfiniteScrollResponseDto.<ReviewResponseDto>builder()
+        .content(responseDtos)
+        .nextCursor(nextCursor)
+        .hasMore(hasMore)
+        .build();
   }
 
   @Override

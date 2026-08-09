@@ -5,7 +5,6 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.swing.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +68,7 @@ public class Review {
   @Column(
       nullable = false
   )
-  private Double rating;
+  private Integer rating;
 
   @Column(
       nullable = false,
@@ -77,11 +76,15 @@ public class Review {
   )
   private String message;
 
+  @Builder.Default
+  private Boolean edited = false;
+
   @OneToMany(
       mappedBy = "review",
       orphanRemoval = true,
       cascade = CascadeType.ALL
   )
+  @Builder.Default
   private List<ReviewImage> reviewImages = new ArrayList<>();
 
   @CreationTimestamp

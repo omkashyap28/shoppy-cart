@@ -1,6 +1,7 @@
 package com.omkashyap.com.backend.service;
 
 import com.omkashyap.com.backend.dto.requestDto.ReviewRequestDto;
+import com.omkashyap.com.backend.dto.responseDto.InfiniteScrollResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ReviewResponseDto;
 
 import java.util.List;
@@ -8,7 +9,11 @@ import java.util.List;
 public interface ReviewService {
   ReviewResponseDto addReviewToProduct(String productId, ReviewRequestDto requestDto);
 
-  List<ReviewResponseDto> getAllProductReviewsByProductId(String productId);
+  InfiniteScrollResponseDto<ReviewResponseDto> getAllProductReviewsByProductId(
+      String productId,
+      int size,
+      Long cursor
+  );
 
   void deleteReviewByProductAndReviewId(String productId, String reviewId);
 

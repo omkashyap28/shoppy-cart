@@ -11,9 +11,13 @@ import java.util.List;
 public class ReviewResponseDto {
 
   private String reviewId;
-  private Double rating;
+  private Integer rating;
   private String message;
-  private List<String> reviewImages;
+  private List<ReviewImageResponseDto> reviewImages;
+  private String userId;
+  private String profileImgUrl;
+  private String username;
+  private Boolean edited;
   private LocalDateTime createdAt;
 
 }
