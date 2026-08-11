@@ -2,7 +2,6 @@ package com.omkashyap.com.backend.dtoMapper;
 
 import com.omkashyap.com.backend.dto.responseDto.ProductImageResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
-import com.omkashyap.com.backend.dto.responseDto.ProductsResponseDto;
 import com.omkashyap.com.backend.entity.AffiliateUserProduct;
 import com.omkashyap.com.backend.entity.Product;
 import org.springframework.stereotype.Component;

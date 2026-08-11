@@ -16,7 +16,7 @@ public class ProductsResponseDto {
   private String productThumbnail;
   private Boolean inStock;
   private Integer totalReviews;
-  private Float averageRating;
+  private Double averageRating;
   private Float price;
   private Integer coins;
   private String productUrl;

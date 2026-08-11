@@ -19,7 +19,7 @@ public class ProductResponseDto {
   private String sellerId;
   private Boolean inStock;
   private Integer totalReviews;
-  private Float averageRating;
+  private Double averageRating;
   private Long categoryId;
   private Float price;
   private Integer coins;

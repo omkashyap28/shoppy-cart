@@ -44,9 +44,20 @@ public class ProductController {
     return ResponseEntity.status(HttpStatus.OK).body(reviewService.getAllProductReviewsByProductId(productId, limit, cursor));
   }
 
-  @DeleteMapping("/reviews")
-  ResponseEntity<Void> deleteReviewById(@PathVariable String productId, @RequestParam String reviewId) {
-    reviewService.deleteReviewByProductAndReviewId(productId, reviewId);
+  @GetMapping("/reviews/stats")
+  ResponseEntity<ReviewStatsResponseDto> getProductReviewStats(
+      @PathVariable String productId
+  ) {
+    return ResponseEntity.status(HttpStatus.OK).body(reviewService.getProductReviewStats(productId));
+  }
+
+  @DeleteMapping("/reviews/{reviewId}")
+  ResponseEntity<Void> deleteReviewById(
+      @RequestHeader("Authorization") String authHeader,
+      @PathVariable String productId,
+      @PathVariable String reviewId
+    ) {
+    reviewService.deleteReviewByProductAndReviewId(authHeader, productId, reviewId);
     return ResponseEntity.noContent().build();
   }
 

@@ -86,7 +86,7 @@ public class Product {
 
   private Integer totalReviews;
 
-  private Float averageRating;
+  private Double averageRating;
 
   private Float price;
 
