@@ -6,6 +6,8 @@ export async function deleteImage(fileId: string) {
   await fetch(`https://api.imagekit.io/v1/files/${fileId}`, {
     method: "DELETE",
     headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
       Authorization: `Basic ${authHeader}`,
     },
   });

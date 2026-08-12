@@ -11,6 +11,7 @@ import { FileType, ImageType, SelectType, UploadItem } from "@/types/imagekitUpl
 import { authenticate } from "@/lib/imagekit/authenticator";
 import { uploadFile } from "@/lib/imagekit/uploadFile";
 import { getFolder } from "@/lib/imagekit/getFolder";
+import { deleteImage } from "@/lib/imagekit/delete";
 
 
 interface ImagekitUploadProps {
@@ -164,17 +165,32 @@ export function useImageKitUpload({
     });
   }
 
-  const remove = (id: string) => {
+  const remove = async (id: string) => {
+    const upload = uploads.find(u => u.id === id);
+
+    if (!upload) return;
+
     abort(id);
+
+    if (upload.data?.fileId) {
+      await deleteImage(upload.data.fileId);
+    }
 
     setUploads(
       (prev) => prev.filter(u => u.id !== id)
     );
   }
 
-  const clear = () => {
+  const clear = async () => {
     controllerRef.current.forEach(controller => controller.abort());
     controllerRef.current.clear();
+
+    await Promise.all(
+      uploads
+        .filter(u => u.status === "success")
+        .map(async i => deleteImage(i.data?.fileId || ""))
+    )
+
     setUploads([]);
   }
 

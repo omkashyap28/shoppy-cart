@@ -3,6 +3,7 @@ import { RegisterForm } from "./register-form";
 import { VerifyForm } from "./verify-form";
 import { SellerRegistrationForm } from "./seller-register-form";
 import { SellerVerificationForm } from "./seller-verification-form";
+import { AddReviewForm } from "./add-review-form";
 
 export {
   LoginForm,
@@ -10,4 +11,5 @@ export {
   VerifyForm,
   SellerRegistrationForm,
   SellerVerificationForm,
+  AddReviewForm
 };

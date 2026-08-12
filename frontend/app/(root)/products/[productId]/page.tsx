@@ -1,13 +1,13 @@
-"use cache";
-
 import { Metadata } from "next";
 import { Product } from "@/components/products";
 import { Product as ProductType } from "@/types/product";
 import dynamic from "next/dynamic";
 import { Loader } from "@/components/layout";
 import { Discussion } from "@/components/products/discussion/discussion";
+import { serverFetch } from "@/lib/serverFetch";
+import { cacheLife } from 'next/cache'
 
-const Review = dynamic(() => import("@/components/products/reviews/review"), {
+const Review = dynamic(() => import("@/components/products/review/review"), {
   loading: () => <Loader />,
 });
 
@@ -15,15 +15,16 @@ interface Props {
   params: Promise<{ productId: string }>;
 }
 
-const getProduct = async (productId: string): Promise<ProductType> => {
-  const baseUrl = process.env.NEXT_BACKEND_BASE_URL;
-  const response = await fetch(`${baseUrl}/product/${productId}`);
+const getProduct = async (productId: string) => {
+  "use cache";
+  cacheLife({stale: 300});
+  
+  return await serverFetch<ProductType>(`/product/${productId}`, {
+    next: {
+      tags: [`product:${productId}`],
+    }
+  });
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch product data");
-  }
-
-  return response.json() as Promise<ProductType>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -78,8 +79,8 @@ export default async function ProductPage({ params }: Props) {
   return (
     <>
       <Product product={product} />
+      <Review productId={productId} />
       <Discussion productId={productId} />
-      <Review productId={product.productId} /> 
     </>
   );
 }
