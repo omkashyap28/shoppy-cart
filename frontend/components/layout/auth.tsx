@@ -8,14 +8,14 @@ import { useEffect } from "react";
 export function Auth() {
   const userId = useAppStore((state) => state.userId);
   const setUser = useAppStore((state) => state.setUser);
+  const setLoading = useAppStore((state) => state.setLoading);
 
   const { data: authData } = useQuery({
     queryKey: ["auth"],
-    queryFn: async () => {
-      return await refreshAccessToken();
-    },
+    queryFn: refreshAccessToken,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
+    staleTime: Infinity,
   });
 
   useEffect(() => {
@@ -24,8 +24,8 @@ export function Auth() {
     }
   }, [authData]);
 
-  const { data: userData } = useQuery({
-    queryKey: ["user-data"],
+  const { data: userData, isLoading } = useQuery({
+    queryKey: ["user-data", userId],
     queryFn: async () => {
       const response = await apiFetch(`user/${userId}`);
 
@@ -38,6 +38,10 @@ export function Auth() {
     staleTime: Infinity,
     enabled: !!userId,
   });
+
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
 
   useEffect(() => {
     if (userData) {

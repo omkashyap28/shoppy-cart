@@ -1,4 +1,6 @@
 import { Logo, Navbar, Profile, Search, Theme } from "@/components/layout";
+import { AvatarSkeleton } from "@/components/sekeleton";
+import { Suspense } from "react";
 
 export function Header() {
   return (
@@ -13,7 +15,9 @@ export function Header() {
           <div className="flex items-center gap-3">
             <Search />
             <Theme />
-            <Profile />
+            <Suspense fallback={<AvatarSkeleton />}>
+              <Profile />
+            </Suspense>
           </div>
         </div>
       </header>

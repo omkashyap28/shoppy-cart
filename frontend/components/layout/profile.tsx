@@ -4,7 +4,6 @@ import {
   HeartIcon,
   LayoutDashboardIcon,
   List,
-  LogInIcon,
   LogOutIcon,
   ShoppingCart,
   User2Icon,
@@ -20,25 +19,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useCallback } from "react";
 import { logout } from "@/lib/utils";
 import { useAppStore } from "@/store/store";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { AvatarSkeleton } from "../sekeleton/avatar-skeleton";
 
 export function Profile() {
-  const user = useAppStore(state => state.user);
+
+  const user = useAppStore((state) => state.user);
   const isAuth = useAppStore((state) => state.isAuth);
   const sellerId = useAppStore((state) => state.sellerId);
   const affiliateCode = useAppStore((state) => state.affiliateCode);
-  const router = useRouter();
 
-  if(isAuth && !user) {
-    return (
-      <Button onClick={() => router.push("/login")}>
-        Login
-      </Button>
-    );
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const handleRedirect = useCallback(() => {
+    const origin = window.location.origin;
+
+    const url = new URL('/login', origin)
+    if (searchParams.size > 0) {
+      url.searchParams.set('redirect', `${pathname}?${searchParams.toString()}`)
+    } else {
+      url.searchParams.set('redirect', pathname)
+    }
+
+    router.push(url.toString());
+  }, [pathname, searchParams, router]);
+
+  if (!isAuth || !user) {
+    return <Button onClick={handleRedirect}>Login</Button>;
   }
 
   return (
@@ -52,50 +64,50 @@ export function Profile() {
           title="Avatar"
         >
           <Avatar>
-            <AvatarImage src={user?.avatarUrl || "/user.png"} alt="Avatar" />
+            <AvatarImage src={user.avatarUrl ?? undefined} alt="Avatar" />
             <AvatarFallback>
-              <AvatarSkeleton className="size-8!" />
+              <User2Icon />
             </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-fit!">
         <DropdownMenuGroup>
-              {menuItems.map(({ title, icon, titleProp, href }) => (
-                <Link href={href} key={title} title={titleProp}>
-                  <DropdownMenuItem>
-                    {icon}
-                    {title}
-                  </DropdownMenuItem>
-                </Link>
-              ))}
-              {sellerId != "" ? (
-                <Link href="/seller/dashboard" title="Dashboard">
-                  <DropdownMenuItem>
-                    <LayoutDashboardIcon />
-                    Seller Dashboard
-                  </DropdownMenuItem>
-                </Link>
-              ) : affiliateCode != "" ? (
-                <Link href="/affiliate/dashboard" title="Dashboard">
-                  <DropdownMenuItem>
-                    <LayoutDashboardIcon />
-                    Affiliate Dashboard
-                  </DropdownMenuItem>
-                </Link>
-              ) : (
-                <></>
-              )}
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={logout}
-              title="Sign Out"
-            >
-              <LogOutIcon />
-              Sign Out
-            </DropdownMenuItem>
+          {menuItems.map(({ title, icon, titleProp, href }) => (
+            <Link href={href} key={title} title={titleProp}>
+              <DropdownMenuItem>
+                {icon}
+                {title}
+              </DropdownMenuItem>
+            </Link>
+          ))}
+          {sellerId != "" ? (
+            <Link href="/seller/dashboard" title="Dashboard">
+              <DropdownMenuItem>
+                <LayoutDashboardIcon />
+                Seller Dashboard
+              </DropdownMenuItem>
+            </Link>
+          ) : affiliateCode != "" ? (
+            <Link href="/affiliate/dashboard" title="Dashboard">
+              <DropdownMenuItem>
+                <LayoutDashboardIcon />
+                Affiliate Dashboard
+              </DropdownMenuItem>
+            </Link>
+          ) : (
+            <></>
+          )}
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          variant="destructive"
+          onClick={logout}
+          title="Sign Out"
+        >
+          <LogOutIcon />
+          Sign Out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
