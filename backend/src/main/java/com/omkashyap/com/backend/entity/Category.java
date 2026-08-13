@@ -39,9 +39,11 @@ public class Category {
       mappedBy = "parent",
       cascade = CascadeType.ALL
   )
+  @Builder.Default
   private List<Category> children = new ArrayList<>();
-
+  
   @OneToMany(mappedBy = "category")
+  @Builder.Default
   private List<Product> products = new ArrayList<>();
 
   public Category(String name, Category parent) {

@@ -174,10 +174,7 @@ public class ProductDiscussionServiceImpl implements ProductDiscussionService {
 
   @Override
   public List<ProductDiscussionRepliesResponseDto> getAllProductDiscussionsReplies(String discussionId) {
-    ProductDiscussion parent = productDiscussionRepository.findByDiscussionId(discussionId).orElseThrow(() ->
-        new IllegalArgumentException("Product discussion not available with this id"));
-
-    List<ProductDiscussion> replies = productDiscussionRepository.findAllByParentId(parent.getId());
+    List<ProductDiscussion> replies = productDiscussionRepository.findRepliesByParentDiscussionId(discussionId);
 
     return replies.stream()
         .map(productDiscussionDtoMapper::mapToReplyDto)

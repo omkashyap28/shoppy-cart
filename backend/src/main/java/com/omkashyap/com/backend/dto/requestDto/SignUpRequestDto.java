@@ -1,7 +1,6 @@
 package com.omkashyap.com.backend.dto.requestDto;
 
 import com.omkashyap.com.backend.type.GenderEnum;
-import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 

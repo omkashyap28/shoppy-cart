@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
   Optional<Product> findByProductId(String productId);
 
+  Optional<Product> findByProductIdAndSeller_SellerId(String productId, String sellerId); 
+
   List<Product> findAllBySeller(Seller seller);
 
   Boolean existsByProductId(String productId);
@@ -57,4 +59,21 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
       @Param("limit") int limit
   );
 
+  @Query(value = """
+    SELECT *
+    FROM product
+    ORDER BY id DESC
+    """, nativeQuery = true)
+  List<Product> findTopNProducts(@Param("limit") Pageable limit);
+
+  @Query(value = """
+    SELECT *
+    FROM product
+    WHERE id < :lastProductId
+    ORDER BY id DESC
+    """, nativeQuery = true)
+  List<Product> findTopNProductsAfterId(
+      @Param("lastProductId") Long lastProductId,
+      @Param("limit") Pageable limit
+  );
 }

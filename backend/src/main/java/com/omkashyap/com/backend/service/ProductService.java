@@ -1,6 +1,7 @@
 package com.omkashyap.com.backend.service;
 
 import com.omkashyap.com.backend.dto.requestDto.ProductRequestDto;
+import com.omkashyap.com.backend.dto.responseDto.InfiniteScrollResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductsResponseDto;
 
@@ -19,4 +20,6 @@ public interface ProductService {
   void deleteProductBySellerId(String sellerId, String productId);
 
   ProductResponseDto getProductBySellerAndProductId(String sellerId, String productId);
+
+  InfiniteScrollResponseDto<ProductsResponseDto> getInitialProducts(int limit, Long lastProductId);
 }

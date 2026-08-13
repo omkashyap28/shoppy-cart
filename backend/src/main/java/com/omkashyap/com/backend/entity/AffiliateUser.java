@@ -36,6 +36,7 @@ public class AffiliateUser {
       cascade = CascadeType.ALL,
       orphanRemoval = true
   )
+  @Builder.Default
   private List<AffiliateUserProduct> affiliateUserProducts = new ArrayList<>();
 
 }

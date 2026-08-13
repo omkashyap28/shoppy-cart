@@ -50,6 +50,7 @@ public class ProductAttribute {
   @ManyToMany(
       mappedBy = "productAttributes"
   )
+  @Builder.Default
   private List<CartItem> cart = new ArrayList<>();
 
 }

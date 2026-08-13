@@ -1,6 +1,5 @@
 package com.omkashyap.com.backend.security;
 
-import com.omkashyap.com.backend.entity.User;
 import com.omkashyap.com.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;

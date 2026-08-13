@@ -2,7 +2,9 @@ package com.omkashyap.com.backend.controller;
 
 import com.omkashyap.com.backend.dto.responseDto.InfiniteScrollResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.ProductsResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.SearchHistoryResponseDto;
+import com.omkashyap.com.backend.service.ProductService;
 import com.omkashyap.com.backend.service.SearchHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import java.util.List;
 public class SearchController {
 
   private final SearchHistoryService searchHistoryService;
+  private final ProductService productService;
 
   @GetMapping
   ResponseEntity<InfiniteScrollResponseDto<ProductResponseDto>> searchProduct(
@@ -71,6 +74,16 @@ public class SearchController {
   ResponseEntity<List<String>> autoCompleteSearch(@RequestParam String keyword) {
     return ResponseEntity.status(HttpStatus.OK).body(
         searchHistoryService.autoCompleteSearch(keyword)
+    );
+  }
+
+  @GetMapping("/initial")
+  ResponseEntity<InfiniteScrollResponseDto<ProductsResponseDto>> getInitialProducts(
+    @RequestParam(required = false, defaultValue = "20") int limit,
+    @RequestParam(required = false) Long lastProductId
+  ) {
+    return ResponseEntity.status(HttpStatus.OK).body(
+        productService.getInitialProducts(limit, lastProductId)
     );
   }
 

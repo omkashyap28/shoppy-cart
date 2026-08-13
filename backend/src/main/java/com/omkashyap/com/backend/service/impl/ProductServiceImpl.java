@@ -142,8 +142,7 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   public ProductResponseDto patchProductById(String sellerId, String productId, Map<String, Object> values) {
-    Seller seller = sellerRepository.findBySellerId(sellerId).orElseThrow(() -> new IllegalArgumentException("Seller not exists"));
-    Product product = productRepository.findByProductId(productId).orElseThrow(() -> new IllegalArgumentException("Product not exists with this id"));
+    Product product = productRepository.findByProductIdAndSeller_SellerId(productId, sellerId).orElseThrow(() -> new IllegalArgumentException("Product not exists with this id"));
 
     values.forEach((key, val) -> {
       switch (key) {
@@ -188,40 +187,39 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   public ProductResponseDto getProductBySellerAndProductId(String sellerId, String productId) {
-    Seller seller = sellerRepository.findBySellerId(sellerId).orElseThrow(() -> new IllegalArgumentException("Seller not exists"));
-    Product product = productRepository.findByProductId(productId).orElseThrow(() -> new IllegalArgumentException("Product not exists with this id"));
+    Product product = productRepository.findByProductIdAndSeller_SellerId(productId, sellerId).orElseThrow(() -> new IllegalArgumentException("Product not exists with this id"));
 
     return productDtoMapper.mapToDto(product);
   }
 
   @Override
-  public InfiniteScrollResponseDto<ProductsResponseDto> getInitialProducts(String cursor, int limit) {
+  public InfiniteScrollResponseDto<ProductsResponseDto> getInitialProducts(int limit, Long lastProductId) {
 
-    Pageable pageable = PageRequest.of(0, limit);
+    Pageable pageable = PageRequest.of(0, Math.min(limit, 25));
 
     List<Product> products;
 
-    if(cursor == null) {
-      products = productRepository.findFirstPage(pageable);
+    if (lastProductId == null) {
+      products = productRepository.findTopNProducts(pageable);
     } else {
-      products = productRepository.findNextPage(cursor, pageable);
+      products = productRepository.findTopNProductsAfterId(lastProductId, pageable);
     }
 
-    List<ProductsResponseDto> productsResponseDtos = products.stream()
-        .map(productsDtoMapper::mapToDto).toList();
+    List<ProductsResponseDto> productDtos = products.stream()
+        .map(productsDtoMapper::mapToDto)
+        .toList();
 
     Long nextCursor = null;
-    boolean hasMore = false;
-
     if(!products.isEmpty()) {
       nextCursor = products.getLast().getId();
-      hasMore = products.size() == limit;
     }
 
+    boolean hasMore = products.size() == limit;
+
     return InfiniteScrollResponseDto.<ProductsResponseDto>builder()
-        .content(productsResponseDtos)
-        .hasMore(hasMore)
+        .content(productDtos)
         .nextCursor(nextCursor)
+        .hasMore(hasMore)
         .build();
   }
 

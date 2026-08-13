@@ -76,7 +76,7 @@ public class ProductController {
   @GetMapping("/related")
   ResponseEntity<List<ProductResponseDto>> getRelatedProductsByTag(
       @PathVariable String productId,
-      @RequestParam(required = false, defaultValue = "10") int limit
+      @RequestParam(required = false, defaultValue = "20") int limit
   ) {
     return ResponseEntity.status(HttpStatus.OK).body(
         searchHistoryService.getRelatedProducts(productId, limit)

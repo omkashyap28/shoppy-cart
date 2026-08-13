@@ -43,6 +43,7 @@ public class WishList {
       cascade = CascadeType.ALL,
       orphanRemoval = true
   )
+  @Builder.Default
   private List<WishListItem> items = new ArrayList<>();
 
   @CreationTimestamp

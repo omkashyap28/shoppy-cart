@@ -43,6 +43,7 @@ public class Orders {
       cascade = CascadeType.ALL,
       orphanRemoval = true
   )
+  @Builder.Default
   private List<OrderItem> items = new ArrayList<>();
 
 }

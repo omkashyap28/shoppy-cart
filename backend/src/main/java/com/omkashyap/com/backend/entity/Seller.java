@@ -77,6 +77,7 @@ public class Seller {
       mappedBy = "seller",
       cascade = CascadeType.ALL
   )
+  @Builder.Default
   private List<Product> products = new ArrayList<>();
 
   @JsonIgnore
