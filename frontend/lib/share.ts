@@ -3,7 +3,7 @@ export function getShareLinks(url: string, title: string) {
   const encodedTitle = encodeURIComponent(title);
 
   return {
-    whatsapp: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`,
+    whatsapp: `https://api.whatsapp.com/send/?text=${encodedTitle}%20${encodedUrl}`,
 
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
 
@@ -11,28 +11,4 @@ export function getShareLinks(url: string, title: string) {
 
     mail: `mailto:?subject=${encodedTitle}&body=${encodedUrl}`,
   };
-}
-
-export async function nativeShare({
-  title,
-  text,
-  url,
-}: {
-  title: string;
-  text?: string;
-  url: string;
-}) {
-  if (!navigator.share) return false;
-
-  try {
-    await navigator.share({
-      title,
-      text,
-      url,
-    });
-
-    return true;
-  } catch {
-    return false;
-  }
 }
