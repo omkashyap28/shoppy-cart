@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { Loader } from "@/components/layout";
 import { Discussion } from "@/components/products/discussion/discussion";
 import { serverFetch } from "@/lib/serverFetch";
-import { cacheLife } from 'next/cache'
+import { cacheLife } from "next/cache";
 
 const Review = dynamic(() => import("@/components/products/review/review"), {
   loading: () => <Loader />,
@@ -17,14 +17,14 @@ interface Props {
 
 const getProduct = async (productId: string) => {
   "use cache";
-  cacheLife({stale: 300});
-  
+  cacheLife({ stale: 300 });
+
   return await serverFetch<ProductType>(`/product/${productId}`, {
     next: {
       tags: [`product:${productId}`],
-    }
+    },
+    errorMessage: `Product with this ID is not exits`,
   });
-
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

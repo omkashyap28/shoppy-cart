@@ -17,18 +17,18 @@ export interface ProductImage {
 
 export interface ProductCardProps {
   productId: string;
-  brandName: string;
+  brandName?: string;
   description: string;
   productThumbnail: string;
-  sellerId: string;
+  sellerId?: string;
   inStock: boolean;
   totalReviews: number;
   averageRating: number;
-  categoryId: number;
+  categoryId?: number;
   price: number;
   coins: number;
   productUrl: string;
-  tags: string[];
+  tags?: string[];
 }
 
 export interface Product {
@@ -47,6 +47,19 @@ export interface Product {
   sellerId: string;
   tags: string[];
   totalReviews: number;
+}
+
+export interface Products {
+  productId: string;
+  brandName: string;
+  description: string;
+  productThumbnail: string;
+  inStock: boolean;
+  totalReviews: number;
+  averageRating: number;
+  price: number;
+  coins: number;
+  productUrl: string;
 }
 
 export interface DiscussionType {
