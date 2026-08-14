@@ -18,6 +18,7 @@ import { ShareModel } from "./share-model";
 import { ImageDrop } from "./image-drop";
 import { MagnetButton } from "./magnet-button";
 import { Loader } from "./loader";
+import { InfiniteScroll } from "./infinite-scroll";
 
 export {
   Header,
@@ -40,4 +41,5 @@ export {
   ImageDrop,
   MagnetButton,
   Loader,
+  InfiniteScroll
 };
