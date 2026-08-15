@@ -2,6 +2,7 @@ package com.omkashyap.com.backend.service;
 
 import com.omkashyap.com.backend.dto.responseDto.InfiniteScrollResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.ProductsResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.SearchHistoryResponseDto;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public interface SearchHistoryService {
       int limit
   );
 
-  List<ProductResponseDto> getRelatedProducts(
+  List<ProductsResponseDto> getRelatedProducts(
       String productId,
       int limit
   );

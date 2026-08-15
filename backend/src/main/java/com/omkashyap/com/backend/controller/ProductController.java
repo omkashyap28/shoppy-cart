@@ -74,7 +74,7 @@ public class ProductController {
 
 
   @GetMapping("/related")
-  ResponseEntity<List<ProductResponseDto>> getRelatedProductsByTag(
+  ResponseEntity<List<ProductsResponseDto>> getRelatedProductsByTag(
       @PathVariable String productId,
       @RequestParam(required = false, defaultValue = "20") int limit
   ) {

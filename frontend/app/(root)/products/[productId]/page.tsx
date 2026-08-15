@@ -3,13 +3,26 @@ import { Product } from "@/components/products";
 import { Product as ProductType } from "@/types/product";
 import dynamic from "next/dynamic";
 import { Loader } from "@/components/layout";
-import { Discussion } from "@/components/products/discussion/discussion";
 import { serverFetch } from "@/lib/serverFetch";
 import { cacheLife } from "next/cache";
+
+const Recommendation = dynamic(
+  () => import("@/components/products/recommendation/recommendation"),
+  {
+    loading: () => <Loader />,
+  }
+);
 
 const Review = dynamic(() => import("@/components/products/review/review"), {
   loading: () => <Loader />,
 });
+
+const Discussion = dynamic(
+  () => import("@/components/products/discussion/discussion"),
+  {
+    loading: () => <Loader />,
+  }
+);
 
 interface Props {
   params: Promise<{ productId: string }>;
@@ -81,6 +94,7 @@ export default async function ProductPage({ params }: Props) {
       <Product product={product} />
       <Review productId={productId} />
       <Discussion productId={productId} />
+      <Recommendation productId={productId} />
     </>
   );
 }

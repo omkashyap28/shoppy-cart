@@ -10,7 +10,7 @@ interface DiscussionProps {
   productId: string;
 }
 
-export function Discussion({ productId }: DiscussionProps) {
+export default function Discussion({ productId }: DiscussionProps) {
 
   const { data: discussions, isLoading, isError } = useQuery<DiscussionType[]>({
     queryKey: ["discussions", productId],

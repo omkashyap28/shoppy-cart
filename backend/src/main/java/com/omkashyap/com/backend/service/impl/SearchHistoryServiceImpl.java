@@ -2,8 +2,10 @@ package com.omkashyap.com.backend.service.impl;
 
 import com.omkashyap.com.backend.dto.responseDto.InfiniteScrollResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.ProductsResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.SearchHistoryResponseDto;
 import com.omkashyap.com.backend.dtoMapper.ProductDtoMapper;
+import com.omkashyap.com.backend.dtoMapper.ProductsDtoMapper;
 import com.omkashyap.com.backend.entity.*;
 import com.omkashyap.com.backend.repository.ProductRepository;
 import com.omkashyap.com.backend.repository.SearchHistoryRepository;
@@ -25,6 +27,7 @@ public class SearchHistoryServiceImpl implements SearchHistoryService {
   private final UserRepository userRepository;
   private final SearchHistoryRepository searchHistoryRepository;
   private final ProductDtoMapper productDtoMapper;
+  private final ProductsDtoMapper productsDtoMapper;
   private final SearchSuggestionRepository searchSuggestionRepository;
 
 
@@ -170,7 +173,7 @@ public class SearchHistoryServiceImpl implements SearchHistoryService {
   }
 
   @Override
-  public List<ProductResponseDto> getRelatedProducts(
+  public List<ProductsResponseDto> getRelatedProducts(
       String productId,
       int limit
   ) {
@@ -191,7 +194,7 @@ public class SearchHistoryServiceImpl implements SearchHistoryService {
         );
 
     return relatedProducts.stream()
-        .map(productDtoMapper::mapToDto)
+        .map(productsDtoMapper::mapToDto)
         .toList();
   }
 }
