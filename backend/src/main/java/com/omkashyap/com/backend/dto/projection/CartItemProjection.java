@@ -16,7 +16,7 @@ public interface CartItemProjection {
 
   Integer getTotalReviews();
 
-  Float getAverageRating();
+  Double getAverageRating();
 
   Float getPrice();
 

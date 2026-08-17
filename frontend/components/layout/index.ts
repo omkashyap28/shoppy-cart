@@ -19,6 +19,7 @@ import { ImageDrop } from "./image-drop";
 import { MagnetButton } from "./magnet-button";
 import { Loader } from "./loader";
 import { InfiniteScroll } from "./infinite-scroll";
+import { RatingStar } from "./rating-star";
 
 export {
   Header,
@@ -41,5 +42,6 @@ export {
   ImageDrop,
   MagnetButton,
   Loader,
-  InfiniteScroll
+  InfiniteScroll,
+  RatingStar
 };

@@ -2,6 +2,7 @@ package com.omkashyap.com.backend.service.impl;
 
 import com.omkashyap.com.backend.dto.projection.CartItemProjection;
 import com.omkashyap.com.backend.dto.requestDto.CartRequestDto;
+import com.omkashyap.com.backend.dto.requestDto.CartUpdateRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.CartItemResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.CartResponseDto;
 import com.omkashyap.com.backend.entity.*;
@@ -96,6 +97,31 @@ public class CartServiceImpl implements CartService {
   @Transactional
   public void removeCartItemFromCartById(String cartItemId) {
     cartItemRepository.deleteByCartItemId(cartItemId);
+  }
+
+  @Override
+  public CartItemResponseDto patchCartByCartId(String cartItemId, CartUpdateRequestDto cartUpdateRequestDto) {
+    CartItem cartItem = cartItemRepository.findByCartItemId(cartItemId).orElseThrow(() ->
+        new IllegalArgumentException("Invalid cartId")
+    );
+
+    cartItem.setQuantity(cartUpdateRequestDto.getQuantity());
+    cartItemRepository.save(cartItem);
+
+    return CartItemResponseDto.builder()
+        .cartItemId(cartItem.getCartItemId())
+        .productId(cartItem.getProduct().getProductId())
+        .brandName(cartItem.getProduct().getBrandName())
+        .description(cartItem.getProduct().getDescription())
+        .productThumbnail(cartItem.getProduct().getProductThumbnail())
+        .inStock(cartItem.getProduct().getInStock())
+        .totalReviews(cartItem.getProduct().getTotalReviews())
+        .averageRating(cartItem.getProduct().getAverageRating())
+        .price(cartItem.getProduct().getPrice())
+        .coins(cartItem.getProduct().getCoins())
+        .productUrl(cartItem.getProduct().getProductUrl())
+        .quantity(cartItem.getQuantity())
+        .build();
   }
 
 }

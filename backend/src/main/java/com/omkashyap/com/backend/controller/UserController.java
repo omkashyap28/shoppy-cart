@@ -2,6 +2,7 @@ package com.omkashyap.com.backend.controller;
 
 import com.omkashyap.com.backend.dto.requestDto.AddressRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.CartRequestDto;
+import com.omkashyap.com.backend.dto.requestDto.CartUpdateRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.WishListRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.*;
 import com.omkashyap.com.backend.service.*;
@@ -31,7 +32,8 @@ public class UserController {
   }
 
   @PatchMapping
-  ResponseEntity<UserResponseDto> updatePartialUserDetail(@PathVariable String userId, @RequestBody Map<String, Object> updates) {
+  ResponseEntity<UserResponseDto> updatePartialUserDetail(@PathVariable String userId,
+      @RequestBody Map<String, Object> updates) {
     return ResponseEntity.status(HttpStatus.OK).body(userService.updatePartialUserDetails(userId, updates));
   }
 
@@ -42,7 +44,8 @@ public class UserController {
   }
 
   @PostMapping("/address")
-  ResponseEntity<UserResponseDto> createAddressByUserId(@PathVariable String userId, @RequestBody AddressRequestDto addressRequestDto) {
+  ResponseEntity<UserResponseDto> createAddressByUserId(@PathVariable String userId,
+      @RequestBody AddressRequestDto addressRequestDto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(userService.addAddressToUser(userId, addressRequestDto));
   }
 
@@ -63,17 +66,28 @@ public class UserController {
 
   @GetMapping("/cart")
   ResponseEntity<List<CartItemResponseDto>> getCartItemsFromCart(@PathVariable String userId) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(cartService.getCartItemsFromCart(userId));
+    return ResponseEntity.status(HttpStatus.OK).body(cartService.getCartItemsFromCart(userId));
+  }
+
+  @PatchMapping("/cart/{cartItemId}")
+  ResponseEntity<CartItemResponseDto> patchCartItemByCartId(
+      @PathVariable String cartItemId,
+      @RequestBody CartUpdateRequestDto cartUpdateRequestDto) {
+    return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+        cartService.patchCartByCartId(cartItemId, cartUpdateRequestDto));
   }
 
   @DeleteMapping("/cart/{cartItemId}")
-  ResponseEntity<Void> removeCartItemFromCartById(@PathVariable String cartItemId) {
+  ResponseEntity<Void> removeCartItemFromCartById(
+      @PathVariable String userId,
+      @PathVariable String cartItemId) {
     cartService.removeCartItemFromCartById(cartItemId);
     return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/wishlists")
-  ResponseEntity<WishListResponseDto> addProductToWishList(@PathVariable String userId, @RequestBody WishListRequestDto requestDto) {
+  ResponseEntity<WishListResponseDto> addProductToWishList(@PathVariable String userId,
+      @RequestBody WishListRequestDto requestDto) {
     return ResponseEntity.status(HttpStatus.ACCEPTED).body(wishListService.addProductToWishList(userId, requestDto));
   }
 
@@ -92,10 +106,8 @@ public class UserController {
   ResponseEntity<InfiniteScrollResponseDto<ProductDiscussionResponseDto>> getProductDiscussionsByUser(
       @RequestHeader("Authorization") String authHeader,
       @RequestParam(required = false) Long cursor,
-      @RequestParam(defaultValue = "10") int size
-  ) {
+      @RequestParam(defaultValue = "10") int size) {
     return ResponseEntity.status(HttpStatus.OK).body(
-        productDiscussionService.getAllDiscussionByUser(authHeader, cursor, size)
-    );
+        productDiscussionService.getAllDiscussionByUser(authHeader, cursor, size));
   }
 }
