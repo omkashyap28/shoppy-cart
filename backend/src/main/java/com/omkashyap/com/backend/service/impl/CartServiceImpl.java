@@ -3,7 +3,9 @@ package com.omkashyap.com.backend.service.impl;
 import com.omkashyap.com.backend.dto.projection.CartItemProjection;
 import com.omkashyap.com.backend.dto.requestDto.CartRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.CartUpdateRequestDto;
+import com.omkashyap.com.backend.dto.requestDto.CheckProductExistenceInCartRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.CartItemResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.CartProductExistenceCheckResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.CartResponseDto;
 import com.omkashyap.com.backend.entity.*;
 import com.omkashyap.com.backend.repository.*;
@@ -14,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -121,6 +124,42 @@ public class CartServiceImpl implements CartService {
         .coins(cartItem.getProduct().getCoins())
         .productUrl(cartItem.getProduct().getProductUrl())
         .quantity(cartItem.getQuantity())
+        .build();
+  }
+
+  @Override
+  public CartProductExistenceCheckResponseDto checkProductExistenceInCart(String userId, CheckProductExistenceInCartRequestDto requestDto) {
+
+    Optional<Cart> cart = cartRepository.findByUser_UserId(userId);
+
+    if(cart.isEmpty()) {
+      return CartProductExistenceCheckResponseDto.builder()
+          .exists(false)
+          .productId(requestDto.getProductId())
+          .cartId(null)
+          .build();    }
+
+    Optional<CartItem> cartItem = cartItemRepository.findAllByCart_Id(cart.get().getId())
+        .stream()
+        .filter(
+            item -> item.
+                    getProduct()
+                    .getProductId()
+                    .equals(requestDto.getProductId())
+        ).findFirst();
+
+    if(cartItem.isEmpty()) {
+      return CartProductExistenceCheckResponseDto.builder()
+          .exists(false)
+          .productId(requestDto.getProductId())
+          .cartId(null)
+          .build();
+    }
+
+    return CartProductExistenceCheckResponseDto.builder()
+        .exists(true)
+        .productId(requestDto.getProductId())
+        .cartId(cartItem.get().getCartItemId())
         .build();
   }
 

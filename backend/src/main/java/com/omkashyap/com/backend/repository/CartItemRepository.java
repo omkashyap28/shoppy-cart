@@ -29,10 +29,13 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
         JOIN ci.cart c
         JOIN ci.product p
         WHERE c.user.userId = :userId
+        ORDER BY ci.createdAt DESC
         """)
     List<CartItemProjection> findCartItems(String userId);
 
   void deleteByCartItemId(String cartItemId);
 
   Optional<CartItem> findByCartItemId(String cartId);
+
+  List<CartItem> findAllByCart_Id(Long id);
 }

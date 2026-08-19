@@ -1,10 +1,6 @@
 package com.omkashyap.com.backend.controller;
 
-import com.omkashyap.com.backend.dto.requestDto.AddressRequestDto;
-import com.omkashyap.com.backend.dto.requestDto.CartRequestDto;
-import com.omkashyap.com.backend.dto.requestDto.CartUpdateRequestDto;
-import com.omkashyap.com.backend.dto.requestDto.WishListProductExistenceCheckRequestDto;
-import com.omkashyap.com.backend.dto.requestDto.WishListRequestDto;
+import com.omkashyap.com.backend.dto.requestDto.*;
 import com.omkashyap.com.backend.dto.responseDto.*;
 import com.omkashyap.com.backend.service.*;
 import lombok.RequiredArgsConstructor;
@@ -69,13 +65,22 @@ public class UserController {
   ResponseEntity<List<CartItemResponseDto>> getCartItemsFromCart(@PathVariable String userId) {
     return ResponseEntity.status(HttpStatus.OK).body(cartService.getCartItemsFromCart(userId));
   }
-
+  
   @PatchMapping("/cart/{cartItemId}")
   ResponseEntity<CartItemResponseDto> patchCartItemByCartId(
       @PathVariable String cartItemId,
       @RequestBody CartUpdateRequestDto cartUpdateRequestDto) {
     return ResponseEntity.status(HttpStatus.ACCEPTED).body(
         cartService.patchCartByCartId(cartItemId, cartUpdateRequestDto));
+  }
+  @PostMapping("/cart/check-product")
+  ResponseEntity<CartProductExistenceCheckResponseDto> checkProductExistenceInCart(
+      @PathVariable String userId,
+      @RequestBody CheckProductExistenceInCartRequestDto requestDto
+  ) {
+    return ResponseEntity.status(HttpStatus.OK).body(
+        cartService.checkProductExistenceInCart(userId, requestDto)
+    );
   }
 
   @DeleteMapping("/cart/{cartItemId}")

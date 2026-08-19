@@ -2,7 +2,9 @@ package com.omkashyap.com.backend.service;
 
 import com.omkashyap.com.backend.dto.requestDto.CartRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.CartUpdateRequestDto;
+import com.omkashyap.com.backend.dto.requestDto.CheckProductExistenceInCartRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.CartItemResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.CartProductExistenceCheckResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.CartResponseDto;
 
 import java.util.List;
@@ -15,4 +17,6 @@ public interface CartService {
   void removeCartItemFromCartById(String cartItemId);
 
   CartItemResponseDto patchCartByCartId(String cartItemId, CartUpdateRequestDto cartUpdateRequestDto);
+
+  CartProductExistenceCheckResponseDto checkProductExistenceInCart(String userId, CheckProductExistenceInCartRequestDto requestDto);
 }

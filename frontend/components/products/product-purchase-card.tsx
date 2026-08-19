@@ -9,13 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { Info, ShoppingCart } from "lucide-react";
+import { Info } from "lucide-react";
 import { QuantitySelector } from "../layout/quantity-selector";
 import { useState } from "react";
-import { apiFetch } from "@/lib/utils";
-import { useAppStore } from "@/store/store";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { usePings } from "react-pings";
 import { AmountTab } from "./amount-tab";
 import { Image } from "@imagekit/next";
 import { Separator } from "../ui/separator";
@@ -31,6 +27,7 @@ import {
 } from "../ui/hover-card";
 import { MagnetButton } from "../layout";
 import { Input } from "../ui/input";
+import { CartButton } from "../layout/cart-btn";
 
 interface ProductPurchaseCardProps {
   price: number;
@@ -53,13 +50,9 @@ export function ProductPurchaseCard({
   description,
 }: ProductPurchaseCardProps) {
   const [quantity, setQuantity] = useState(1);
-  const userId = useAppStore((state) => state.user?.userId);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [fastModeEnabled, setFastModeEnabled] = useState(false);
   const [couponCodeValue, setCouponCodeValue] = useState("");
-
-  const queryClient = useQueryClient();
-  const pings = usePings();
 
   const handleIncrement = () => {
     if (quantity < MAX_LIMIT) {
@@ -71,41 +64,6 @@ export function ProductPurchaseCard({
       setQuantity((prev) => prev - 1);
     }
   };
-
-  const { mutate: handleAddToCart } = useMutation({
-    mutationFn: async () => {
-      if (!userId) return;
-
-      const payload = {
-        productId,
-        quantity,
-        selectedAttributes: null,
-      };
-
-      const response = await apiFetch(`user/${userId}/cart`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.status !== 201) {
-        throw new Error("Failed to add product in cart");
-      }
-
-      return await response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["user-cart-items", userId],
-      });
-      pings.success("Product added to cart");
-    },
-    onError: () => {
-      pings.error("Failed to add product in cart");
-    },
-  });
 
   async function applyCouponCode(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -163,7 +121,7 @@ export function ProductPurchaseCard({
               Astimated delivery on:
             </h4>
             <div className="flex w-full items-baseline justify-between">
-              <span>{format(date, "PPPP")}</span>
+              <span>{format(String(date), "PPPP")}</span>
               <Popover>
                 <PopoverTrigger
                   className="text-primary underline-offset-2 hover:underline"
@@ -216,19 +174,13 @@ export function ProductPurchaseCard({
       </CardContent>
       <CardFooter>
         <div className="flex w-full flex-col items-center gap-2">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => handleAddToCart()}
-          >
-            <ShoppingCart className="size-4" />
-            Add to Cart
-          </Button>
+          <CartButton
+            productId={productId}
+          />
           <MagnetButton magnetStrength={0.15} disabled={!inStock} padding={2}>
             <Button
               className="w-full"
               disabled={!inStock}
-              onClick={() => console.log("jkddkshf")}
             >
               Buy Now
             </Button>

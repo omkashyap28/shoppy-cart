@@ -11,4 +11,4 @@ export interface CartResponse {
   coins: number;
   productUrl: string;
   quantity: number;
-}
+}t

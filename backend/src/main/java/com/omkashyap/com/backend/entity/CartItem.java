@@ -17,7 +17,7 @@ import java.util.UUID;
 @Builder
 @Table(
     uniqueConstraints = @UniqueConstraint(
-        name = "uk_cart_cart_item_id", columnNames = "cart_item_id"
+        name = "uk_cart_unique_key", columnNames = {"cart_id", "product_id", "cart_item_pk"}
     )
 )
 public class CartItem {

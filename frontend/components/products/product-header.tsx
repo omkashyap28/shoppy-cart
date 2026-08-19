@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { Heart, PackageCheck, Star } from "lucide-react";
+import { PackageCheck, Star } from "lucide-react";
 
 import { ShareModel } from "@/components/layout";
-import { Toggle } from "@/components/ui/toggle";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { WishlistButton } from "../layout/wishlist-btn";
 
 interface ProductHeaderProps {
   productId: string;
@@ -84,8 +84,9 @@ export function ProductHeader({
           />
 
           <span
-            className={`text-sm font-medium ${inStock ? "text-green-600" : "text-red-500"
-              }`}
+            className={`text-sm font-medium ${
+              inStock ? "text-green-600" : "text-red-500"
+            }`}
           >
             {inStock ? "In Stock" : "Out of Stock"}
           </span>
@@ -100,11 +101,9 @@ export function ProductHeader({
         </div>
 
         <div className="flex items-center gap-2">
-          <Toggle variant="outline">
-            <Heart className="size-4" />
-            Wishlist
-          </Toggle>
-
+          <WishlistButton
+            productId={productId}
+           />
           <ShareModel
             productTitle={description}
             url={`/product/${productId}`}

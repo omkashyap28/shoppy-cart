@@ -20,7 +20,7 @@ export function PageComponent({
           {heading}
         </h1>
       </div>
-      <section className="mt-6">{children}</section>
+      <section className="mt-4">{children}</section>
     </div>
   );
 }

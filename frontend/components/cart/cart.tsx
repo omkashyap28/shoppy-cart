@@ -32,7 +32,8 @@ export function Cart() {
       return await response.json();
     },
     enabled: !!userId,
-    staleTime: Infinity,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 
   if (status === "pending") return <Loader />;

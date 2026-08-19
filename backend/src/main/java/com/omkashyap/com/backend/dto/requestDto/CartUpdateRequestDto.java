@@ -1,7 +1,6 @@
 package com.omkashyap.com.backend.dto.requestDto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
