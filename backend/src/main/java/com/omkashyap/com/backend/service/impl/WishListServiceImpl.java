@@ -1,6 +1,8 @@
 package com.omkashyap.com.backend.service.impl;
 
+import com.omkashyap.com.backend.dto.requestDto.WishListProductExistenceCheckRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.WishListRequestDto;
+import com.omkashyap.com.backend.dto.responseDto.WishListProductExistenceCheckResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.WishListResponseDto;
 import com.omkashyap.com.backend.dtoMapper.WishListDtoMapper;
 import com.omkashyap.com.backend.entity.*;
@@ -11,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -68,10 +72,13 @@ public class WishListServiceImpl implements WishListService {
   @Override
   public List<WishListResponseDto> getWishListProducts(String userId) {
 
-    WishList wishList = wishListRepository.findByUser_UserId(userId).orElseThrow(() ->
-        new IllegalArgumentException("User not exists")
-    );
-    List<WishListItem> wishListItems = wishListItemRepository.findAllByWishListId(wishList.getId());
+    Optional<WishList> wishList = wishListRepository.findByUser_UserId(userId);
+
+    if(wishList.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    List<WishListItem> wishListItems = wishListItemRepository.findAllByWishListId(wishList.get().getId());
 
     return wishListItems.stream().map(wishListDtoMapper::mapToDto).toList();
   }
@@ -80,6 +87,45 @@ public class WishListServiceImpl implements WishListService {
   @Transactional
   public void removeProductFromWishlist(String wishlistId) {
     wishListItemRepository.deleteByWishListItemId(wishlistId);
+  }
+
+  public WishListProductExistenceCheckResponseDto checkProductExistenceInWishlist(
+    String userId,
+     WishListProductExistenceCheckRequestDto requestDto
+    ) {
+
+    Optional<WishList> wishList = wishListRepository.findByUser_UserId(userId);
+
+    if(wishList.isEmpty()) {
+      return WishListProductExistenceCheckResponseDto.builder()
+          .exists(false)
+          .productId(requestDto.getProductId())
+          .wishlistId(null)
+          .build();
+    }
+
+    Optional<WishListItem> wishListItem = wishListItemRepository
+        .findAllByWishListId(wishList.get().getId())
+        .stream().filter(
+            item -> item
+                .getProduct()
+                .getProductId()
+                .equals(requestDto.getProductId())
+        ).findFirst();
+
+    if(wishListItem.isEmpty()) {
+      return WishListProductExistenceCheckResponseDto.builder()
+          .exists(false)
+          .productId(requestDto.getProductId())
+          .wishlistId(null)
+          .build();
+    }
+
+    return WishListProductExistenceCheckResponseDto.builder()
+        .exists(true)
+        .productId(requestDto.getProductId())
+        .wishlistId(wishListItem.get().getWishListItemId())
+        .build();
   }
 
 }

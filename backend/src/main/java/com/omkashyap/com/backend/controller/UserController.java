@@ -3,6 +3,7 @@ package com.omkashyap.com.backend.controller;
 import com.omkashyap.com.backend.dto.requestDto.AddressRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.CartRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.CartUpdateRequestDto;
+import com.omkashyap.com.backend.dto.requestDto.WishListProductExistenceCheckRequestDto;
 import com.omkashyap.com.backend.dto.requestDto.WishListRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.*;
 import com.omkashyap.com.backend.service.*;
@@ -100,6 +101,17 @@ public class UserController {
   ResponseEntity<Void> removeProductFromWishlist(@PathVariable String wishlistId) {
     wishListService.removeProductFromWishlist(wishlistId);
     return ResponseEntity.noContent().build();
+  }
+
+
+  @PostMapping("/wishlists/check-product")
+  ResponseEntity<WishListProductExistenceCheckResponseDto> checkProductExistenceInWishlist(
+    @PathVariable String userId,
+    @RequestBody WishListProductExistenceCheckRequestDto requestDto
+  ) {
+    return ResponseEntity.status(HttpStatus.OK).body(
+      wishListService.checkProductExistenceInWishlist(userId, requestDto)
+    );
   }
 
   @GetMapping("/discussions")

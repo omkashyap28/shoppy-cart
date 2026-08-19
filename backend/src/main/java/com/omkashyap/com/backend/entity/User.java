@@ -85,7 +85,7 @@ public class User implements UserDetails {
     private List<Session> sessions = new ArrayList<>();
 
     @JsonIgnore
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private WishList wishList;
 
     @JsonIgnore

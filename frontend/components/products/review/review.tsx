@@ -21,8 +21,6 @@ export default async function Review({ productId }: ReviewProps) {
     }
   );
 
-  console.log(response);
-
   return (
     <section id="customer-reviews" className="w-full py-6">
       <Heading2 className="relative border-y border-border bg-background py-2 text-xl md:text-3xl">

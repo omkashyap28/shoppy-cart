@@ -19,7 +19,7 @@ import java.util.UUID;
     ),
     uniqueConstraints = {
         @UniqueConstraint(
-            name = "uk_wishlist_item_id", columnNames = "wish_list_item_id"
+            name = "uk_wishlist_item_id", columnNames = {"wishlist_id", "product_id"}
         )
     }
 )
