@@ -1,13 +1,13 @@
-import { InfiniteRespone } from "@/types/infiniteScroll";
+import { PaginationResponse } from "@/types/paginationResponse";
 import { QueryFunctionContext, useInfiniteQuery } from "@tanstack/react-query";
 
 interface UserInfiniteQueryOptions<T> {
   queryKey: string[];
-  queryFn: (context: QueryFunctionContext) => Promise<InfiniteRespone<T>>;
+  queryFn: (context: QueryFunctionContext) => Promise<PaginationResponse<T>>;
   initialPageParam?: number;
 }
 
-export function useInfiniteScroll<T = unknown>({
+export function usePaginationQuery<T = unknown>({
   queryKey,
   queryFn,
   initialPageParam = 0,
