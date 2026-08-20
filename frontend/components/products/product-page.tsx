@@ -2,7 +2,7 @@
 
 import { Products } from "@/types/product";
 import { InfiniteScroll } from "../layout/infinite-scroll";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { usePaginationQuery as useInfiniteScroll } from "@/hooks/usePaginationQuery";
 import { ProductCard } from "./product-card";
 
 export function ProductPage() {

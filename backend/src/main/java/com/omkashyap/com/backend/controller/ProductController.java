@@ -51,6 +51,17 @@ public class ProductController {
     return ResponseEntity.status(HttpStatus.OK).body(reviewService.getProductReviewStats(productId));
   }
 
+  @GetMapping("/reviews/images")
+  ResponseEntity<InfiniteScrollResponseDto<ReviewImageResponseDto>> getAllReviewsImagesByProductId(
+      @PathVariable String productId,
+      @RequestParam(required = false, defaultValue = "10") int limit,
+      @RequestParam(required = false) Long cursor
+  ) {
+    return ResponseEntity.status(HttpStatus.OK).body(
+        reviewService.getAllReviewsImagesByProductId(productId, limit, cursor)
+    );
+  }
+
   @DeleteMapping("/reviews/{reviewId}")
   ResponseEntity<Void> deleteReviewById(
       @RequestHeader("Authorization") String authHeader,

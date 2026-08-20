@@ -5,6 +5,7 @@ import { ReviewCard } from "./review-card";
 import { ReviewResponseType } from "@/types/review";
 import { Suspense } from "react";
 import { ReviewRatingsStats } from "./review-ratings-stats";
+import { ReviewImages } from "./review-images";
 import { serverFetch } from "@/lib/serverFetch";
 
 interface ReviewProps {
@@ -26,21 +27,30 @@ export default async function Review({ productId }: ReviewProps) {
       <Heading2 className="relative border-y border-border bg-background py-2 text-xl md:text-3xl">
         Customer Reviews
       </Heading2>
-      <div className="grid gap-5 md:grid-cols-[380px_1fr] md:divide-x md:divide-border md:divide-dashed">
+      <div className="grid gap-5 md:grid-cols-[380px_1fr] md:divide-x md:divide-dashed md:divide-border">
         <div className="h-fit w-full">
           <ReviewRatingsStats productId={productId} />
+          <ReviewImages productId={productId} />
         </div>
         <div className="@container w-full">
           <Suspense fallback={<Loader />}>
-            <div className="grid gap-3 @xl:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-4 @5xl:gap-8">
-              {response.content.map((review) => (
-                <ReviewCard
-                  review={review}
-                  key={review.reviewId}
-                  productId={productId}
-                />
-              ))}
-            </div>
+            {response.content.length === 0 ? (
+              <div className="flex h-36 w-full items-center justify-center p-2">
+                <p className="text-center text-base tracking-tight text-muted-foreground">
+                  No reviews exists for this product
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-3 @xl:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-4 @5xl:gap-8">
+                {response.content.map((review) => (
+                  <ReviewCard
+                    review={review}
+                    key={review.reviewId}
+                    productId={productId}
+                  />
+                ))}
+              </div>
+            )}
           </Suspense>
         </div>
       </div>

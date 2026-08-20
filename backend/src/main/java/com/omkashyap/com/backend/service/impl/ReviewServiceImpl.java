@@ -3,6 +3,7 @@ package com.omkashyap.com.backend.service.impl;
 import com.omkashyap.com.backend.dto.projection.ReviewStatsProjection;
 import com.omkashyap.com.backend.dto.requestDto.ReviewRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.InfiniteScrollResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.ReviewImageResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ReviewResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ReviewStatsResponseDto;
 import com.omkashyap.com.backend.dtoMapper.ReviewDtoMapper;
@@ -18,6 +19,7 @@ import com.omkashyap.com.backend.service.ReviewService;
 import com.omkashyap.com.backend.util.AuthHeaderUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -191,6 +193,43 @@ public class ReviewServiceImpl implements ReviewService {
         .averageRating(stats.getAverageRating())
         .totalReviews(stats.getTotalReviews())
         .ratingDistribution(distribution)
+        .build();
+  }
+
+  @Override
+  public InfiniteScrollResponseDto<ReviewImageResponseDto> getAllReviewsImagesByProductId(
+      String productId,
+      int limit,
+      Long cursor
+  ) {
+    Pageable page = PageRequest.of(0, Math.min(limit, 20));
+
+    Page<ReviewImage> reviewImages;
+
+    if (cursor == null) {
+      reviewImages = reviewImageRepository.findInitialReviewImages(productId, page);
+    } else {
+      reviewImages = reviewImageRepository.findReviewImagesAfterCursor(productId, cursor, page);
+    }
+
+    List<ReviewImageResponseDto> responsesDto = reviewImages.stream().map(
+        item -> ReviewImageResponseDto.builder()
+            .imageId(item.getImageId())
+            .thumbnailUrl(item.getThumbnailUrl())
+            .imageUrl(item.getImageUrl())
+            .build()
+    ).toList();
+
+    System.out.println(responsesDto);
+
+    boolean hasMore = reviewImages.hasNext();
+
+    Long nextCursor = reviewImages.isEmpty() ? null : reviewImages.getContent().getLast().getId();
+
+    return InfiniteScrollResponseDto.<ReviewImageResponseDto>builder()
+        .content(responsesDto)
+        .nextCursor(nextCursor)
+        .hasMore(hasMore)
         .build();
   }
 

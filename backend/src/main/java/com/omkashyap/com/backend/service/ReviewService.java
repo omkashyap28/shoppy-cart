@@ -2,6 +2,7 @@ package com.omkashyap.com.backend.service;
 
 import com.omkashyap.com.backend.dto.requestDto.ReviewRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.InfiniteScrollResponseDto;
+import com.omkashyap.com.backend.dto.responseDto.ReviewImageResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ReviewResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ReviewStatsResponseDto;
 
@@ -21,5 +22,7 @@ public interface ReviewService {
   List<ReviewResponseDto> getAllReviewsByUserId(String userId);
 
   ReviewStatsResponseDto getProductReviewStats(String productId);
+
+  InfiniteScrollResponseDto<ReviewImageResponseDto> getAllReviewsImagesByProductId(String productId, int limit, Long cursor);
 }
 
