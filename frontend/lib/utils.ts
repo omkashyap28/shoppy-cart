@@ -120,7 +120,7 @@ export async function logout() {
   const { signal, cancel } = requestTimeout();
 
   try {
-    const response = await fetch(`backend/auth/logout`, {
+    const response = await fetch(`/backend/auth/logout`, {
       method: "DELETE",
       credentials: "include",
       signal,
