@@ -2,13 +2,13 @@
 
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { verifyFormSchema } from "@/schemas";
@@ -17,8 +17,9 @@ import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/store";
 import { useEffect, useRef, useState } from "react";
 import { usePings } from "react-pings";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
-import { Input } from "@/components/ui/input";
+import { Mail } from "lucide-react";
 
 export function VerifyForm({ onSuccess }: { onSuccess: () => void }) {
 
@@ -38,12 +39,12 @@ export function VerifyForm({ onSuccess }: { onSuccess: () => void }) {
   });
 
   const onSubmit = async (data: z.infer<typeof verifyFormSchema>) => {
-    setLoading(true);
+
 
     const { otp } = data;
     try {
 
-      const res = await apiFetch(`/otp/verify`, {
+      const res = await apiFetch(`otp/verify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -56,29 +57,24 @@ export function VerifyForm({ onSuccess }: { onSuccess: () => void }) {
       if (!res.ok) {
         throw new Error(`Failed to verify: ${responseData.message}`);
       }
-
-      pings.success("OTP verified successfully");
       onSuccess();
 
     } catch (e) {
-      pings.error("Failed to verify OTP or Invalid OTP");
-      console.error(e);
-    } finally {
-      form.reset({
-        otp: "",
+      form.setError("otp", {
+        message: "Invalid OTP! Try again",
       });
-      setLoading(false);
+      form.setValue("otp", "", { shouldDirty: true });
+      form.setFocus("otp");
+      console.error(e);
     }
   };
 
   const sendOTP = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      form.reset({
-        otp: "",
-      });
+      form.reset();
 
-      const res = await apiFetch(`/otp/generate`, {
+      const res = await apiFetch(`otp/generate`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -88,8 +84,7 @@ export function VerifyForm({ onSuccess }: { onSuccess: () => void }) {
       if (!res.ok) {
         throw Error(`Failed to send OTP: ${res.statusText}`);
       }
-
-      pings.success("OTP sent successfully");
+      pings.success("OTP send successfully");
       setFormOpen(true);
 
       // Clear existing timer
@@ -110,7 +105,9 @@ export function VerifyForm({ onSuccess }: { onSuccess: () => void }) {
       }, 1000);
 
     } catch (error) {
-      pings.error("Failed to sent OTP");
+      form.setError("root", {
+        message: "Fail to send otp! Try again."
+      })
       console.error(error);
     } finally {
       setLoading(false);
@@ -132,13 +129,23 @@ export function VerifyForm({ onSuccess }: { onSuccess: () => void }) {
           <FieldLabel htmlFor="otpEmail">
             Email
           </FieldLabel>
-          <Input value={email} disabled id="otpEmail" />
+          <InputGroup>
+            <InputGroupInput type="email" placeholder="example@gmail.com" disabled value={email || ""} />
+            <InputGroupAddon align="inline-end">
+              {!email ? <Spinner /> : <Mail />}
+            </InputGroupAddon>
+          </InputGroup>
         </Field>
         <Field>
-          <Button variant="default" onClick={sendOTP}>
-            Send OTP
+          <Button variant="default" onClick={sendOTP} disabled={loading}>
+            {loading && <Spinner />} Send OTP
           </Button>
-          <FieldDescription>
+        </Field>
+        <Field>
+          {form.formState.errors.root && <FieldError>
+            {form.formState.errors.root.message}
+          </FieldError>}
+          <FieldDescription className="text-xs mt-2">
             By clicking send OTP, you agree to our terms and conditions.
           </FieldDescription>
         </Field>
@@ -146,49 +153,53 @@ export function VerifyForm({ onSuccess }: { onSuccess: () => void }) {
     );
   } else {
     return (
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FieldGroup>
-          <Field className="w-fit">
-            <FieldLabel htmlFor="digits-only">Enter OTP</FieldLabel>
-            <InputOTP
-              id="digits-only"
-              maxLength={6}
-              pattern={REGEXP_ONLY_DIGITS}
-              value={form.watch("otp")}
-              onChange={(value) => form.setValue("otp", value)}
-              disabled={loading}
-            >
-              <InputOTPGroup>
-                <InputOTPSlot index={0} />
-                <InputOTPSlot index={1} />
-                <InputOTPSlot index={2} />
-                <InputOTPSlot index={3} />
-                <InputOTPSlot index={4} />
-                <InputOTPSlot index={5} />
-              </InputOTPGroup>
-            </InputOTP>
-          </Field>
-          <Field>
-            <Button disabled={loading} aria-disabled={loading} type="submit">
-              {loading && <Spinner />} Verify
-            </Button>
-          </Field>
-          <Field>
-            {timeLeft > 0 ? (
-              <p>Resend OTP in {timeLeft}s</p>
-            ) : (
-              <Button
-                variant="link"
-                type="button"
-                className="w-fit!"
-                onClick={sendOTP}
+      <FieldGroup>
+        <Controller
+          name="otp"
+          control={form.control}
+          render={(({ field, fieldState }) => (
+            <Field>
+              <FieldLabel htmlFor="digits-only">Enter OTP</FieldLabel>
+              <InputOTP
+                id="digits-only"
+                maxLength={6}
+                pattern={REGEXP_ONLY_DIGITS}
+                disabled={loading}
+                autoFocus
+                {...field}
+                onComplete={form.handleSubmit(onSubmit)}
               >
-                Resend OTP
-              </Button>
-            )}
-          </Field>
-        </FieldGroup>
-      </form>
+                <InputOTPGroup aria-invalid={fieldState.invalid}>
+                  {Array.from({ length: 6 }).map((_, idx) => <InputOTPSlot index={idx} key={idx} />)}
+                </InputOTPGroup>
+              </InputOTP>
+              {form.formState.isSubmitting && <FieldContent>
+                <span className="text-sm tracking-tight font-normal text-muted-foreground">Verifying...</span>
+              </FieldContent>
+              }
+              {fieldState.error && <FieldError>
+                {fieldState.error.message}
+              </FieldError>}
+            </Field>
+          ))
+          }
+        />
+        <Field className="items-end">
+          <Button
+            variant="outline"
+            type="button"
+            className="w-fit! text-muted-foreground text-xs"
+            onClick={sendOTP}
+            disabled={loading || !!timeLeft}
+          >
+            {
+              timeLeft ?
+                `Resend OTP in ${timeLeft}s` :
+                "Resend OTP"
+            }
+          </Button>
+        </Field >
+      </FieldGroup >
     );
   }
 }

@@ -4,6 +4,7 @@ import { VerifyForm } from "./verify-form";
 import { SellerRegistrationForm } from "./seller-register-form";
 import { SellerVerificationForm } from "./seller-verification-form";
 import { AddReviewForm } from "./add-review-form";
+import { WalletRegistrationForm } from "./wallet-registration-form";
 
 export {
   LoginForm,
@@ -11,5 +12,6 @@ export {
   VerifyForm,
   SellerRegistrationForm,
   SellerVerificationForm,
-  AddReviewForm
+  AddReviewForm,
+  WalletRegistrationForm,
 };
