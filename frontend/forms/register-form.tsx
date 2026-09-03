@@ -15,7 +15,7 @@ import {
   FieldLabel,
   FieldSeparator,
 } from "@/components/ui/field";
-import { redirect } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 import { useAppStore } from "@/store/store";
 import { Spinner } from "@/components/ui/spinner";
 import { usePings } from "react-pings";
@@ -35,6 +35,8 @@ export function RegisterForm() {
   const setLoading = useAppStore((state) => state.setLoading);
   const loading = useAppStore((state) => state.loading);
   const pings = usePings();
+
+  const searchParams = useSearchParams();
 
   const onSubmit = async (data: z.infer<typeof registerFormSchema>) => {
     try {
@@ -63,7 +65,7 @@ export function RegisterForm() {
 
       pings.success("Account created successfully");
       form.reset();
-      redirect("/login");
+      redirect(`/login?redirect=${searchParams.get("redirect") || ""}`);
     } catch (e) {
       pings.error("Failed to create account");
       throw e;
@@ -80,7 +82,7 @@ export function RegisterForm() {
             variant="outline"
             type="button"
             onClick={() =>
-              (window.location.href = `api/auth/login/oauth/google`)
+              (window.location.href = `backend/auth/login/oauth/google`)
             }
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -176,7 +178,12 @@ export function RegisterForm() {
             {loading && <Spinner />} Register
           </Button>
           <FieldDescription className="text-center">
-            Already have an account? <Link href="/login">Login</Link>
+            Already have an account?{" "}
+            <Link
+              href={`/login${searchParams.get("redirect") || ""}`}
+            >
+              Login
+            </Link>
           </FieldDescription>
         </Field>
       </FieldGroup>

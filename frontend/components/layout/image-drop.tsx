@@ -13,7 +13,7 @@ export function ImageDrop({
   handleUpload,
   title,
   disabled,
-  className
+  className,
 }: {
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   handleUpload: () => void;
@@ -21,7 +21,6 @@ export function ImageDrop({
   disabled: boolean;
   className?: string;
 }) {
-
   const [dropBox, setDropBox] = useState(false);
 
   const { getRootProps, getInputProps, open, inputRef } = useDropzone({
@@ -45,16 +44,22 @@ export function ImageDrop({
   });
 
   return (
-    <div className={cn("relative mt-6 w-full gap-2 rounded-xl border-2 border-dashed border-primary p-6", className)}>
+    <div
+      className={cn(
+        "relative mt-6 w-full gap-2 rounded-xl border-2 border-dashed border-primary p-6",
+        className
+      )}
+    >
       <Card
         {...getRootProps({
-          className:
-            "dropzone mx-auto border border-primary/40",
+          className: "dropzone mx-auto border border-primary/40",
         })}
       >
         {dropBox && <DropBoxContainer />}
         <CardHeader>
-          <CardTitle className="text-center">{title || "Upload Images"}</CardTitle>
+          <CardTitle className="text-center">
+            {title || "Upload Images"}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center gap-4">
@@ -74,8 +79,11 @@ export function ImageDrop({
                   }}
                 />
                 <Button
-                disabled={disabled}
-                 type="button" onClick={open} className="h-11 w-full">
+                  disabled={disabled}
+                  type="button"
+                  onClick={open}
+                  className="h-11 w-full"
+                >
                   <CloudUpload className="size-5" />
                   Upload Images
                 </Button>

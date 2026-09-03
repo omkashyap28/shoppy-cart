@@ -17,26 +17,30 @@ import { usePings } from "react-pings";
 import { apiFetch } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
 
-export function SellerVerificationForm({ onSuccess }: { onSuccess: () => void }) {
-
-  const loading = useAppStore(state => state.loading);
-  const setLoading = useAppStore(state => state.setLoading);
-  const sellerId = useAppStore(state => state.sellerId);
+export function SellerVerificationForm({
+  onSuccess,
+}: {
+  onSuccess: () => void;
+}) {
+  const loading = useAppStore((state) => state.loading);
+  const setLoading = useAppStore((state) => state.setLoading);
+  const sellerId = useAppStore((state) => state.sellerId);
   const pings = usePings();
 
   const form = useForm<z.infer<typeof sellerVerificationFormSchema>>({
     resolver: zodResolver(sellerVerificationFormSchema),
     defaultValues: {
       gstNo: "",
-      panNo: ""
-    }
+      panNo: "",
+    },
   });
 
-  const onSubmit = async (data: z.infer<typeof sellerVerificationFormSchema>) => {
-
+  const onSubmit = async (
+    data: z.infer<typeof sellerVerificationFormSchema>
+  ) => {
     const formData = {
       gstNo: data.gstNo,
-      panNo: data.panNo
+      panNo: data.panNo,
     };
 
     try {
@@ -45,9 +49,9 @@ export function SellerVerificationForm({ onSuccess }: { onSuccess: () => void })
       const res = await apiFetch(`seller/${sellerId}/verification`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
 
       const data = await res.json();
@@ -59,7 +63,6 @@ export function SellerVerificationForm({ onSuccess }: { onSuccess: () => void })
 
       pings.success("Seller verified successfully");
       onSuccess();
-
     } catch (e) {
       pings.error("Verification failed");
       throw e;
@@ -76,7 +79,9 @@ export function SellerVerificationForm({ onSuccess }: { onSuccess: () => void })
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="gstNo">GST Number <span className="text-destructive">*</span></FieldLabel>
+              <FieldLabel htmlFor="gstNo">
+                GST Number <span className="text-destructive">*</span>
+              </FieldLabel>
               <Input
                 {...field}
                 id="gstNo"
@@ -94,7 +99,9 @@ export function SellerVerificationForm({ onSuccess }: { onSuccess: () => void })
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="panNo">Pan Number <span className="text-destructive">*</span></FieldLabel>
+              <FieldLabel htmlFor="panNo">
+                Pan Number <span className="text-destructive">*</span>
+              </FieldLabel>
               <Input
                 {...field}
                 id="panNo"
@@ -108,7 +115,9 @@ export function SellerVerificationForm({ onSuccess }: { onSuccess: () => void })
           )}
         />
         <Field>
-          <Button type="submit" disabled={loading}>{loading && <Spinner />} Add Details</Button>
+          <Button type="submit" disabled={loading}>
+            {loading && <Spinner />} Add Details
+          </Button>
         </Field>
       </FieldGroup>
     </form>

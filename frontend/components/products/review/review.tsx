@@ -41,13 +41,11 @@ export default async function Review({ productId }: ReviewProps) {
                 </p>
               </div>
             ) : (
-              <div className="grid gap-3 @xl:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-4 @5xl:gap-8">
+              <div className="columns-1 gap-3 space-y-3 @xl:columns-2 @3xl:columns-3 @5xl:columns-4 @5xl:gap-8 @5xl:space-y-8">
                 {response.content.map((review) => (
-                  <ReviewCard
-                    review={review}
-                    key={review.reviewId}
-                    productId={productId}
-                  />
+                  <div key={review.reviewId} className="break-inside-avoid">
+                    <ReviewCard review={review} productId={productId} />
+                  </div>
                 ))}
               </div>
             )}

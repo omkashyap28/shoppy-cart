@@ -15,7 +15,10 @@ export const sellerRegistrationFormSchema = z.object({
 export const sellerVerificationFormSchema = z.object({
   gstNo: z
     .string()
-    .regex(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-1A-Z]{1}$/, "GST number must be exactly 15 digits")
+    .regex(
+      /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-1A-Z]{1}$/,
+      "GST number must be exactly 15 digits"
+    )
     .min(15, "GST number must be 15 digits")
     .max(15, "GST number must be 15 digits"),
   panNo: z

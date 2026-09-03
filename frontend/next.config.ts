@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  allowedDevOrigins: ['10.81.97.120'],
+  allowedDevOrigins: ["10.81.97.120"],
   turbopack: {
     root: "../",
   },

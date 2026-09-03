@@ -28,7 +28,7 @@ export async function ReviewRatingsStats({
         <span className="text-5xl font-extrabold tracking-tight text-foreground">
           {response.averageRating}
         </span>
-        <div className="mt-2 flex items-center gap-1 text-amber-400 justify-center">
+        <div className="mt-2 flex items-center justify-center gap-1 text-amber-400">
           {Array.from({ length: 5 }).map((_, i) => (
             <Star
               key={i}
@@ -49,7 +49,7 @@ export async function ReviewRatingsStats({
           .reverse()
           .map(([rating, count], idx) => (
             <Field key={idx}>
-              <FieldLabel className="flex items-center justify-between text-xs px-1">
+              <FieldLabel className="flex items-center justify-between px-1 text-xs">
                 <span>
                   {rating} {Number(rating) === 1 ? "Star" : "Stars"}
                 </span>

@@ -26,13 +26,18 @@ const Discussion = dynamic(
 
 interface Props {
   params: Promise<{ productId: string }>;
+  searchParams: Promise<{ refId?: string }>;
 }
 
-const getProduct = async (productId: string) => {
+const getProduct = async (productId: string, refId: string | null = null) => {
   "use cache";
   cacheLife({ stale: 300 });
 
-  return await serverFetch<ProductType>(`/product/${productId}`, {
+  const endPoint = refId
+    ? `/product/${productId}?refId=${refId}`
+    : `/product/${productId}`;
+
+  return await serverFetch<ProductType>(endPoint, {
     next: {
       tags: [`product:${productId}`],
     },
@@ -85,9 +90,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function ProductPage({ params }: Props) {
+export default async function ProductPage({ params, searchParams }: Props) {
   const { productId } = await params;
-  const product = await getProduct(productId);
+  const { refId } = await searchParams;
+  const product = await getProduct(productId, refId);
 
   return (
     <>

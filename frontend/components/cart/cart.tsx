@@ -33,14 +33,14 @@ export function Cart() {
     },
     enabled: !!userId,
     refetchOnWindowFocus: true,
-    refetchOnMount: true
+    refetchOnMount: true,
   });
 
   if (status === "pending") return <Loader />;
 
   if (status === "error") {
     return (
-      <div className="relative z-10 flex flex-col h-66 w-full items-center justify-center rounded-full bg-background/30 p-2">
+      <div className="relative z-10 flex h-66 w-full flex-col items-center justify-center rounded-full bg-background/30 p-2">
         <p className="tracking tight mb-4 text-base text-destructive">
           Failed to load cart. Try again!
         </p>
@@ -70,7 +70,7 @@ export function Cart() {
           <CartCard cartItem={cartItem} key={cartItem.cartItemId} />
         ))}
       </div>
-      <ProceedButton />
+      <ProceedButton cartItems={cartItems} />
     </div>
   );
 }

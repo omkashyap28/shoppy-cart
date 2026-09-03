@@ -33,23 +33,22 @@ export function CartButton({ productId }: CartButtonProps) {
 
   const queryKey = cartCheckKey(userId, productId);
 
-  const { data, isPending: isChecking } = useQuery<CartCheckResponse>({
+  const { data, isPending: isChecking } = useQuery<
+    CartCheckResponse | undefined
+  >({
     queryKey,
     enabled: Boolean(userId && productId),
     staleTime: 30_000,
     queryFn: async () => {
-      const response = await apiFetch(
-        `user/${userId}/cart/check-product`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            productId,
-          }),
-        }
-      );
+      const response = await apiFetch(`user/${userId}/cart/check-product`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to check cart");
@@ -66,12 +65,11 @@ export function CartButton({ productId }: CartButtonProps) {
 
   const addToCartMutation = useMutation({
     mutationFn: async () => {
-
       const payload = {
         productId,
         productAttributes: {},
         quantity: 1,
-      }
+      };
 
       const response = await apiFetch(`user/${userId}/cart`, {
         method: "POST",
@@ -84,7 +82,7 @@ export function CartButton({ productId }: CartButtonProps) {
       if (!response.ok) {
         throw new Error("Failed to add product to cart");
       }
-      
+
       return response.json();
     },
 
@@ -101,12 +99,9 @@ export function CartButton({ productId }: CartButtonProps) {
 
   const deleteFromCartMutation = useMutation({
     mutationFn: async (cartId: string) => {
-      const response = await apiFetch(
-        `user/${userId}/cart/${cartId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await apiFetch(`user/${userId}/cart/${cartId}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         throw new Error("Failed to remove product from cart");

@@ -62,6 +62,8 @@ export interface Products {
   productUrl: string;
 }
 
+export type ProductResponseDto = Products;
+
 export interface DiscussionType {
   discussionId: string;
   productId: string;

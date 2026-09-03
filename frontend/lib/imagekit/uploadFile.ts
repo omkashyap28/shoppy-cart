@@ -2,20 +2,20 @@ import { upload } from "@imagekit/next";
 import { AuthResponse } from "./authenticator";
 
 interface UploadFileParams {
-  file: File,
-  folder: string,
-  auth: AuthResponse
-  signal: AbortSignal
-  onProgress: (percentage: number) => void,
+  file: File;
+  folder: string;
+  auth: AuthResponse;
+  signal: AbortSignal;
+  onProgress: (percentage: number) => void;
 }
 
-export function uploadFile(
-  { file,
-    folder,
-    auth,
-    signal,
-    onProgress }: UploadFileParams
-) {
+export function uploadFile({
+  file,
+  folder,
+  auth,
+  signal,
+  onProgress,
+}: UploadFileParams) {
   return upload({
     file,
     fileName: file.name,
@@ -27,9 +27,7 @@ export function uploadFile(
     signature: auth.signature,
     abortSignal: signal,
     onProgress(e) {
-      onProgress(
-        Math.floor(e.loaded / e.total * 100)
-      )
+      onProgress(Math.floor((e.loaded / e.total) * 100));
     },
-  })
+  });
 }

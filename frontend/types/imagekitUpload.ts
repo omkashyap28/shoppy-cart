@@ -5,7 +5,7 @@ export interface ImagekitFile {
   status: "idle" | "success" | "error" | "pending";
   progress: number;
   data?: UploadResponse;
-  error?: string
+  error?: string;
 }
 
 export interface UploadItem {
@@ -14,7 +14,7 @@ export interface UploadItem {
   progress: number;
   status: "idle" | "success" | "error" | "pending";
   data?: UploadResponse;
-  error?: string
+  error?: string;
 }
 
 export type SelectType = "single" | "multiple";

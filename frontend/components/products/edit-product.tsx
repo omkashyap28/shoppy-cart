@@ -152,9 +152,7 @@ export function EditProduct({ product, onClose }: EditProductDrawerProps) {
                   <EditIcon className="size-5" /> Edit product
                 </div>
               </DialogTitle>
-              <DialogDescription>
-                Edit product
-              </DialogDescription>
+              <DialogDescription>Edit product</DialogDescription>
             </DialogHeader>
             <FieldGroup className="py-5">
               <Controller
@@ -233,9 +231,7 @@ export function EditProduct({ product, onClose }: EditProductDrawerProps) {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <DrawerHeader>
             <DrawerTitle>Edit product</DrawerTitle>
-            <DrawerDescription>
-              Edit product
-            </DrawerDescription>
+            <DrawerDescription>Edit product</DrawerDescription>
           </DrawerHeader>
 
           <FieldGroup className="p-4">

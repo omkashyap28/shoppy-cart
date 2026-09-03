@@ -65,7 +65,7 @@ function SummaryList({
   quantity: number;
   fastModeEnabled: boolean;
 }) {
-  const total = price * quantity;
+  const total = !fastModeEnabled ? price * quantity : price * quantity + 30;
 
   return (
     <ul className="divide-y border-border">

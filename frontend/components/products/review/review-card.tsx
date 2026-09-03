@@ -62,15 +62,10 @@ export function ReviewCard({ review, productId }: ReviewCardProps) {
 
   const images = review.reviewImages ?? [];
   const visibleImages = images.slice(0, MAX_VISIBLE_IMAGES);
-  const remainingImages = Math.max(
-    images.length - MAX_VISIBLE_IMAGES,
-    0
-  );
+  const remainingImages = Math.max(images.length - MAX_VISIBLE_IMAGES, 0);
 
   return (
-    <Card
-      className="group relative max-h-fit overflow-hidden border-border/60 hover:shadow-md"
-    >
+    <Card className="group relative max-h-fit overflow-hidden border-border/60 hover:shadow-md">
       <CardHeader className="relative border-b border-border/60 pb-4">
         <ReviewHeader
           createdAt={review.createdAt as string}
@@ -93,7 +88,7 @@ export function ReviewCard({ review, productId }: ReviewCardProps) {
               onClick={() => handleDelete(review.reviewId)}
               disabled={isPending}
               aria-label="Delete review"
-              className="text-muted-foreground opacity-70 transition-all hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+              className="text-muted-foreground opacity-70 transition-all group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive"
             >
               {isPending ? <Spinner /> : <Trash2 />}
             </Button>
@@ -108,8 +103,7 @@ export function ReviewCard({ review, productId }: ReviewCardProps) {
           <div className="flex gap-2 overflow-hidden">
             {visibleImages.map(({ imageId, thumbnailUrl }, index) => {
               const isLastVisible = index === MAX_VISIBLE_IMAGES - 1;
-              const showRemainingOverlay =
-                isLastVisible && remainingImages > 0;
+              const showRemainingOverlay = isLastVisible && remainingImages > 0;
 
               return (
                 <div
@@ -137,7 +131,7 @@ export function ReviewCard({ review, productId }: ReviewCardProps) {
           </div>
         )}
 
-        <p className="wrap-break whitespace-pre-wrap text-sm leading-6 text-foreground/90">
+        <p className="wrap-break text-sm leading-6 whitespace-pre-wrap text-foreground/90">
           {review.message}
         </p>
       </CardContent>

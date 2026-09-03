@@ -26,7 +26,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export function Profile() {
-
   const user = useAppStore((state) => state.user);
   const isAuth = useAppStore((state) => state.isAuth);
   const sellerId = useAppStore((state) => state.sellerId);
@@ -39,11 +38,14 @@ export function Profile() {
   const handleRedirect = useCallback(() => {
     const origin = window.location.origin;
 
-    const url = new URL('/login', origin)
+    const url = new URL("/login", origin);
     if (searchParams.size > 0) {
-      url.searchParams.set('redirect', `${pathname}?${searchParams.toString()}`)
+      url.searchParams.set(
+        "redirect",
+        `${pathname}?${searchParams.toString()}`
+      );
     } else {
-      url.searchParams.set('redirect', pathname)
+      url.searchParams.set("redirect", pathname);
     }
 
     router.push(url.toString());

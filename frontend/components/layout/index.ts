@@ -43,5 +43,5 @@ export {
   MagnetButton,
   Loader,
   InfiniteScroll,
-  RatingStar
+  RatingStar,
 };

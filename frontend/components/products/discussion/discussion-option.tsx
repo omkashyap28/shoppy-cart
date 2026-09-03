@@ -23,9 +23,8 @@ export function DiscussionOption({
   discussionId,
   productId,
   queryKey,
-  setEditable
+  setEditable,
 }: DiscussionOptionProps) {
-
   const queryClient = useQueryClient();
 
   const { mutate: deleteMutation } = useMutation({
@@ -55,9 +54,7 @@ export function DiscussionOption({
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40" align="end">
         <DropdownMenuGroup>
-          <DropdownMenuItem
-            onClick={() => setEditable(true)}
-          >
+          <DropdownMenuItem onClick={() => setEditable(true)}>
             <Pencil /> Edit
           </DropdownMenuItem>
           <DropdownMenuItem

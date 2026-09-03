@@ -76,7 +76,7 @@ export function InfiniteScroll({
     };
   }, [handleIntersection, rootMargin]);
 
-  if(loading) return <Loader />
+  if (loading) return <Loader />;
 
   return (
     <div className={className}>
@@ -86,9 +86,7 @@ export function InfiniteScroll({
 
       {isFetchingNextPage && (
         <div className="flex w-full justify-center py-4">
-          {loader ?? (
-              <Loader />
-          )}
+          {loader ?? <Loader />}
         </div>
       )}
 

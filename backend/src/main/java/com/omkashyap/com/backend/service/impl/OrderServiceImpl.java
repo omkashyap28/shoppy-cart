@@ -62,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
       throw new IllegalArgumentException("Selected quantity for product not available");
     }
 
-    Orders orders = ordersRepository.findByUser_UserId(authHeader).orElseGet(() -> Orders.builder()
+    Orders orders = ordersRepository.findByUser_UserId(user.getUserId()).orElseGet(() -> Orders.builder()
         .user(user)
         .build());
     ordersRepository.save(orders);
@@ -126,10 +126,11 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public List<OrderResponseDto> getUserAllOrders(String userId) {
 
-    Orders order = ordersRepository.findByUser_UserId(userId).orElseThrow(() ->
-        new IllegalArgumentException("User not exists")
-    );
-    List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(order.getId());
+    Orders order = ordersRepository.findByUser_UserId(userId).orElse(null);
+    if (order == null) {
+      return List.of();
+    }
+    List<OrderItem> orderItems = orderItemRepository.findAllByOrderIdOrderByCreatedAtDesc(order.getId());
 
     return orderItems.stream().map(orderDtoMapper::mapToDto).toList();
   }
@@ -177,14 +178,15 @@ public class OrderServiceImpl implements OrderService {
       productRepository.save(product);
     }
     if (orderItem.getStatus().getOrderStatus().equals(OrderStatusEnum.CANCELLED)) {
-      if (orderItem.getPayments().getPaymentMethod().equals(PaymentMethodEnum.WALLET)) {
-        if (orderItem.getPayments().getPaymentStatus().equals(PaymentStatusEnum.SUCCESS)) {
+      if (orderItem.getPayments() != null && orderItem.getPayments().getPaymentMethod() == PaymentMethodEnum.WALLET) {
+        if (orderItem.getPayments().getPaymentStatus() == PaymentStatusEnum.SUCCESS) {
           UserWallet wallet = userWalletRepository.
               findByUser_Email(orderItem.getOrder().getUser().getEmail()).orElse(null);
-          assert wallet != null;
-          wallet.setCoins(wallet.getCoins() + orderItem.getPayments().getCoins());
-          wallet.setTotalCredits(orderItem.getPayments().getCoins());
-          userWalletRepository.save(wallet);
+          if (wallet != null) {
+            wallet.setCoins(wallet.getCoins() + orderItem.getPayments().getCoins());
+            wallet.setTotalCredits(wallet.getTotalCredits() + orderItem.getPayments().getCoins());
+            userWalletRepository.save(wallet);
+          }
         }
       }
     }
@@ -203,7 +205,7 @@ public class OrderServiceImpl implements OrderService {
         new IllegalArgumentException("Order not exists with this id")
     );
 
-    if (orderItem.getCreatedAt().plusDays(7).equals(LocalDateTime.now())) {
+    if (orderItem.getCreatedAt().plusDays(7).isBefore(LocalDateTime.now())) {
       throw new IllegalArgumentException("Exchange not available");
     }
 
@@ -243,7 +245,7 @@ public class OrderServiceImpl implements OrderService {
         new IllegalArgumentException("Order not exists with this id")
     );
 
-    if (orderItem.getCreatedAt().plusDays(7).equals(LocalDateTime.now())) {
+    if (orderItem.getCreatedAt().plusDays(7).isBefore(LocalDateTime.now())) {
       throw new IllegalArgumentException("Return not available");
     }
 

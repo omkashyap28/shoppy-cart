@@ -70,7 +70,7 @@ public class PaymentServiceImpl implements PaymentService {
       Product product = productRepository.findByProductId(orderItem.getProduct().getProductId()).orElse(null);
       if (product != null) {
         product.setTotalEarning(product.getTotalEarning().add(BigDecimal.valueOf(product.getPrice() * orderItem.getQuantity())));
-        paymentRepository.save(payment);
+        productRepository.save(product);
       }
     }
     OrderStatus orderStatus = orderStatusRepository.findByOrderItem_OrderItemId(orderItem.getOrderItemId()).orElse(null);

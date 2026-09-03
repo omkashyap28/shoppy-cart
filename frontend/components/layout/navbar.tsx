@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import Link from "next/link"
+import Link from "next/link";
 
 import {
   NavigationMenu,
@@ -8,8 +8,8 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
-import { navLinks } from "@/constants"
+} from "@/components/ui/navigation-menu";
+import { navLinks } from "@/constants";
 
 export function Navbar() {
   return (
@@ -27,5 +27,5 @@ export function Navbar() {
         ))}
       </NavigationMenuList>
     </NavigationMenu>
-  )
+  );
 }

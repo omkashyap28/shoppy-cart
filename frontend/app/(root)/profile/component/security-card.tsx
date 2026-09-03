@@ -196,9 +196,7 @@ export function SecurityCard() {
             <div className="mx-auto w-full max-w-md">
               <DrawerHeader>
                 <DrawerTitle>Change Password</DrawerTitle>
-                <DrawerDescription>
-                  Change your password
-                </DrawerDescription>
+                <DrawerDescription>Change your password</DrawerDescription>
               </DrawerHeader>
               <form
                 id="resetPasswordForm"
@@ -326,7 +324,7 @@ export function SecurityCard() {
                     className={cn(
                       "flex items-center justify-between py-2",
                       idx !== deviceSessions.length - 1 &&
-                      "border-b border-primary/10"
+                        "border-b border-primary/10"
                     )}
                   >
                     <div className="flex items-center gap-1">
@@ -410,6 +408,6 @@ export function SecurityCard() {
 
 async function signedOutFromAllDevices() {
   await apiFetch("auth/logout/all-devices", {
-    method: "DELETE"
+    method: "DELETE",
   });
 }

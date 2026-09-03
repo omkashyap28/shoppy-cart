@@ -47,12 +47,12 @@ export function ProductCard({
         <p className="mt-2 truncate text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
           {brandName}
         </p>
-        <h2 className="group-hover:underline line-clamp-2 min-h-10 text-sm font-medium text-foreground">
+        <h2 className="line-clamp-2 min-h-10 text-sm font-medium text-foreground group-hover:underline">
           {description}
         </h2>
 
         <div className="mt-3 flex items-center justify-end gap-1 text-sm text-muted-foreground">
-          <Star className="size-4 text-amber-400 fill-current" />
+          <Star className="size-4 fill-current text-amber-400" />
           <span>
             {averageRating?.toFixed(1) ?? "0.0"} ({totalReviews})
           </span>

@@ -101,9 +101,7 @@ export function ProductHeader({
         </div>
 
         <div className="flex items-center gap-2">
-          <WishlistButton
-            productId={productId}
-           />
+          <WishlistButton productId={productId} />
           <ShareModel
             productTitle={description}
             url={`/product/${productId}`}

@@ -20,7 +20,7 @@ export function MobileMenu() {
 
   useEffect(() => {
     (() => {
-      setCurrentDate(String(new Date().getFullYear())); 
+      setCurrentDate(String(new Date().getFullYear()));
     })();
   });
 

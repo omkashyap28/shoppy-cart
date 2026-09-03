@@ -26,7 +26,6 @@ export function ReviewImageCarosel({
   uploadedItems: ReviewImageType[];
   setUploadedItems: (uploadedItems: ReviewImageType[]) => void;
 }) {
-
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const persist = (items: ReviewImageType[]) => {
@@ -58,7 +57,10 @@ export function ReviewImageCarosel({
       >
         <CarouselContent>
           {uploadedItems.map(({ thumbnailUrl, imageId }, idx) => (
-            <CarouselItem className="basis-auto overflow-hidden rounded-sm" key={idx}>
+            <CarouselItem
+              className="basis-auto overflow-hidden rounded-sm"
+              key={idx}
+            >
               <div className="relative h-74 w-74">
                 <Image
                   src={thumbnailUrl}

@@ -14,10 +14,10 @@ export type AppStoreStates = {
   loading: boolean;
   isAuth: boolean;
   accessToken: string;
-  userId: string
+  userId: string;
   user: UserResponse | null;
   sellerId: string;
-  affiliateCode: stria
+  affiliateCode: string;
 };
 
 export type AppStore = AppStoreStates & AppStoreReducers;

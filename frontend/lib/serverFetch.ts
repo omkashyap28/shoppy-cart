@@ -16,7 +16,8 @@ export async function serverFetch<T = unknown>(
   path: string,
   options: ServerFetchOptions = {}
 ): Promise<T> {
-  const { validateStatus, errorMessage, revalidate, headers, ...init } = options;
+  const { validateStatus, errorMessage, revalidate, headers, ...init } =
+    options;
 
   const url = path.startsWith("http") ? path : `${baseUrl}${path}`;
 
@@ -29,7 +30,7 @@ export async function serverFetch<T = unknown>(
         "Content-Type": "application/json",
         ...headers,
       },
-      signal
+      signal,
     });
 
     let isValid;
@@ -46,15 +47,19 @@ export async function serverFetch<T = unknown>(
     }
 
     if (!isValid) {
-      throw new Error(errorMessage ?? `${init.method ?? "GET"} ${url} failed: ${res.status}`);
+      throw new Error(
+        errorMessage ?? `${init.method ?? "GET"} ${url} failed: ${res.status}`
+      );
     }
 
     if (revalidate) {
-      (Array.isArray(revalidate) ? revalidate : [revalidate]).forEach((tag) => revalidateTag(tag, "max"));
+      (Array.isArray(revalidate) ? revalidate : [revalidate]).forEach((tag) =>
+        revalidateTag(tag, "max")
+      );
     }
 
     return res.status === 204 ? (null as T) : await res.json();
   } finally {
-    cancel()
+    cancel();
   }
 }

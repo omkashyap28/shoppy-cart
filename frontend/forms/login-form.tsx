@@ -144,7 +144,7 @@ export function LoginForm({}) {
             {loading && <Spinner />} Login
           </Button>
           <FieldDescription className="text-center">
-            Don&apos;t have an account? <Link href="/register">Sign up</Link>
+            Don&apos;t have an account? <Link href={`/register?redirect=${searchParams.get("redirect") || ""}`}>Sign up</Link>
           </FieldDescription>
         </Field>
       </FieldGroup>

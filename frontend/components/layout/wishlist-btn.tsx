@@ -33,7 +33,9 @@ export function WishlistButton({ productId }: WishlistButtonProps) {
 
   const queryKey = wishlistCheckKey(userId, productId);
 
-  const { data, isPending: isChecking } = useQuery<WishlistCheckResponse>({
+  const { data, isPending: isChecking } = useQuery<
+    WishlistCheckResponse | undefined
+  >({
     queryKey,
     enabled: Boolean(userId && productId),
     staleTime: 30_000,
@@ -79,7 +81,7 @@ export function WishlistButton({ productId }: WishlistButtonProps) {
       if (!response.ok) {
         throw new Error("Failed to add product to wishlist");
       }
-      
+
       return response.json();
     },
 

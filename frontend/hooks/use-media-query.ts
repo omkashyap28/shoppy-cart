@@ -2,16 +2,24 @@ import * as React from "react";
 
 export function useMediaQuery(query: string): boolean {
   const getMatches = (q: string): boolean => {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    if (
+      typeof window === "undefined" ||
+      typeof window.matchMedia !== "function"
+    ) {
       return false;
     }
     return window.matchMedia(q).matches;
   };
 
-  const [matches, setMatches] = React.useState<boolean>(() => getMatches(query));
+  const [matches, setMatches] = React.useState<boolean>(() =>
+    getMatches(query)
+  );
 
   React.useEffect(() => {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    if (
+      typeof window === "undefined" ||
+      typeof window.matchMedia !== "function"
+    ) {
       return;
     }
 

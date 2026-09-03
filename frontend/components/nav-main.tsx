@@ -19,13 +19,12 @@ export function NavMain({
     icon?: React.ReactNode;
   }[];
 }) {
-
   const router = useRouter();
 
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
-      <SidebarMenu>
+        <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => {
@@ -41,7 +40,10 @@ export function NavMain({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton onClick={() => router.push(item.url)} tooltip={item.title}>
+              <SidebarMenuButton
+                onClick={() => router.push(item.url)}
+                tooltip={item.title}
+              >
                 {item.icon}
                 <span>{item.title}</span>
               </SidebarMenuButton>

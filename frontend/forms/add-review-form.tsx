@@ -32,7 +32,6 @@ type ReviewSchema = z.infer<typeof reviewSchema>;
 const MAXLENGHT = 200;
 
 export function AddReviewForm({ className }: { className: string }) {
-
   const [uploadedImages, setUploadedImages] = useState<ReviewImageType[]>([]);
 
   const { productId } = useParams<{ productId: string }>();
@@ -54,11 +53,10 @@ export function AddReviewForm({ className }: { className: string }) {
 
   useEffect(() => {
     form.setValue("reviewImages", uploadedImages);
-  }, [uploadedImages, form])
+  }, [uploadedImages, form]);
 
   const onSubmit = (data: ReviewSchema) => {
     startTransition(async () => {
-
       const payload = {
         userId,
         message: data.message,
@@ -69,13 +67,12 @@ export function AddReviewForm({ className }: { className: string }) {
       try {
         await createReview(productId, payload, {
           headers: {
-            "Authorization": `Bearer ${accessToken}`
-          }
+            Authorization: `Bearer ${accessToken}`,
+          },
         });
 
         form.reset();
         router.replace(`/products/${productId}`);
-
       } catch (error) {
         pings.error("Failed to create review");
         throw error;
@@ -93,9 +90,7 @@ export function AddReviewForm({ className }: { className: string }) {
             <ReviewRating
               onChange={field.onChange}
               value={field.value}
-              disabled={
-                field.disabled || isPending
-              }
+              disabled={field.disabled || isPending}
               error={fieldState.error?.message}
             />
           )}
@@ -116,9 +111,7 @@ export function AddReviewForm({ className }: { className: string }) {
                     fieldState.error ? "textarea-error" : "textarea-counter"
                   }
                   placeholder={`What did you like or dislike?`}
-                  disabled={
-                    field.disabled || isPending
-                  }
+                  disabled={field.disabled || isPending}
                   {...field}
                 />
                 <InputGroupAddon align="block-end">
@@ -159,7 +152,7 @@ export function AddReviewForm({ className }: { className: string }) {
             )}
           </Button>
           <FieldDescription>
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius sed 
+            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eius sed
           </FieldDescription>
         </Field>
       </FieldGroup>

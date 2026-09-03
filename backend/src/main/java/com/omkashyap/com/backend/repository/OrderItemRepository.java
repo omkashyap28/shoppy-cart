@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
-  List<OrderItem> findAllByOrderId(Long id);
+  List<OrderItem> findAllByOrderIdOrderByCreatedAtDesc(Long id);
 
   Optional<OrderItem> findByOrderItemId(String orderItemId);
 }

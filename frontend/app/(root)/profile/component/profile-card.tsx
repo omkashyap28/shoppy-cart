@@ -44,12 +44,10 @@ import { AvatarCard } from "./avatar-card";
 import { UserAddresses } from "./user-addresses";
 import { UserResponse } from "@/types/user";
 
-
 export function ProfileCard() {
-  
-  const user = useAppStore(state => state.user);
+  const user = useAppStore((state) => state.user);
 
-  if(!user) return;
+  if (!user) return;
 
   return (
     <div className="space-y-5">
@@ -71,7 +69,6 @@ export function ProfileCard() {
     </div>
   );
 }
-
 
 function EditProfileForm({ user }: { user: UserResponse }) {
   const [isNotEditable, setIsNotEditable] = useState<boolean>(true);

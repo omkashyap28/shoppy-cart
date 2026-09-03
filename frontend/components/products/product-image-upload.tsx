@@ -15,7 +15,10 @@ function CircularProgress({ progress }: { progress: number }) {
   const offset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+    <div
+      className="relative flex items-center justify-center"
+      style={{ width: size, height: size }}
+    >
       <svg width={size} height={size} className="-rotate-90">
         <circle
           cx={size / 2}
@@ -61,10 +64,7 @@ export function ProductImageUpload({
     if (uploads.length !== 0) {
       const filteredUploads = filterUploadResponse(uploads);
 
-      localStorage.setItem(
-        "reviewImages",
-        JSON.stringify(filteredUploads)
-      );
+      localStorage.setItem("reviewImages", JSON.stringify(filteredUploads));
 
       setUploadedItems(filteredUploads);
     }

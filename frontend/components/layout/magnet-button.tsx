@@ -75,7 +75,7 @@ export function MagnetButton({
       ref={magnetRef}
       className={cn(
         "w-full rounded-lg border border-transparent backdrop-blur-sm transition-all duration-150",
-        isActive && "border-dashed border-primary bg-primary/30",
+        isActive && "border-dashed border-primary bg-primary/20",
         wrapperClassName
       )}
       style={{ position: "relative", display: "inline-block" }}

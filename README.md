@@ -201,6 +201,11 @@ shoppy-cart/
 │   ├── lib/                 # Utility functions
 │   ├── store/               # Zustand store
 │   ├── providers/           # Context providers
+|   ├── forms                # Forms (login, registration, etc.)
+|   ├── hooks                # Custom react hooks
+|   ├── constants            # Constant data (navigational, footer, etc.)
+|   ├── scehmas              # Form validation Scehmas
+|   ├── public               # Public assets
 │   ├── proxy.ts             # Middleware configuration
 │   └── package.json         # Dependencies
 └── [backend-folder]/        # Spring Boot backend

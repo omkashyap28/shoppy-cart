@@ -29,7 +29,10 @@ interface ProductDiscussionProps {
 
 type ProductDiscussionSchema = z.infer<typeof productDiscussionSchema>;
 
-export function DiscussionTextarea({ productId, className }: ProductDiscussionProps) {
+export function DiscussionTextarea({
+  productId,
+  className,
+}: ProductDiscussionProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
   const pings = usePings();
@@ -84,11 +87,10 @@ export function DiscussionTextarea({ productId, className }: ProductDiscussionPr
     <form onSubmit={form.handleSubmit(onSubmit)} className={className}>
       <Card className="max-h-fit w-full">
         <CardHeader className="border-b border-border tracking-tight">
-          <CardTitle className="text-lg font-semibold">
-            Ask question
-          </CardTitle>
+          <CardTitle className="text-lg font-semibold">Ask question</CardTitle>
           <CardDescription>
-            Ask your questions about product from seller and other shoppy user&#39;s.
+            Ask your questions about product from seller and other shoppy
+            user&#39;s.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -120,17 +122,17 @@ export function DiscussionTextarea({ productId, className }: ProductDiscussionPr
             disabled={isSubmitting || !form.formState.isDirty}
             className="flex items-center gap-1"
           >
-            {
-              isSubmitting ?
-                <>
-                  <Spinner className="size-4" />
-                  <span>Submiting...</span>
-                </> :
-                <>
-                  <Send className="size-4" />
-                  <span>Submit</span>
-                </>
-            }
+            {isSubmitting ? (
+              <>
+                <Spinner className="size-4" />
+                <span>Submiting...</span>
+              </>
+            ) : (
+              <>
+                <Send className="size-4" />
+                <span>Submit</span>
+              </>
+            )}
           </Button>
         </CardFooter>
       </Card>

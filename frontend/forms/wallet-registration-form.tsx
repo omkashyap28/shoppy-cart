@@ -31,14 +31,21 @@ export function WalletRegistrationForm({
 }) {
   const pings = usePings();
 
-  const { control, handleSubmit, formState, reset, setValue, setFocus, getValues } =
-    useForm<WalletRegistrationSchema>({
-      resolver: zodResolver(walletRegistrationSchema),
-      defaultValues: {
-        mPin: "",
-        confirmMPin: "",
-      },
-    });
+  const {
+    control,
+    handleSubmit,
+    formState,
+    reset,
+    setValue,
+    setFocus,
+    getValues,
+  } = useForm<WalletRegistrationSchema>({
+    resolver: zodResolver(walletRegistrationSchema),
+    defaultValues: {
+      mPin: "",
+      confirmMPin: "",
+    },
+  });
 
   async function onSubmit(data: WalletRegistrationSchema) {
     console.log(data);
@@ -84,12 +91,16 @@ export function WalletRegistrationForm({
                 {...field}
                 autoFocus
                 onComplete={() => {
-                  setFocus("confirmMPin")
+                  setFocus("confirmMPin");
                 }}
               >
                 <InputOTPGroup>
                   {Array.from({ length: 4 }).map((_, idx) => (
-                    <InputOTPSlot index={idx} key={idx} aria-invalid={fieldState.invalid} />
+                    <InputOTPSlot
+                      index={idx}
+                      key={idx}
+                      aria-invalid={fieldState.invalid}
+                    />
                   ))}
                 </InputOTPGroup>
               </InputOTP>
@@ -114,7 +125,11 @@ export function WalletRegistrationForm({
               >
                 <InputOTPGroup>
                   {Array.from({ length: 4 }).map((_, idx) => (
-                    <InputOTPSlot index={idx} key={idx} aria-invalid={fieldState.invalid} />
+                    <InputOTPSlot
+                      index={idx}
+                      key={idx}
+                      aria-invalid={fieldState.invalid}
+                    />
                   ))}
                 </InputOTPGroup>
               </InputOTP>
@@ -129,13 +144,14 @@ export function WalletRegistrationForm({
             type="submit"
             disabled={!formState.isDirty || formState.isSubmitting}
           >
-            {formState.isSubmitting ?
+            {formState.isSubmitting ? (
               <>
                 <Spinner />
                 <span>Settingup...</span>
-              </> :
+              </>
+            ) : (
               <span>Setup</span>
-            }
+            )}
           </Button>
         </Field>
       </FieldGroup>

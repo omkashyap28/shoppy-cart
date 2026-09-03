@@ -12,15 +12,43 @@ export interface ReviewRatingProps {
   disabled?: boolean;
 }
 
-const RATING_MAP: Record<number, { label: string; colorClass: string; starColorClass: string }> = {
-  1: { label: "Terrible", colorClass: "text-red-500 dark:text-red-400", starColorClass: "fill-red-500 text-red-500" },
-  2: { label: "Poor", colorClass: "text-orange-500 dark:text-orange-400", starColorClass: "fill-orange-500 text-orange-500" },
-  3: { label: "Average", colorClass: "text-amber-500 dark:text-amber-400", starColorClass: "fill-amber-500 text-amber-500" },
-  4: { label: "Good", colorClass: "text-lime-500 dark:text-lime-400", starColorClass: "fill-lime-500 text-lime-500" },
-  5: { label: "Excellent", colorClass: "text-primary", starColorClass: "fill-primary text-primary" },
+const RATING_MAP: Record<
+  number,
+  { label: string; colorClass: string; starColorClass: string }
+> = {
+  1: {
+    label: "Terrible",
+    colorClass: "text-red-500 dark:text-red-400",
+    starColorClass: "fill-red-500 text-red-500",
+  },
+  2: {
+    label: "Poor",
+    colorClass: "text-orange-500 dark:text-orange-400",
+    starColorClass: "fill-orange-500 text-orange-500",
+  },
+  3: {
+    label: "Average",
+    colorClass: "text-amber-500 dark:text-amber-400",
+    starColorClass: "fill-amber-500 text-amber-500",
+  },
+  4: {
+    label: "Good",
+    colorClass: "text-lime-500 dark:text-lime-400",
+    starColorClass: "fill-lime-500 text-lime-500",
+  },
+  5: {
+    label: "Excellent",
+    colorClass: "text-primary",
+    starColorClass: "fill-primary text-primary",
+  },
 };
 
-export function ReviewRating({ value, onChange, error, disabled = false }: ReviewRatingProps) {
+export function ReviewRating({
+  value,
+  onChange,
+  error,
+  disabled = false,
+}: ReviewRatingProps) {
   const [hoveredRating, setHoveredRating] = useState<number | null>(null);
 
   const activeRating = hoveredRating !== null ? hoveredRating : value;
@@ -71,13 +99,13 @@ export function ReviewRating({ value, onChange, error, disabled = false }: Revie
               onBlur={() => setHoveredRating(null)}
               onKeyDown={(e) => handleKeyDown(e, starIndex)}
               className={cn(
-                "relative rounded-full p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                "relative rounded-full p-1 transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none",
                 disabled && "cursor-not-allowed opacity-60"
               )}
             >
               <Star
                 className={cn(
-                  "size-7 transition-colors duration-200 smsize-8",
+                  "smsize-8 size-7 transition-colors duration-200",
                   isFilled && starConfig
                     ? starConfig.starColorClass
                     : "text-muted-foreground/30 dark:text-muted-foreground/20"
@@ -97,7 +125,10 @@ export function ReviewRating({ value, onChange, error, disabled = false }: Revie
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.15 }}
-              className={cn("text-base font-semibold tracking-wide", activeRatingConfig.colorClass)}
+              className={cn(
+                "text-base font-semibold tracking-wide",
+                activeRatingConfig.colorClass
+              )}
             >
               {activeRatingConfig.label}
             </motion.p>

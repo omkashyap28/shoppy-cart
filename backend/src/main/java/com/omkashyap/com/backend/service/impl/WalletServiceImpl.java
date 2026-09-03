@@ -9,6 +9,9 @@ import com.omkashyap.com.backend.entity.Payment;
 import com.omkashyap.com.backend.entity.Product;
 import com.omkashyap.com.backend.entity.User;
 import com.omkashyap.com.backend.entity.UserWallet;
+import com.omkashyap.com.backend.error.InvalidArgumentException;
+import com.omkashyap.com.backend.error.NotFoundException;
+import com.omkashyap.com.backend.error.TemporaryLockException;
 import com.omkashyap.com.backend.repository.PaymentRepository;
 import com.omkashyap.com.backend.repository.ProductRepository;
 import com.omkashyap.com.backend.repository.UserRepository;
@@ -42,11 +45,9 @@ public class WalletServiceImpl implements WalletService {
   @Override
   public WalletResponseDto createUserWallet(
       String authHeader,
-      @Valid WalletRequestDto requestDto
-  ) {
+      @Valid WalletRequestDto requestDto) {
     String email = authHeaderUtil.getEmailFromAuthHeader(authHeader);
-    User user = userRepository.findByEmail(email).orElseThrow(() ->
-        new IllegalArgumentException("User not exists"));
+    User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not exists"));
 
     UserWallet userWallet = UserWallet.builder()
         .user(user)
@@ -58,8 +59,7 @@ public class WalletServiceImpl implements WalletService {
     emailUtil.sendWalletWelcomeEmail(
         userWallet.getUser().getEmail(),
         userWallet.getUser().getFirstName(),
-        userWallet.getWalletId()
-    );
+        userWallet.getWalletId());
 
     return userWalletDtoMapper.mapToWalletResponseDto(userWallet);
   }
@@ -67,12 +67,11 @@ public class WalletServiceImpl implements WalletService {
   @Override
   public WalletResponseDto getUserWallet(
       String authHeader,
-      @Valid WalletRequestDto requestDto
-  ) {
+      @Valid WalletRequestDto requestDto) {
     String email = authHeaderUtil.getEmailFromAuthHeader(authHeader);
 
-    UserWallet userWallet = userWalletRepository.findByUser_Email(email).orElseThrow(() ->
-        new IllegalArgumentException("Wallet not exists for this user"));
+    UserWallet userWallet = userWalletRepository.findByUser_Email(email)
+        .orElseThrow(() -> new NotFoundException("Wallet not exists for this user"));
 
     if (userWallet.getInvalidAttempts() >= 5) {
       walletUtil.lockAccount(userWallet);
@@ -80,10 +79,10 @@ public class WalletServiceImpl implements WalletService {
 
     if (userWallet.getIsLocked() &&
         userWallet.getLockedUntil() != null &&
-        userWallet.getLockedUntil().isAfter(LocalDateTime.now())
-    ) {
+        userWallet.getLockedUntil().isAfter(LocalDateTime.now())) {
       LocalDateTime lockedUntil = userWallet.getLockedUntil();
-      throw new RuntimeException("Account is temporarily locked. Please try after " + lockedUntil);
+      throw new TemporaryLockException("Account is temporary locked due to too many invalid attempts. Please try after "
+          + lockedUntil.getMinute() + "minutes");
     }
 
     walletUtil.unlockAccount(userWallet);
@@ -91,7 +90,7 @@ public class WalletServiceImpl implements WalletService {
     boolean isValid = walletUtil.compareMPin(requestDto.getMPin(), userWallet.getMPin());
     if (!isValid) {
       userWallet.setInvalidAttempts(userWallet.getInvalidAttempts() + 1);
-      throw new IllegalArgumentException("Invalid MPin");
+      throw new InvalidArgumentException("Invalid MPIN");
     }
 
     return userWalletDtoMapper.mapToWalletResponseDto(userWallet);
@@ -101,30 +100,29 @@ public class WalletServiceImpl implements WalletService {
   @Transactional
   public WalletPaymentResponseDto makePayment(String authHeader, WalletPaymentRequestDto requestDto) {
 
-    Payment payment = paymentRepository.findByPaymentId(requestDto.getPaymentId()).orElseThrow(() ->
-        new IllegalArgumentException("Invalid payment id"));
+    Payment payment = paymentRepository.findByPaymentId(requestDto.getPaymentId())
+        .orElseThrow(() -> new IllegalArgumentException("Invalid payment id"));
 
     if (payment.getPaymentStatus() != PaymentStatusEnum.PENDING) {
       throw new RuntimeException("Payment already completed");
     }
 
     String email = authHeaderUtil.getEmailFromAuthHeader(authHeader);
-    UserWallet userWallet = userWalletRepository.findByUser_Email(email).orElseThrow(() ->
-        new IllegalArgumentException("Wallet not exists for this user"));
+    UserWallet userWallet = userWalletRepository.findByUser_Email(email)
+        .orElseThrow(() -> new IllegalArgumentException("Wallet not exists for this user"));
 
     if (!payment.getOrderItem().getOrder().getUser().getEmail().equals(userWallet.getUser().getEmail())) {
-      throw new RuntimeException("Unauthorized payment");
+      throw new NotFoundException("Unauthorized payment");
     }
 
-    if (userWallet.getCoins().equals(0L) && (userWallet.getCoins() < payment.getCoins())) {
+    if (userWallet.getCoins() < payment.getCoins()) {
       payment.setPaymentStatus(PaymentStatusEnum.FAILED);
       emailUtil.sendPaymentFailEmail(
           payment.getOrderItem().getOrder().getUser().getEmail(),
           payment.getOrderItem().getOrderItemId(),
           String.valueOf(payment.getAmount()),
-          payment.getTransactionId()
-      );
-      throw new IllegalArgumentException("User not have sufficient coins to pay");
+          payment.getTransactionId());
+      throw new InvalidArgumentException("User not have sufficient coins to pay");
     }
 
     if (userWallet.getInvalidAttempts() >= 5) {
@@ -133,8 +131,7 @@ public class WalletServiceImpl implements WalletService {
 
     if (userWallet.getIsLocked() &&
         userWallet.getLockedUntil() != null &&
-        userWallet.getLockedUntil().isAfter(LocalDateTime.now())
-    ) {
+        userWallet.getLockedUntil().isAfter(LocalDateTime.now())) {
       LocalDateTime lockedUntil = userWallet.getLockedUntil();
       throw new RuntimeException("Account is temporarily locked. Please try after " + lockedUntil);
     }
@@ -164,11 +161,11 @@ public class WalletServiceImpl implements WalletService {
 
     if (payment.getPaymentStatus().equals(PaymentStatusEnum.SUCCESS)) {
       Product product = productRepository.findByProductId(
-          payment.getOrderItem().getProduct().getProductId()
-      ).orElse(null);
+          payment.getOrderItem().getProduct().getProductId()).orElse(null);
       if (product != null) {
-        product.setTotalEarning(product.getTotalEarning().add(BigDecimal.valueOf(product.getPrice() * payment.getOrderItem().getQuantity())));
-        paymentRepository.save(payment);
+        product.setTotalEarning(product.getTotalEarning()
+            .add(BigDecimal.valueOf(product.getPrice() * payment.getOrderItem().getQuantity())));
+        productRepository.save(product);
       }
     }
 
@@ -177,15 +174,13 @@ public class WalletServiceImpl implements WalletService {
           payment.getOrderItem().getOrder().getUser().getEmail(),
           payment.getOrderItem().getOrderItemId(),
           String.valueOf(payment.getAmount()),
-          payment.getTransactionId()
-      );
+          payment.getTransactionId());
     } else {
       emailUtil.sendPaymentSuccessEmail(
           payment.getOrderItem().getOrder().getUser().getEmail(),
           payment.getOrderItem().getOrderItemId(),
           String.valueOf(payment.getAmount()),
-          payment.getTransactionId()
-      );
+          payment.getTransactionId());
     }
 
     return userWalletDtoMapper.mapToWalletPaymentResponseDto(payment);

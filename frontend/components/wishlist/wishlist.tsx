@@ -34,7 +34,7 @@ export function Wishlist() {
     },
     enabled: !!userId,
     refetchOnWindowFocus: true,
-    refetchOnMount: true
+    refetchOnMount: true,
   });
 
   if (status === "pending") return <Loader />;

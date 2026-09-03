@@ -30,8 +30,8 @@ export interface ReviewPayloadType {
 }
 
 export interface ReviewStatsResponseType {
-  productId: string,
-  averageRating: number,
+  productId: string;
+  averageRating: number;
   totalReviews: number;
   ratingDistribution: Record<string, number>;
 }

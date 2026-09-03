@@ -25,6 +25,21 @@ class GlobalExceptionHandler {
     return responseBuilder(HttpStatus.FORBIDDEN, tokenReusedException.getMessage());
   }
 
+  @ExceptionHandler(InvalidArgumentException.class)
+  public ResponseEntity<ErrorResponseDto> handleInvalidMpinException(InvalidArgumentException invalidMpinException) {
+    return responseBuilder(HttpStatus.UNPROCESSABLE_CONTENT, invalidMpinException.getMessage());
+  }
+
+  @ExceptionHandler(NotFoundException.class)
+  public ResponseEntity<ErrorResponseDto> handleNotFoundException(NotFoundException notFoundException) {
+    return responseBuilder(HttpStatus.NOT_FOUND, notFoundException.getMessage());
+  }
+
+  @ExceptionHandler(TemporaryLockException.class)
+  public ResponseEntity<ErrorResponseDto> handleTemporaryLockException(TemporaryLockException temporaryLockException) {
+    return responseBuilder(HttpStatus.LOCKED, temporaryLockException.getMessage());
+  }
+
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponseDto> handleException(
       Exception ex

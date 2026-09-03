@@ -56,24 +56,32 @@ public class AuthController {
     deviceCookie.setAttribute("SameSite", "Lax");
     deviceCookie.setMaxAge(30 * 24 * 60 * 60);
 
-    Cookie userIdCookie = new Cookie("userId", responseDto.getUserId());
-    userIdCookie.setHttpOnly(true);
-    userIdCookie.setSecure(false);
-    userIdCookie.setPath("/");
-    userIdCookie.setAttribute("SameSite", "Lax");
-    userIdCookie.setMaxAge(7 * 24 * 60 * 60);
+    if(responseDto.getSellerId() != null && !responseDto.getSellerId().isEmpty()) {
+      Cookie sellerCookie = new Cookie(
+          "hasSellerAccount", "true"
+      );
+      sellerCookie.setPath("/");
+      sellerCookie.setHttpOnly(true);
+      sellerCookie.setSecure(false);
+      sellerCookie.setAttribute("SameSite", "Lax");
+      sellerCookie.setMaxAge(30 * 24 * 60 * 60);
+      response.addCookie(sellerCookie);
+    }
 
-    Cookie userEmailCookie = new Cookie("userEmail", responseDto.getEmail());
-    userEmailCookie.setHttpOnly(true);
-    userEmailCookie.setSecure(false);
-    userEmailCookie.setPath("/");
-    userEmailCookie.setAttribute("SameSite", "Lax");
-    userEmailCookie.setMaxAge(7 * 24 * 60 * 60);
+    if(responseDto.getAffiliateCode() != null && !responseDto.getAffiliateCode().isEmpty()) {
+      Cookie affiliateCookie = new Cookie(
+          "hasAffiliateAccount", "true"
+      );
+      affiliateCookie.setPath("/");
+      affiliateCookie.setHttpOnly(true);
+      affiliateCookie.setSecure(false);
+      affiliateCookie.setAttribute("SameSite", "Lax");
+      affiliateCookie.setMaxAge(30 * 24 * 60 * 60);
+      response.addCookie(affiliateCookie);
+    }
 
     response.addCookie(cookie);
     response.addCookie(deviceCookie);
-    response.addCookie(userIdCookie);
-    response.addCookie(userEmailCookie);
 
     return ResponseEntity.ok(
         LoginResponseDto.builder()
@@ -116,20 +124,12 @@ public class AuthController {
     cookie.setMaxAge(7 * 24 * 60 * 60);
     response.addCookie(cookie);
 
-    Cookie userIdCookie = new Cookie("userId", authResponseDto.getUserId());
-    userIdCookie.setHttpOnly(true);
-    userIdCookie.setSecure(false);
-    userIdCookie.setPath("/");
-    userIdCookie.setAttribute("SameSite", "Lax");
-    userIdCookie.setMaxAge(7 * 24 * 60 * 60);
-
-    Cookie userEmailCookie = new Cookie("userEmail", authResponseDto.getEmail());
-    userEmailCookie.setHttpOnly(true);
-    userEmailCookie.setSecure(false);
-    userEmailCookie.setPath("/");
-    userEmailCookie.setAttribute("SameSite", "Lax");
-    userEmailCookie.setMaxAge(7 * 24 * 60 * 60);
-
+    Cookie deviceCookie = new Cookie("shoppyDeviceId", authResponseDto.getDeviceId());
+    deviceCookie.setPath("/");
+    deviceCookie.setHttpOnly(true);
+    deviceCookie.setSecure(false);
+    deviceCookie.setAttribute("SameSite", "Lax");
+    deviceCookie.setMaxAge(30 * 24 * 60 * 60);
 
     if(authResponseDto.getSellerId() != null && !authResponseDto.getSellerId().isEmpty()) {
       Cookie sellerCookie = new Cookie("hasSellerAccount", "true");
@@ -204,6 +204,8 @@ public class AuthController {
   public ResponseEntity<Void> clearSession(HttpServletResponse response) {
     clearCookie(response, "accessToken");
     clearCookie(response, "refreshToken");
+    clearCookie(response, "hasSellerAccount");
+    clearCookie(response, "hasAffiliateAccount");
     return ResponseEntity.noContent().build();
   }
 
@@ -224,15 +226,15 @@ public class AuthController {
     cookie.setMaxAge(7 * 24 * 60 * 60);
     cookie.setPath("/");
 
-
-    Cookie otpCookie = new Cookie("otpVerified", null);
-    otpCookie.setMaxAge(0);
-    otpCookie.setPath("/");
-    otpCookie.setHttpOnly(true);
-    otpCookie.setSecure(true);
+    Cookie sellerCookie = new Cookie("hasSellerAccount", "true");
+    sellerCookie.setPath("/");
+    sellerCookie.setHttpOnly(true);
+    sellerCookie.setSecure(false);
+    sellerCookie.setAttribute("SameSite", "Lax");
+    sellerCookie.setMaxAge(30 * 24 * 60 * 60);
 
     response.addCookie(cookie);
-    response.addCookie(otpCookie);
+    response.addCookie(sellerCookie);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(
         SellerResponseDto.builder()
@@ -266,10 +268,10 @@ public class AuthController {
     cookie.setPath("/");
 
     Cookie affiliateCookie = new Cookie("hasAffiliateAccount", "true");
-    cookie.setSecure(false);
-    cookie.setHttpOnly(true);
-    cookie.setMaxAge(7 * 24 * 60 * 60);
-    cookie.setPath("/");
+    affiliateCookie.setSecure(false);
+    affiliateCookie.setHttpOnly(true);
+    affiliateCookie.setMaxAge(30 * 24 * 60 * 60);
+    affiliateCookie.setPath("/");
 
     response.addCookie(cookie);
     response.addCookie(affiliateCookie);

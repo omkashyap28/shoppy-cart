@@ -11,20 +11,30 @@ interface DiscussionReplyProps {
   repliesCount: number;
   productId: string;
   discussionId: string;
-  userName: string
+  userName: string;
 }
 
-export function DiscussionListFooter({ repliesCount, productId, discussionId, userName }: DiscussionReplyProps) {
-
+export function DiscussionListFooter({
+  repliesCount,
+  productId,
+  discussionId,
+  userName,
+}: DiscussionReplyProps) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <div className="flex items-start justify-between w-full">
+      <div className="flex w-full items-start justify-between">
         <div className="flex items-start gap-0.5">
           {repliesCount > 0 && (
             <Button variant="ghost" size="sm" onClick={() => setOpen(!open)}>
-              <ChevronDown className={cn("h-4 w-4 transition-transform duration-100", open && "-rotate-180")} /> View replies
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform duration-100",
+                  open && "-rotate-180"
+                )}
+              />{" "}
+              View replies
             </Button>
           )}
           <DiscussionReplyForm
@@ -34,11 +44,13 @@ export function DiscussionListFooter({ repliesCount, productId, discussionId, us
           />
         </div>
       </div>
-      {open && <DiscussionReplies
-        productId={productId}
-        discussionId={discussionId}
-        open={open}
-      />}
+      {open && (
+        <DiscussionReplies
+          productId={productId}
+          discussionId={discussionId}
+          open={open}
+        />
+      )}
     </>
   );
 }

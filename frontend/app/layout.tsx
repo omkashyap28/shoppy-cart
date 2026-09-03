@@ -40,7 +40,7 @@ export default function RootLayout({
       suppressHydrationWarning
       data-scroll-behavior="smooth"
       className={cn(
-        "antialiased selection:bg-primary selection:text-white scroll-smooth",
+        "scroll-smooth antialiased selection:bg-primary selection:text-white",
         fontMono.variable,
         "font-sans",
         inter.variable

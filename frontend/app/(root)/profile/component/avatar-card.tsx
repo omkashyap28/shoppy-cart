@@ -36,7 +36,7 @@ export function AvatarCard({
   const { fileInputRef, handleUpload, uploads, uploading } = useImageKitUpload({
     fileType: "image",
     selectType: "single",
-    imageType: "avatar"
+    imageType: "avatar",
   });
 
   useEffect(() => {
@@ -88,14 +88,14 @@ export function AvatarCard({
     },
     onError: () => {
       pings.error("Failed to update profile");
-    }
+    },
   });
 
   useEffect(() => {
-    if(uploads.length === 0) return;
+    if (uploads.length === 0) return;
     const { data, status } = uploads[0];
-    
-    if(!data) return;
+
+    if (!data) return;
     if (data.url && data.fileId && status === "success") {
       mutate({
         avatarUrl: data.url,
@@ -131,27 +131,25 @@ export function AvatarCard({
           <AvatarFallback>
             <AvatarSkeleton />
           </AvatarFallback>
-          {
-            !uploading && (
-              <label htmlFor="user-profile-input">
-            <AvatarBadge className="z-2 size-6.5! cursor-pointer transition-all duration-150 active:scale-90">
-              <Plus className="size-4!" />
-            </AvatarBadge>
-            <input
-              type="file"
-              disabled={uploading}
-              name="user-profile-input"
-              id="user-profile-input"
-              className="hidden"
-              ref={fileInputRef}
-              hidden
-              aria-hidden
-              accept="image/*"
-              onChange={handleUpload}
-            />
-          </label>
-            )
-          }
+          {!uploading && (
+            <label htmlFor="user-profile-input">
+              <AvatarBadge className="z-2 size-6.5! cursor-pointer transition-all duration-150 active:scale-90">
+                <Plus className="size-4!" />
+              </AvatarBadge>
+              <input
+                type="file"
+                disabled={uploading}
+                name="user-profile-input"
+                id="user-profile-input"
+                className="hidden"
+                ref={fileInputRef}
+                hidden
+                aria-hidden
+                accept="image/*"
+                onChange={handleUpload}
+              />
+            </label>
+          )}
         </Avatar>
         <div className="flex flex-col items-start">
           <h2 className="-mb-1 text-2xl font-semibold tracking-tight">

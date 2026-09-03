@@ -17,16 +17,14 @@ export const metadata: Metadata = {
 };
 
 export default function NotFound() {
-
   return (
-    <div className="dark">
-      <div className="relative min-h-screen overflow-hidden bg-neutral-50 font-mono transition-colors duration-500 dark:bg-neutral-950 flex flex-col items-center justify-center gap-3">
+    <div>
+      <div className="relative flex min-h-screen flex-col items-center justify-center gap-3 overflow-hidden bg-neutral-50 font-mono transition-colors duration-500 dark:bg-neutral-950">
+        <div className="pointer-events-none absolute -top-[10%] -left-[10%] h-[480px] w-[480px] animate-[drift1_14s_ease-in-out_infinite] rounded-full bg-neutral-300 opacity-50 blur-[72px] transition-colors duration-500 dark:bg-neutral-800" />
 
-        <div className="pointer-events-none absolute -left-[10%] -top-[10%] h-[480px] w-[480px] animate-[drift1_14s_ease-in-out_infinite] rounded-full bg-neutral-300 opacity-50 blur-[72px] transition-colors duration-500 dark:bg-neutral-800" />
+        <div className="pointer-events-none absolute -right-[8%] -bottom-[8%] h-[380px] w-[380px] animate-[drift2_18s_ease-in-out_infinite] rounded-full bg-neutral-400 opacity-50 blur-[72px] transition-colors duration-500 dark:bg-neutral-700" />
 
-        <div className="pointer-events-none absolute -bottom-[8%] -right-[8%] h-[380px] w-[380px] animate-[drift2_18s_ease-in-out_infinite] rounded-full bg-neutral-400 opacity-50 blur-[72px] transition-colors duration-500 dark:bg-neutral-700" />
-
-        <div className="pointer-events-none absolute left-[55%] top-[40%] h-[300px] w-[300px] animate-[drift3_22s_ease-in-out_infinite] rounded-full bg-neutral-200 opacity-55 blur-[72px] transition-colors duration-500 dark:bg-neutral-900" />
+        <div className="pointer-events-none absolute top-[40%] left-[55%] h-[300px] w-[300px] animate-[drift3_22s_ease-in-out_infinite] rounded-full bg-neutral-200 opacity-55 blur-[72px] transition-colors duration-500 dark:bg-neutral-900" />
 
         <div className="relative z-10 flex flex-col items-center gap-3">
           <div className="flex items-center gap-3 text-neutral-900 transition-colors duration-500 dark:text-neutral-100">
@@ -39,8 +37,8 @@ export default function NotFound() {
             Page Not Found
           </h1>
 
-          <p className="m-0 text-sm tracking-wide text-neutral-500 transition-colors duration-500 dark:text-neutral-500">
-            The page you're looking for doesn't exist.
+          <p className="m-0 mx-auto max-w-[18rem] text-center text-sm tracking-wide text-wrap text-neutral-500 transition-colors duration-500 dark:text-neutral-500">
+            The page you&#39;re looking for doesn&#39;t exist.
           </p>
         </div>
       </div>

@@ -48,8 +48,9 @@ export function Hero() {
       imageRefs.current.forEach((img) => {
         if (!img) return;
 
-        img.style.transform = `translate3d(${x * 40}px, ${y * 40
-          }px, 0) scale(1.08)`;
+        img.style.transform = `translate3d(${x * 40}px, ${
+          y * 40
+        }px, 0) scale(1.08)`;
       });
     });
   };

@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Link2, LucideDownload, Share2 } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import {
   Dialog,
   DialogContent,
@@ -27,45 +27,58 @@ import {
   DrawerTrigger,
 } from "../ui/drawer";
 import { cn } from "@/lib/utils";
+import { VariantProps } from "class-variance-authority";
+
+interface ShareModelComponentProps extends VariantProps<typeof buttonVariants> {
+  url: string;
+  productTitle: string;
+  modelTitle?: string;
+  modelDescription?: string;
+  triggerContent?: React.ReactNode;
+  className?: string;
+}
 
 function ShareModelComponent({
   url,
   productTitle,
-}: {
-  url: string;
-  productTitle: string;
-}) {
+  modelTitle = "Share Product",
+  modelDescription = "Share this product via link or QR.",
+  triggerContent,
+  className,
+  variant = "ghost",
+  size = "icon",
+}: ShareModelComponentProps) {
   const isDesktop = useMediaQuery("(min-width: 640px)");
-
   const [isCopied, setIsCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [baseUrl, setBaseUrl] = useState("http://localhost:3000");
 
-  const share = getShareLinks(`${baseUrl}${url}`, productTitle);
+  const fullUrl = `${baseUrl}${url}`;
+  const share = getShareLinks(fullUrl, productTitle);
 
   const socialShare = [
     {
       icon: <Facebook className="size-6" />,
       title: "Facebook",
-      className: "bg-[#1877f2]!",
+      className: "bg-[#1877f2]",
       onClick: () => openLink(share.facebook),
     },
     {
       icon: <Whatsapp className="size-6" />,
       title: "Whatsapp",
-      className: "bg-[#25D366]!",
+      className: "bg-[#25D366]",
       onClick: () => openLink(share.whatsapp),
     },
     {
       icon: <Mail className="size-6" />,
       title: "Mail",
-      className: "bg-[#4285F4]!",
+      className: "bg-[#4285F4]",
       onClick: () => openLink(share.mail),
     },
     {
       icon: <Telegram className="size-6" />,
       title: "Telegram",
-      className: "bg-[#0088CC]!",
+      className: "bg-[#0088CC]",
       onClick: () => openLink(share.telegram),
     },
   ];
@@ -73,7 +86,7 @@ function ShareModelComponent({
   async function handleCopyLink() {
     if (timerRef.current) clearTimeout(timerRef.current);
 
-    await window.navigator.clipboard.writeText(`${baseUrl}${url}`);
+    await window.navigator.clipboard.writeText(fullUrl);
     setIsCopied(true);
 
     timerRef.current = setTimeout(() => {
@@ -93,56 +106,60 @@ function ShareModelComponent({
     };
   }, []);
 
-  function openLink(url: string) {
-    window.open(`${url}`, "_blank", "noopener,noreferrer");
+  function openLink(shareUrl: string) {
+    window.open(shareUrl, "_blank", "noopener,noreferrer");
   }
 
   if (isDesktop) {
     return (
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <Share2 className="size-4" />
+          <Button variant={variant} size={size} className={className}>
+            {triggerContent || <Share2 className="size-4" />}
           </Button>
         </DialogTrigger>
 
-        <DialogContent>
+        <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Share Product</DialogTitle>
-            <DialogDescription>
-              Share this product via link or QR.
-            </DialogDescription>
+            <DialogTitle>{modelTitle}</DialogTitle>
+            <DialogDescription>{modelDescription}</DialogDescription>
           </DialogHeader>
 
           <div className="relative flex items-center justify-center py-5">
-            <GenerateQRCode url={`${baseUrl}${url}`} />
+            <GenerateQRCode url={fullUrl} />
           </div>
 
-          <DialogFooter className="flex-row! gap-3 border-border sm:justify-start">
+          <DialogFooter className="flex-row gap-3 border-border sm:justify-start">
             {socialShare.map(({ icon, title, className, onClick }) => (
               <Tooltip key={title}>
-                <TooltipTrigger
-                  onClick={onClick}
-                  className={cn(
-                    "flex size-10! items-center justify-center rounded-full! text-white!",
-                    className
-                  )}
-                >
-                  {icon}
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={onClick}
+                    className={cn(
+                      "flex size-10 items-center justify-center rounded-full text-white transition-opacity hover:opacity-90",
+                      className
+                    )}
+                  >
+                    {icon}
+                  </button>
                 </TooltipTrigger>
                 <TooltipContent>{title}</TooltipContent>
               </Tooltip>
             ))}
             <Tooltip>
-              <TooltipTrigger
-                onClick={handleCopyLink}
-                className="flex size-10! items-center justify-center rounded-full! bg-indigo-500! text-white!"
-              >
-                {isCopied ? (
-                  <Check className="size-6" />
-                ) : (
-                  <Link2 className="size-6" />
-                )}
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="flex size-10 items-center justify-center rounded-full bg-indigo-500 text-white transition-opacity hover:opacity-90"
+                >
+                  {isCopied ? (
+                    <Check className="size-5" />
+                  ) : (
+                    <Link2 className="size-5" />
+                  )}
+                </button>
               </TooltipTrigger>
               <TooltipContent>
                 {isCopied ? "Copied" : "Copy Link"}
@@ -157,30 +174,32 @@ function ShareModelComponent({
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Share2 className="size-4" />
+        <Button variant={variant} size={size} className={className}>
+          {triggerContent || <Share2 className="size-4" />}
         </Button>
       </DrawerTrigger>
 
-      <DrawerContent className="border-none!">
+      <DrawerContent className="border-none">
         <DrawerHeader>
-          <DrawerTitle>Share Product</DrawerTitle>
-          <DrawerDescription>
-            Share this product via link or QR.
-          </DrawerDescription>
+          <DrawerTitle>{modelTitle}</DrawerTitle>
+          <DrawerDescription>{modelDescription}</DrawerDescription>
         </DrawerHeader>
 
         <div className="flex items-center justify-center py-5">
-          <GenerateQRCode url={`${baseUrl}${url}`} />
+          <GenerateQRCode url={fullUrl} />
         </div>
 
-        <DrawerFooter className="scrollbar-none flex-row! gap-3 overflow-x-auto border-t border-border">
+        <DrawerFooter className="scrollbar-none flex-row gap-3 overflow-x-auto border-t border-border">
           {socialShare.map(({ icon, title, className, onClick }) => (
             <Button
               key={title}
               onClick={onClick}
               variant="outline"
-              className={cn("size-11! rounded-full! text-white!", className)}
+              size="icon"
+              className={cn(
+                "size-11 shrink-0 rounded-full text-white hover:text-white",
+                className
+              )}
             >
               {icon}
             </Button>
@@ -189,12 +208,13 @@ function ShareModelComponent({
           <Button
             onClick={handleCopyLink}
             variant="outline"
-            className="size-11! rounded-full! bg-indigo-500! text-white!"
+            size="icon"
+            className="size-11 shrink-0 rounded-full bg-indigo-500 text-white hover:bg-indigo-600 hover:text-white"
           >
             {isCopied ? (
-              <Check className="size-7" />
+              <Check className="size-6" />
             ) : (
-              <Link2 className="size-7" />
+              <Link2 className="size-6" />
             )}
           </Button>
         </DrawerFooter>
@@ -207,56 +227,53 @@ export const ShareModel = memo(ShareModelComponent);
 
 function GenerateQRCode({ url }: { url: string }) {
   const isDesktop = useMediaQuery("(min-width: 640px)");
-
-  const [options] = useState<Options>({
-    width: isDesktop ? 210 : 240,
-    height: isDesktop ? 210 : 240,
-    type: "svg",
-    data: url,
-    margin: 10,
-    qrOptions: {
-      typeNumber: 0,
-      mode: "Byte",
-      errorCorrectionLevel: "H",
-    },
-    dotsOptions: {
-      color: "#000000",
-      type: "dots",
-      roundSize: true,
-    },
-    cornersDotOptions: {
-      color: "#432dd7",
-      type: "extra-rounded",
-    },
-    cornersSquareOptions: {
-      type: "extra-rounded",
-      color: "#432dd7",
-    },
-    backgroundOptions: {
-      color: "#ffffff",
-    },
-  });
-  const [qrCode, setQrCode] = useState<QRCodeStyling>();
   const ref = useRef<HTMLDivElement>(null);
+  const qrCodeRef = useRef<QRCodeStyling | null>(null);
 
   useEffect(() => {
-    (() => setQrCode(new QRCodeStyling(options)))();
-  }, [options]);
+    const size = isDesktop ? 210 : 240;
+    const options: Options = {
+      width: size,
+      height: size,
+      type: "svg",
+      data: url,
+      margin: 10,
+      qrOptions: {
+        typeNumber: 0,
+        mode: "Byte",
+        errorCorrectionLevel: "H",
+      },
+      dotsOptions: {
+        color: "#000000",
+        type: "dots",
+        roundSize: true,
+      },
+      cornersDotOptions: {
+        color: "#432dd7",
+        type: "extra-rounded",
+      },
+      cornersSquareOptions: {
+        type: "extra-rounded",
+        color: "#432dd7",
+      },
+      backgroundOptions: {
+        color: "#ffffff",
+      },
+    };
 
-  useEffect(() => {
-    if (ref.current) {
-      qrCode?.append(ref.current);
+    if (!qrCodeRef.current) {
+      qrCodeRef.current = new QRCodeStyling(options);
+      if (ref.current) {
+        ref.current.innerHTML = "";
+        qrCodeRef.current.append(ref.current);
+      }
+    } else {
+      qrCodeRef.current.update(options);
     }
-  }, [qrCode, ref]);
-
-  useEffect(() => {
-    if (!qrCode) return;
-    qrCode?.update(options);
-  }, [qrCode, options]);
+  }, [url, isDesktop]);
 
   const onDownloadClick = () => {
-    if (!qrCode) return;
-    qrCode.download({
+    qrCodeRef.current?.download({
       name: "product-qr-code",
       extension: "png",
     });
@@ -273,7 +290,7 @@ function GenerateQRCode({ url }: { url: string }) {
         variant="outline"
         title="Download QR Code"
       >
-        <LucideDownload /> Download QR
+        <LucideDownload className="mr-2 size-4" /> Download QR
       </Button>
     </div>
   );

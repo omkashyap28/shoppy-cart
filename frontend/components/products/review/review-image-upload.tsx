@@ -14,9 +14,8 @@ interface ReviewImageUploadProps {
 
 export function ReviewImageUpload({
   uploadedImages,
-  setUploadedImages
+  setUploadedImages,
 }: ReviewImageUploadProps) {
-
   const {
     clear,
     fileInputRef,
@@ -24,21 +23,18 @@ export function ReviewImageUpload({
     remove,
     retry,
     uploading,
-    uploads
+    uploads,
   } = useImageKitUpload({
     fileType: "image",
     imageType: "reviews",
-    selectType: "multiple"
-  })
+    selectType: "multiple",
+  });
 
   useEffect(() => {
     if (uploads.length !== 0) {
       const filteredUploads = filterReviewUploadResponse(uploads);
 
-      localStorage.setItem(
-        "reviewImages",
-        JSON.stringify(filteredUploads)
-      );
+      localStorage.setItem("reviewImages", JSON.stringify(filteredUploads));
 
       setUploadedImages(filteredUploads);
     }
@@ -52,20 +48,22 @@ export function ReviewImageUpload({
     }
   }, [setUploadedImages]);
 
-  if(uploadedImages.length < 1) {
+  if (uploadedImages.length < 1) {
     return (
       <ImageDrop
-      fileInputRef={fileInputRef}
-      handleUpload={handleUpload}
-      title="Upload Review Images"
-      disabled={uploading}
-      className="border! p-4 mt-0!"
+        fileInputRef={fileInputRef}
+        handleUpload={handleUpload}
+        title="Upload Review Images"
+        disabled={uploading}
+        className="mt-0! border! p-4"
       />
     );
   }
 
-  return <ReviewImageCarosel
-    uploadedItems={uploadedImages}
-    setUploadedItems={setUploadedImages}
-  />
+  return (
+    <ReviewImageCarosel
+      uploadedItems={uploadedImages}
+      setUploadedItems={setUploadedImages}
+    />
+  );
 }

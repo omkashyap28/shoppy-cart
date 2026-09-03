@@ -34,32 +34,31 @@ export function Theme() {
     meta.setAttribute("content", theme);
   }, [resolvedTheme]);
 
-  const toggleTheme = useCallback(function () {
-    setTheme(theme === "dark" ? "light" : "dark");
-  }, [theme, setTheme]);
+  const toggleTheme = useCallback(
+    function () {
+      setTheme(theme === "dark" ? "light" : "dark");
+    },
+    [theme, setTheme]
+  );
 
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === "d") {
         toggleTheme();
       }
-    }
+    };
 
     window.addEventListener("keydown", handleKeydown);
 
     return () => {
       window.removeEventListener("keydown", handleKeydown);
-    }
+    };
   }, [toggleTheme]);
 
   if (!mounted) return <Skeleton className="size-8! rounded-full!" />;
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={toggleTheme}
-    >
+    <Button variant="ghost" size="icon" onClick={toggleTheme}>
       {theme === "dark" ? (
         <Moon className="size-4 opacity-60" />
       ) : (

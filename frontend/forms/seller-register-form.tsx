@@ -28,13 +28,16 @@ import { Textarea } from "@/components/ui/textarea";
 
 const categories = ["ELECTRONICS", "FASHION", "GROCERY", "BOOKS", "FURNITURE"];
 
-export function SellerRegistrationForm({onSuccess}: {onSuccess: () => void}) {
-
+export function SellerRegistrationForm({
+  onSuccess,
+}: {
+  onSuccess: () => void;
+}) {
   const userId = useAppStore((state) => state.userId);
   const pings = usePings();
-  const setLoading = useAppStore(state => state.setLoading);
-  const loading = useAppStore(state => state.loading);
-  const setSellerId = useAppStore(state => state.setSellerId);
+  const setLoading = useAppStore((state) => state.setLoading);
+  const loading = useAppStore((state) => state.loading);
+  const setSellerId = useAppStore((state) => state.setSellerId);
 
   const form = useForm<z.infer<typeof sellerRegistrationFormSchema>>({
     resolver: zodResolver(sellerRegistrationFormSchema),
@@ -45,8 +48,9 @@ export function SellerRegistrationForm({onSuccess}: {onSuccess: () => void}) {
     },
   });
 
-
-  const onSubmit = async (data: z.infer<typeof sellerRegistrationFormSchema>) => {
+  const onSubmit = async (
+    data: z.infer<typeof sellerRegistrationFormSchema>
+  ) => {
     try {
       setLoading(true);
 
@@ -54,16 +58,16 @@ export function SellerRegistrationForm({onSuccess}: {onSuccess: () => void}) {
         userId,
         shopName: data.shopName,
         description: data.description,
-        category: data.category,  
-      }
+        category: data.category,
+      };
 
       const res = await apiFetch(`auth/seller/register`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-      })
+      });
 
       const responseData = await res.json();
 
@@ -163,7 +167,9 @@ export function SellerRegistrationForm({onSuccess}: {onSuccess: () => void}) {
           )}
         />
         <Field>
-          <Button disabled={loading} aria-disabled={loading} type="submit">Register</Button>
+          <Button disabled={loading} aria-disabled={loading} type="submit">
+            Register
+          </Button>
         </Field>
       </FieldGroup>
     </form>

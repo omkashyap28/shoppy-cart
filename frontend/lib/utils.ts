@@ -78,10 +78,10 @@ export async function refreshAccessToken(): Promise<TokenResponse> {
       signal,
     });
 
-    if(response.status === 401) {
+    if (response.status === 401) {
       refreshFailed = true;
-      clearStore()
-      await clearCookie()
+      clearStore();
+      await clearCookie();
     }
     refreshFailed = false;
     return await response.json();
@@ -131,10 +131,10 @@ export async function logout() {
     }
 
     clearStore();
-    if(typeof window !== "undefined") {
-      window.location.href = "/"
+    await clearCookie();
+    if (typeof window !== "undefined") {
+      window.location.href = "/";
     }
-    
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") {
       throw new Error("Server is not responding. Please try again later.");

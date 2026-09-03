@@ -29,8 +29,7 @@ const steps = [
   },
   {
     title: "Set Your MPIN",
-    description:
-      "Enter your MPIN to complete your wallet registration.",
+    description: "Enter your MPIN to complete your wallet registration.",
   },
 ];
 

@@ -8,7 +8,6 @@ export async function createReview(
   payload: unknown,
   options: RequestInit = {}
 ) {
-
   return serverFetch<ReviewResponseType>(`/product/${productId}/reviews`, {
     method: "POST",
     credentials: "include",
@@ -16,6 +15,6 @@ export async function createReview(
     validateStatus: (status) => status === 201,
     errorMessage: "Failed to create review",
     revalidate: `reviews:${productId}`,
-    ...options
+    ...options,
   });
 }

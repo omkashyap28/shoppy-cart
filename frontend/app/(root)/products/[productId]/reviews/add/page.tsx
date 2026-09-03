@@ -1,9 +1,10 @@
-import { PageComponent } from "@/components/layout";
+import { Loader, PageComponent } from "@/components/layout";
 import { AddReviewForm } from "@/forms";
 import { serverFetch } from "@/lib/serverFetch";
 import { Product as ProductType } from "@/types/product";
 import { Image } from "@imagekit/next";
 import Link from "next/link";
+import { Suspense } from "react";
 
 interface Props {
   params: Promise<{ productId: string }>;
@@ -13,13 +14,12 @@ const getProduct = async (productId: string) => {
   return await serverFetch<ProductType>(`/product/${productId}`);
 };
 
-export default async function AddReview({ params }: Props) {
+async function AddReviewContent({ params }: Props) {
   const { productId } = await params;
-
   const product = await getProduct(productId);
 
   return (
-    <PageComponent heading="Review this product">
+    <>
       <Link href={`/products/${productId}`}>
         <div className="flex w-full items-start gap-2 border-b border-dashed border-border pb-5 sm:gap-4">
           <div className="relative aspect-square size-24 shrink-0 overflow-hidden rounded-md">
@@ -45,6 +45,16 @@ export default async function AddReview({ params }: Props) {
         </div>
       </Link>
       <AddReviewForm className="w-full" />
+    </>
+  );
+}
+
+export default function AddReview({ params }: Props) {
+  return (
+    <PageComponent heading="Review this product">
+      <Suspense fallback={<Loader />}>
+        <AddReviewContent params={params} />
+      </Suspense>
     </PageComponent>
   );
 }

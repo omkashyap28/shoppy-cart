@@ -1,3 +1,5 @@
-import { Hero } from "./hero"
+import { Hero } from "./hero";
+import { RecentViewed } from "./recent-viewed";
+import { Recommended } from "./recommended";
 
-export { Hero }
+export { Hero, RecentViewed, Recommended };

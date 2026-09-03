@@ -42,18 +42,15 @@ export function CartItemQuantitySelector({
 
   const updateQuantityMutation = useMutation({
     mutationFn: async ({ cartId, quantity }: UpdateQuantityParams) => {
-      const response = await apiFetch(
-        `user/${userId}/cart/${cartId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            quantity,
-          }),
-        }
-      );
+      const response = await apiFetch(`user/${userId}/cart/${cartId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          quantity,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to update cart quantity");
@@ -94,12 +91,9 @@ export function CartItemQuantitySelector({
 
   const deleteMutation = useMutation({
     mutationFn: async (cartId: string) => {
-      const response = await apiFetch(
-        `user/${userId}/cart/${cartId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await apiFetch(`user/${userId}/cart/${cartId}`, {
+        method: "DELETE",
+      });
 
       if (response.status !== 204) {
         throw new Error("Failed to delete cart item");
@@ -123,11 +117,7 @@ export function CartItemQuantitySelector({
   const isBusy = isUpdating || isDeleting;
 
   const updateQuantity = (nextQuantity: number) => {
-    if (
-      nextQuantity < MIN_QUANTITY ||
-      nextQuantity > MAX_QUANTITY ||
-      isBusy
-    ) {
+    if (nextQuantity < MIN_QUANTITY || nextQuantity > MAX_QUANTITY || isBusy) {
       return;
     }
 
@@ -160,14 +150,7 @@ export function CartItemQuantitySelector({
   };
 
   return (
-    <div
-      className="
-        flex items-center
-        rounded-lg
-        border border-border/40
-        select-none
-      "
-    >
+    <div className="flex items-center rounded-lg border border-border/40 select-none">
       <AnimatePresence mode="wait" initial={false}>
         {quantity > MIN_QUANTITY ? (
           <motion.div
@@ -233,10 +216,7 @@ export function CartItemQuantitySelector({
               disabled={isDeleting}
               onClick={handleDelete}
               aria-label="Remove item from cart"
-              className="
-                text-destructive
-                hover:text-destructive
-              "
+              className="text-destructive hover:text-destructive"
             >
               {isDeleting ? <Spinner /> : <Trash2 />}
             </Button>
@@ -245,23 +225,11 @@ export function CartItemQuantitySelector({
       </AnimatePresence>
 
       <div
-        className="
-          relative
-          flex
-          size-7
-          shrink-0
-          items-center
-          justify-center
-          overflow-hidden
-          font-medium
-        "
+        className="relative flex size-7 shrink-0 items-center justify-center overflow-hidden font-medium"
         aria-live="polite"
         aria-label={`Quantity ${quantity}`}
       >
-        <AnimatePresence
-          mode="popLayout"
-          initial={false}
-        >
+        <AnimatePresence mode="popLayout" initial={false}>
           <motion.span
             layout
             key={quantity}

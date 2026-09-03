@@ -14,9 +14,7 @@ export default function Layout({
     <>
       <Header />
       <Categories />
-      <Container>
-        {children}
-      </Container>
+      <Container>{children}</Container>
       <Footer />
     </>
   );

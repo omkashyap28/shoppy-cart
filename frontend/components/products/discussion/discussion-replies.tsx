@@ -44,12 +44,14 @@ export function DiscussionReplies({
     staleTime: 20 * 60 * 1000,
   });
 
-  if (isLoading) return <Loader />
+  if (isLoading) return <Loader />;
 
   if (error || !replies) {
-    return <div className="relative z-10 flex h-36 w-full items-center justify-center rounded-full bg-background/30 p-2">
-      <p className="text-muted-foreground">Failed to get product replies</p>
-    </div>;
+    return (
+      <div className="relative z-10 flex h-36 w-full items-center justify-center rounded-full bg-background/30 p-2">
+        <p className="text-muted-foreground">Failed to get product replies</p>
+      </div>
+    );
   }
 
   return (
@@ -83,9 +85,7 @@ function DiscussionRepliesItem({
   const [editable, setEditable] = useState(false);
 
   return (
-    <div
-      className="relative flex flex-col items-start p-4"
-    >
+    <div className="relative flex flex-col items-start p-4">
       <div className="flex w-full items-center justify-between">
         <div className="flex items-center gap-2">
           <Avatar className="size-10!">
@@ -105,9 +105,7 @@ function DiscussionRepliesItem({
               </span>
               <span className="text-xs text-muted-foreground">
                 {format(
-                  new Date(
-                    reply.createdAt as string
-                  ).toLocaleDateString(),
+                  new Date(reply.createdAt as string).toLocaleDateString(),
                   "PPP"
                 )}
               </span>
@@ -132,10 +130,11 @@ function DiscussionRepliesItem({
         )}
       </div>
       <div className="mt-4 w-full">
-        {!editable ?
+        {!editable ? (
           <p className="wrap-break text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
             {reply.message}
-          </p> :
+          </p>
+        ) : (
           <DiscussionEditForm
             discussionId={reply.replyId}
             message={reply.message}
@@ -143,7 +142,7 @@ function DiscussionRepliesItem({
             setEditable={setEditable}
             queryKey={["discussion-replies", discussionId]}
           />
-        }
+        )}
       </div>
     </div>
   );

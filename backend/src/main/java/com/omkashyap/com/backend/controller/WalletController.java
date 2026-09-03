@@ -28,8 +28,8 @@ public class WalletController {
     );
   }
 
-  @GetMapping
-  ResponseEntity<WalletResponseDto> getUserWallet(
+  @PostMapping("/validate")
+  ResponseEntity<WalletResponseDto> validateUserWallet(
       @RequestHeader("Authorization") String authHeader,
       @Valid @RequestBody WalletRequestDto requestDto
   ) {

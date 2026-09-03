@@ -1,5 +1,5 @@
 export interface WishlistResponse {
-  wishlistId:string;
+  wishlistId: string;
   productId: string;
   brandName: string;
   description: string;
@@ -10,5 +10,5 @@ export interface WishlistResponse {
   price: number;
   coins: number;
   productUrl: string;
-  productAttributes: Map<string, string> ;
+  productAttributes: Map<string, string>;
 }

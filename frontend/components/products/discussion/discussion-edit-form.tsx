@@ -31,7 +31,7 @@ export function DiscussionEditForm({
   discussionId,
   message,
   setEditable,
-  queryKey
+  queryKey,
 }: DiscussionEditFormProps) {
   const queryClient = useQueryClient();
   const pings = usePings();
@@ -120,16 +120,17 @@ export function DiscussionEditForm({
               variant="default"
               size="sm"
             >
-              {status === "pending" ?
+              {status === "pending" ? (
                 <>
                   <Spinner />
                   <span>Saving...</span>
-                </> :
+                </>
+              ) : (
                 <>
                   <Save />
                   <span>Save</span>
                 </>
-              }
+              )}
             </InputGroupButton>
           </div>
         </InputGroupAddon>

@@ -18,8 +18,8 @@ export function ProductPage() {
     queryKey: [`products`],
     queryFn: async () => {
       const response = await fetch(`/backend/search/initial`);
-      
-      if(response.status !== 200) {
+
+      if (response.status !== 200) {
         throw new Error("Failed to get initial product");
       }
 
@@ -37,7 +37,7 @@ export function ProductPage() {
       isFetchNextPageError={isFetchNextPageError}
       isFetchingNextPage={isFetchingNextPage}
     >
-      <section className="grid grid-cols-2 gap-4 md:gap-6 py-4 max-xs:p-4 sm:grid-cols-3 md:p-6 lg:grid-cols-4">
+      <section className="grid grid-cols-2 gap-4 py-4 max-xs:p-4 sm:grid-cols-3 md:gap-6 md:p-6 lg:grid-cols-4">
         {response?.map((product) => (
           <ProductCard product={product} key={product.productId} />
         ))}

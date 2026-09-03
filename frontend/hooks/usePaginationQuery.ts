@@ -22,7 +22,7 @@ export function usePaginationQuery<T = unknown>({
     isFetchNextPageError,
     refetch,
     hasNextPage,
-    status
+    status,
   } = useInfiniteQuery({
     queryKey: queryKey,
     queryFn: queryFn,

@@ -55,12 +55,7 @@ export function DiscussionList({
                     {discussion.username}
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    {format(
-                      new Date(
-                        discussion.createdAt as string
-                      ).toLocaleDateString(),
-                      "PPP"
-                    )}
+                    {format(String(discussion.createdAt), "PPP")}
                   </span>
                 </div>
                 {discussion.isEdited && (
@@ -83,10 +78,11 @@ export function DiscussionList({
           </div>
 
           <div className="mt-4 w-full">
-            {!editable ?
+            {!editable ? (
               <p className="wrap-break text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
                 {discussion.message}
-              </p> :
+              </p>
+            ) : (
               <DiscussionEditForm
                 discussionId={discussion.discussionId}
                 message={discussion.message}
@@ -94,7 +90,7 @@ export function DiscussionList({
                 setEditable={setEditable}
                 queryKey={["discussions", discussion.productId]}
               />
-            }
+            )}
 
             <div className="mt-4">
               <DiscussionListFooter

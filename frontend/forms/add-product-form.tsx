@@ -40,7 +40,7 @@ export function AddProductForm() {
   const sellerId = useAppStore((state) => state.sellerId);
   const [uploadedItems, setUploadedItems] = useState<UploadedItems[]>([]);
   const pings = usePings();
-  const router = useRouter()
+  const router = useRouter();
 
   const queryClient = useQueryClient();
 
@@ -72,7 +72,6 @@ export function AddProductForm() {
     );
   }, [uploadedItems, form]);
 
-  
   const mutate = useMutation({
     mutationFn: async (data: AddProductScehma) => {
       const formData = {
@@ -110,7 +109,7 @@ export function AddProductForm() {
     },
     onSettled: () => {
       setLoading(false);
-    }
+    },
   });
 
   function onSubmit(data: AddProductScehma) {

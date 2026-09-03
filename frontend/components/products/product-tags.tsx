@@ -22,7 +22,7 @@ export function ProductTags({
   function handleClick(tag: string) {
     const params = new URLSearchParams();
     params.set("q", tag);
-    
+
     const query = `/search?${params.toString()}`;
     router.push(query);
   }

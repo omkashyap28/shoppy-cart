@@ -26,7 +26,6 @@ export function WishlistButton({ wishlistId = "" }: WishlistButtonProps) {
       userId: string;
       wishlistId: string;
     }) => {
-
       const response = await apiFetch(
         `user/${userId}/wishlists/${wishlistId}`,
         {
@@ -61,7 +60,7 @@ export function WishlistButton({ wishlistId = "" }: WishlistButtonProps) {
       variant="destructive"
       size="icon-lg"
       disabled={isPending}
-      className="rounded-full! shadow border-none"
+      className="rounded-full! border-none shadow"
     >
       {isPending ? (
         <Spinner />

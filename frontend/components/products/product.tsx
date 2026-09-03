@@ -1,11 +1,10 @@
 import { Product as ProductType } from "@/types/product";
-import { Separator } from "../ui/separator";
 import { ProductHeader } from "./product-header";
 import { ProductImageGallery } from "./product-image-gallery";
 import { ProductPurchaseCard } from "./product-purchase-card";
-import { ProductTags } from "./product-tags";
 import { Star } from "lucide-react";
 import Link from "next/link";
+import { AffiliateProductCard } from "../affiliate/affiliate-product-card";
 
 interface ProductProps {
   product: ProductType;
@@ -29,14 +28,6 @@ export function Product({ product }: ProductProps) {
 
   return (
     <>
-      <div className="mt-6 md:mt-8">
-        <ProductTags
-          tags={tags}
-          variant="secondary"
-          className="mb-4 flex flex-wrap gap-2"
-        />
-      </div>
-      <Separator className="bg-none border-b border-dashed border-border" />
       <div className="grid gap-4 py-6 sm:grid-cols-[1fr_280px] md:gap-6 md:py-8">
         <div>
           <div className="mb-6 xl:hidden">
@@ -95,7 +86,12 @@ export function Product({ product }: ProductProps) {
           </div>
         </div>
 
-        <div className="w-full">
+        <div className="w-full space-y-5">
+          <AffiliateProductCard
+            productId={productId}
+            productThumbnail={productThumbnail}
+            description={description}
+          />
           <ProductPurchaseCard
             price={price}
             coins={coins}

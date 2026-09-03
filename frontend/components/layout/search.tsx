@@ -174,11 +174,7 @@ export function Search() {
         <SearchIcon className="size-4 opacity-60" />
       </Button>
 
-      <CommandDialog
-        className="md:min-w-xl"
-        open={open}
-        onOpenChange={setOpen}
-      >
+      <CommandDialog className="md:min-w-xl" open={open} onOpenChange={setOpen}>
         <Command>
           <div className="relative">
             <CommandInput

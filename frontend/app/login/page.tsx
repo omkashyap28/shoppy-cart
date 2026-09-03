@@ -6,11 +6,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LoginForm } from "@/forms";
-
 import { Logo } from "@/components/layout";
 import { FieldDescription } from "@/components/ui/field";
 import Link from "next/link";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Login - Shoppy Cart",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "Account",
     "Login to Shoppy Cart",
     "Login to Account",
-  ]
+  ],
 };
 
 export default function LoginPage() {
@@ -37,7 +37,9 @@ export default function LoginPage() {
               <CardDescription>Login to Shoppy Cart</CardDescription>
             </CardHeader>
             <CardContent>
-              <LoginForm />
+              <Suspense>
+                <LoginForm />
+              </Suspense>
             </CardContent>
           </Card>
           <FieldDescription className="px-6 text-center">

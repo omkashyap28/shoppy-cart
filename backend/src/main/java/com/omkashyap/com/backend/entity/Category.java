@@ -52,7 +52,10 @@ public class Category {
   }
 
   public void addChildren(Category child) {
-    children.add(child);
+    if (this.children == null) {
+      this.children = new ArrayList<>();
+    }
+    this.children.add(child);
     child.assignParent(this);
   }
 

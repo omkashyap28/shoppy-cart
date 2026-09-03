@@ -28,6 +28,7 @@ import {
 import { MagnetButton } from "../layout";
 import { Input } from "../ui/input";
 import { CartButton } from "../layout/cart-btn";
+import { useRouter } from "next/navigation";
 
 interface ProductPurchaseCardProps {
   price: number;
@@ -49,6 +50,7 @@ export function ProductPurchaseCard({
   productThumbnail,
   description,
 }: ProductPurchaseCardProps) {
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [fastModeEnabled, setFastModeEnabled] = useState(false);
@@ -169,18 +171,21 @@ export function ProductPurchaseCard({
           <ExpressCheckoutCard
             amount={price * quantity}
             coins={coins * quantity}
+            productId={productId}
+            quantity={quantity}
           />
         </div>
       </CardContent>
       <CardFooter>
         <div className="flex w-full flex-col items-center gap-2">
-          <CartButton
-            productId={productId}
-          />
+          <CartButton productId={productId} />
           <MagnetButton magnetStrength={0.15} disabled={!inStock} padding={2}>
             <Button
-              className="w-full"
+              className="w-full hover:bg-primary!"
               disabled={!inStock}
+              onClick={() =>
+                router.push(`/products/${productId}/order?quantity=${quantity}`)
+              }
             >
               Buy Now
             </Button>

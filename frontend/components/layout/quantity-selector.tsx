@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Minus, Plus } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 
 interface QuantitySelectorProps {
   quantity?: number;
@@ -39,7 +40,37 @@ export function QuantitySelector({
         >
           <Minus className="size-4" />
         </Button>
-        <span className="min-w-10 text-center text-sm">{quantity}</span>
+        <div
+          className="relative flex size-7 shrink-0 items-center justify-center overflow-hidden font-medium"
+          aria-live="polite"
+          aria-label={`Quantity ${quantity}`}
+        >
+          <AnimatePresence mode="popLayout" initial={false}>
+            <motion.span
+              layout
+              key={quantity}
+              initial={{
+                opacity: 0,
+                y: 10,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              exit={{
+                opacity: 0,
+                y: -10,
+              }}
+              transition={{
+                duration: 0.15,
+                ease: "easeOut",
+              }}
+              className="absolute"
+            >
+              {quantity}
+            </motion.span>
+          </AnimatePresence>
+        </div>
         <Button
           variant="ghost"
           size="icon"

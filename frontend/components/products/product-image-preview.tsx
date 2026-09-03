@@ -40,17 +40,17 @@ export function ProductImageFullscreenPreview({
 
   function goNext() {
     setActiveIndex((prev) => (prev + 1) % items.length);
-  };
+  }
 
   function goPrev() {
     setActiveIndex((prev) => (prev - 1 + items.length) % items.length);
-  };
+  }
 
   if (items.length === 0) return null;
 
   const activeItem = items[activeIndex];
 
-  return ( 
+  return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
