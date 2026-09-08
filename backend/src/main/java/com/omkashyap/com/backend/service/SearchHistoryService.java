@@ -1,5 +1,6 @@
 package com.omkashyap.com.backend.service;
 
+import com.omkashyap.com.backend.dto.requestDto.SearchRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.InfiniteScrollResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductsResponseDto;
@@ -9,11 +10,8 @@ import java.util.List;
 
 public interface SearchHistoryService {
 
-  InfiniteScrollResponseDto<ProductResponseDto> searchProduct(
-      String searchText,
-      String userId,
-      int limit,
-      Long lastProductId
+  InfiniteScrollResponseDto<ProductsResponseDto> searchProduct(
+      SearchRequestDto requestDto
   );
 
   List<SearchHistoryResponseDto> getRecentSearch(String userId);
@@ -32,5 +30,7 @@ public interface SearchHistoryService {
       String productId,
       int limit
   );
+
+  List<ProductsResponseDto> getTrendingProducts();
 
 }

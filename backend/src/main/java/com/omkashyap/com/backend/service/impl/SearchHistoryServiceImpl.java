@@ -1,5 +1,6 @@
 package com.omkashyap.com.backend.service.impl;
 
+import com.omkashyap.com.backend.dto.requestDto.SearchRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.InfiniteScrollResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductsResponseDto;
@@ -13,6 +14,7 @@ import com.omkashyap.com.backend.repository.SearchSuggestionRepository;
 import com.omkashyap.com.backend.repository.UserRepository;
 import com.omkashyap.com.backend.service.SearchHistoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,42 +32,36 @@ public class SearchHistoryServiceImpl implements SearchHistoryService {
   private final ProductsDtoMapper productsDtoMapper;
   private final SearchSuggestionRepository searchSuggestionRepository;
 
-
   @Override
-  public InfiniteScrollResponseDto<ProductResponseDto> searchProduct(
-      String searchText,
-      String userId,
-      int limit,
-      Long lastProductId
-  ) {
-    searchText = searchText.trim().toLowerCase();
+  public InfiniteScrollResponseDto<ProductsResponseDto> searchProduct(
+      SearchRequestDto requestDto) {
 
-    Pageable pageable = PageRequest.of(0, limit);
-    List<Product> products;
+    String query = requestDto.getQuery().trim();
+    query = query.isBlank() ? null : query;
 
-    if (lastProductId == null) {
-      products = productRepository.findByDescriptionContainingIgnoreCaseOrderByIdDesc(
-          searchText,
-          pageable
-      );
-    } else {
-      products = productRepository.findByDescriptionContainingIgnoreCaseAndIdLessThanOrderByIdDesc(
-          searchText,
-          lastProductId,
-          pageable
-      );
-    }
+    int limit = requestDto.getLimit() == null ? 20 : requestDto.getLimit();
 
-//    Save search history
-    String finalSearchText = searchText;
-    if (userId != null && !userId.isBlank()) {
-      User user = userRepository.findByUserId(userId).orElseThrow(() ->
-          new IllegalArgumentException("User not exists"));
+    Pageable pageable = PageRequest.of(0, Math.min(limit, 50));
 
-      SearchHistory searchHistory = searchHistoryRepository.findByUserAndSearchText(user, searchText).orElseGet(() -> {
+    Page<Product> products = productRepository.searchProduct(
+        query,
+        requestDto.getMinPrice(),
+        requestDto.getMaxPrice(),
+        requestDto.getRating(),
+        requestDto.getInStock(),
+        pageable
+    );
+
+    // Save search history
+    if (requestDto.getUserId() != null && !requestDto.getUserId().isBlank()) {
+      User user = userRepository.findByUserId(requestDto.getUserId())
+          .orElse(null);
+
+      String finalQuery = query;
+      SearchHistory searchHistory = searchHistoryRepository.findByUserAndSearchText(user, query).orElseGet(() -> {
         SearchHistory search = SearchHistory.builder()
             .user(user)
-            .searchText(finalSearchText)
+            .searchText(finalQuery)
             .build();
         return searchHistoryRepository.save(search);
       });
@@ -73,37 +69,36 @@ public class SearchHistoryServiceImpl implements SearchHistoryService {
       searchHistoryRepository.save(searchHistory);
     }
 
-//    Save search analytics
-    SearchSuggestion searchSuggestion = searchSuggestionRepository.findByKeyword(searchText).orElseGet(() -> {
+    // Save search analytics
+    SearchSuggestion searchSuggestion = searchSuggestionRepository.findByKeyword(requestDto.getQuery()).orElseGet(() -> {
       SearchSuggestion suggestion = SearchSuggestion.builder()
-          .keyword(finalSearchText)
+          .keyword(requestDto.getQuery())
           .build();
       return searchSuggestionRepository.save(suggestion);
     });
     searchSuggestion.incrementTotalSearches();
     searchSuggestionRepository.save(searchSuggestion);
 
-    List<ProductResponseDto> productResponseDtos = products.stream()
-        .map(productDtoMapper::mapToDto)
+    List<ProductsResponseDto> productResponseDtos = products.stream()
+        .map(productsDtoMapper::mapToDto)
         .toList();
 
     Long nextCursor = null;
 
-    if (!products.isEmpty()) {
-      nextCursor = products.getLast().getId();
+    if(products.hasNext()) {
+      nextCursor = products.getContent().getLast().getId();
     }
 
-    return InfiniteScrollResponseDto.<ProductResponseDto>builder()
+    return InfiniteScrollResponseDto.<ProductsResponseDto>builder()
         .content(productResponseDtos)
         .nextCursor(nextCursor)
-        .hasMore(products.size() == limit)
+        .hasMore(products.hasNext())
         .build();
   }
 
   @Override
   public List<SearchHistoryResponseDto> getRecentSearch(String userId) {
-    User user = userRepository.findByUserId(userId).orElseThrow(() ->
-        new IllegalArgumentException("User not exists"));
+    User user = userRepository.findByUserId(userId).orElseThrow(() -> new IllegalArgumentException("User not exists"));
 
     return searchHistoryRepository
         .findTop10ByUserOrderBySearchedAtDesc(user)
@@ -138,8 +133,7 @@ public class SearchHistoryServiceImpl implements SearchHistoryService {
   public InfiniteScrollResponseDto<ProductResponseDto> searchProductByTags(
       String slug,
       Long lastProductId,
-      int limit
-  ) {
+      int limit) {
     Pageable pageable = PageRequest.of(0, Math.min(limit, 10));
 
     List<Product> products;
@@ -147,14 +141,12 @@ public class SearchHistoryServiceImpl implements SearchHistoryService {
     if (lastProductId == null) {
       products = productRepository.findByTags_SlugIgnoreCaseOrderByIdDesc(
           slug,
-          pageable
-      );
+          pageable);
     } else {
       products = productRepository.findByTags_SlugIgnoreCaseAndIdLessThanOrderByIdDesc(
           slug,
           lastProductId,
-          pageable
-      );
+          pageable);
     }
 
     List<ProductResponseDto> responseDtos = products.stream()
@@ -175,8 +167,7 @@ public class SearchHistoryServiceImpl implements SearchHistoryService {
   @Override
   public List<ProductsResponseDto> getRelatedProducts(
       String productId,
-      int limit
-  ) {
+      int limit) {
 
     Product product = productRepository.findByProductId(productId)
         .orElseThrow(() -> new RuntimeException("Product not found"));
@@ -190,11 +181,17 @@ public class SearchHistoryServiceImpl implements SearchHistoryService {
         .findRandomRelatedProducts(
             productId,
             tags,
-            Math.min(limit, 20)
-        );
+            Math.min(limit, 20));
 
     return relatedProducts.stream()
         .map(productsDtoMapper::mapToDto)
         .toList();
+  }
+
+  public List<ProductsResponseDto> getTrendingProducts() {
+    Pageable page = PageRequest.of(0, 20);
+    List<Product> products = productRepository.findTopNProducts(page);
+
+    return products.stream().map(productsDtoMapper::mapToDto).toList();
   }
 }

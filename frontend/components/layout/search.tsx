@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-
+import { useQuery } from "@tanstack/react-query";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -37,7 +37,25 @@ export function Search() {
   const [searchResults, setSearchResults] = useState<string[]>([]);
 
   const userId = useAppStore((state) => state.userId);
-  const queryClient = useQueryClient();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (pathname !== "/search") return;
+
+    const query = searchParams.get("query")?.trim() ?? "";
+
+    (() => {
+      if (!query) {
+        setSearchValue("");
+        setSearchResults([]);
+        return;
+      }
+
+      setSearchValue(query);
+    })();
+  }, [searchParams, pathname]);
 
   const { data: userSearches = [] } = useQuery<string[]>({
     queryKey: ["user-searches", userId],
@@ -95,27 +113,6 @@ export function Search() {
     }
   }, [searchValue]);
 
-  const setSearchValueToUser = async (value: string) => {
-    if (!userId || !value.trim()) return;
-
-    const response = await apiFetch(
-      `search?query=${encodeURIComponent(value)}&userId=${userId}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Unable to save search");
-    }
-
-    await queryClient.invalidateQueries({
-      queryKey: ["user-searches", userId],
-    });
-  };
-
   const handleSearch = useMemo(
     () =>
       debounce(async (query: string, signal: AbortSignal) => {
@@ -142,6 +139,26 @@ export function Search() {
       }, 400),
     []
   );
+
+  const navigateToSearch = async (value: string) => {
+    const query = value.trim();
+    if (!query) return;
+
+    setSearchValue(query);
+    setSearchResults([]);
+    setOpen(false);
+
+    router.push(`/search?query=${encodeURIComponent(query)}`);
+  };
+
+  const handleInputChange = (value: string) => {
+    setSearchValue(value);
+    if (!value.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    handleSearch(value);
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -174,22 +191,23 @@ export function Search() {
         <SearchIcon className="size-4 opacity-60" />
       </Button>
 
-      <CommandDialog className="md:min-w-xl" open={open} onOpenChange={setOpen}>
+      <CommandDialog
+        className="top-14 md:min-w-2xl"
+        open={open}
+        onOpenChange={setOpen}
+      >
         <Command>
           <div className="relative">
             <CommandInput
               value={searchValue}
-              onValueChange={(value) => {
-                setSearchValue(value);
-                handleSearch(value);
-              }}
+              onValueChange={handleInputChange}
               placeholder="Type something to search..."
             />
 
             {searchValue && (
               <Button
                 variant="ghost"
-                className="absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                className="absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground"
                 onClick={() => {
                   setSearchValue("");
                   setSearchResults([]);
@@ -217,8 +235,7 @@ export function Search() {
                   className="group cursor-pointer"
                   value={`search-${searchValue}`}
                   onSelect={() => {
-                    setSearchValueToUser(searchValue);
-                    setOpen(false);
+                    navigateToSearch(searchValue);
                   }}
                 >
                   {searchValue}
@@ -234,10 +251,7 @@ export function Search() {
                     className="group cursor-pointer"
                     value={`search-${item}`}
                     onSelect={() => {
-                      setOpen(false);
-                      setSearchResults([]);
-                      setSearchValue(item);
-                      setSearchValueToUser(item);
+                      navigateToSearch(item);
                     }}
                   >
                     {item}
@@ -266,10 +280,7 @@ export function Search() {
                     className="group cursor-pointer"
                     value={`recent-${item}`}
                     onSelect={() => {
-                      setOpen(false);
-                      setSearchResults([]);
-                      setSearchValue(item);
-                      setSearchValueToUser(item);
+                      navigateToSearch(item);
                     }}
                   >
                     {item}
@@ -298,10 +309,7 @@ export function Search() {
                     className="group cursor-pointer"
                     value={`trending-${item}`}
                     onSelect={() => {
-                      setOpen(false);
-                      setSearchResults([]);
-                      setSearchValue(item);
-                      setSearchValueToUser(item);
+                      navigateToSearch(item);
                     }}
                   >
                     {item}

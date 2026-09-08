@@ -2,11 +2,13 @@ package com.omkashyap.com.backend.repository;
 
 import com.omkashyap.com.backend.entity.Product;
 import com.omkashyap.com.backend.entity.Seller;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,17 +20,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   List<Product> findAllBySeller(Seller seller);
 
   Boolean existsByProductId(String productId);
-
-  List<Product> findByDescriptionContainingIgnoreCaseAndIdLessThanOrderByIdDesc(
-      String searchText,
-      Long lastProductId,
-      Pageable pageable
-  );
-
-  List<Product> findByDescriptionContainingIgnoreCaseOrderByIdDesc(
-      String searchText,
-      Pageable pageable
-  );
 
   List<Product> findByTags_SlugIgnoreCaseOrderByIdDesc(String tag, Pageable pageable);
 
@@ -75,5 +66,28 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   List<Product> findTopNProductsAfterId(
       @Param("lastProductId") Long lastProductId,
       @Param("limit") Pageable limit
+  );
+
+  @Query("""
+       SELECT p
+              FROM Product p
+              WHERE
+                  (
+                      :query IS NULL
+                      OR LOWER(p.description) LIKE LOWER(CONCAT('%', :query, '%'))
+                  )
+              AND (:minPrice IS NULL OR p.price >= :minPrice)
+              AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+              AND (:rating IS NULL OR p.averageRating >= :rating)
+              AND (:inStock IS NULL OR p.inStock = :inStock)
+              ORDER BY p.id DESC
+      """)
+  Page<Product> searchProduct(
+      @Param("query") String query,
+      @Param("minPrice") BigDecimal minPrice,
+      @Param("maxPrice") BigDecimal maxPrice,
+      @Param("rating") Double rating,
+      @Param("inStock") Boolean inStock,
+      Pageable pageable
   );
 }

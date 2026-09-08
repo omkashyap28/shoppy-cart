@@ -1,5 +1,6 @@
 package com.omkashyap.com.backend.controller;
 
+import com.omkashyap.com.backend.dto.requestDto.SearchRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.InfiniteScrollResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.ProductsResponseDto;
@@ -22,20 +23,12 @@ public class SearchController {
   private final ProductService productService;
 
   @GetMapping
-  ResponseEntity<InfiniteScrollResponseDto<ProductResponseDto>> searchProduct(
-      @RequestParam String query,
-
-      @RequestParam(required = false)
-      Long lastProductId,
-
-      @RequestParam(defaultValue = "10")
-      int limit,
-
-      @RequestParam(required = false) String userId
-  ) {
+  ResponseEntity<InfiniteScrollResponseDto<ProductsResponseDto>> searchProduct(
+      @ModelAttribute SearchRequestDto requestDto
+      ) {
     return ResponseEntity.status(HttpStatus.OK).body(
         searchHistoryService.searchProduct(
-            query, userId, limit, lastProductId
+            requestDto
         )
     );
   }
@@ -84,6 +77,13 @@ public class SearchController {
   ) {
     return ResponseEntity.status(HttpStatus.OK).body(
         productService.getInitialProducts(limit, lastProductId)
+    );
+  }
+
+  @GetMapping("/trendings/products")
+  ResponseEntity<List<ProductsResponseDto>> getTrendingProducts() {
+    return ResponseEntity.status(HttpStatus.OK).body(
+      searchHistoryService.getTrendingProducts()
     );
   }
 
