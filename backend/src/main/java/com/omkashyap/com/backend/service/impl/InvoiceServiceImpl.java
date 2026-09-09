@@ -2,7 +2,6 @@ package com.omkashyap.com.backend.service.impl;
 
 import com.omkashyap.com.backend.dto.responseDto.AllAddressResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.InvoiceResponseDto;
-import com.omkashyap.com.backend.dto.responseDto.ShopAddressResponseDto;
 import com.omkashyap.com.backend.entity.Invoice;
 import com.omkashyap.com.backend.repository.InvoiceRepository;
 import com.omkashyap.com.backend.service.InvoiceService;
@@ -30,7 +29,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         .buyerName(invoice.getUser().getFirstName() + invoice.getUser().getLastName())
         .buyerEmail(invoice.getUser().getEmail())
         .seller(invoice.getOrderItem().getProduct().getSeller().getShopName())
-        .shopAddress(modelMapper.map(invoice.getOrderItem().getProduct().getSeller().getShopAddress(), ShopAddressResponseDto.class))
         .amount(null)
         .paymentMethod(invoice.getPayment().getPaymentMethod())
         .orderId(invoice.getOrderItem().getOrderItemId())

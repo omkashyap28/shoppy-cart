@@ -15,7 +15,6 @@ public class InvoiceResponseDto {
   private String buyerName;
   private String buyerEmail;
   private String seller;
-  private ShopAddressResponseDto shopAddress;
   private String amount;
   private PaymentMethodEnum paymentMethod;
   private String orderId;

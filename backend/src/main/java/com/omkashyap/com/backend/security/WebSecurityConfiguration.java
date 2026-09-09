@@ -29,6 +29,7 @@ public class WebSecurityConfiguration {
                                                 .requestMatchers("/auth/**").permitAll()
                                                 .requestMatchers("/otp/**").permitAll()
                                                 .requestMatchers("/search/**").permitAll()
+                                                .requestMatchers("/invoice/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/user/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/seller/**").permitAll()
                                                 .requestMatchers(HttpMethod.POST, "/seller/register").hasRole("USER")
