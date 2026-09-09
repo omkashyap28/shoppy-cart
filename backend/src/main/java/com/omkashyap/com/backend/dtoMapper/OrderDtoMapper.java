@@ -18,8 +18,12 @@ public class OrderDtoMapper {
         .quantity(orderItem.getQuantity())
         .amount(orderItem.getAmount())
         .coins(orderItem.getCoins())
+        .paymentMethod(null)
         .productUrl(orderItem.getProduct().getProductUrl())
+        .thumbnailUrl(orderItem.getProduct().getProductThumbnail())
+        .description(orderItem.getProduct().getDescription())
         .productId(orderItem.getProduct().getProductId())
+        .invoiceId(null)
         .orderStatus(orderItem.getStatus().getOrderStatus())
         .createdAt(orderItem.getCreatedAt())
         .confirmedAt(orderItem.getStatus().getConfirmedAt())
@@ -31,6 +35,14 @@ public class OrderDtoMapper {
         .returnedAt(orderItem.getStatus().getReturnedAt())
         .exchangedAt(orderItem.getStatus().getExchangedAt())
         .build();
+
+      if(orderItem.getPayments() != null) {
+        dto.setPaymentMethod(orderItem.getPayments().getPaymentMethod());
+      }
+
+      if(orderItem.getInvoice() != null) {
+        dto.setInvoiceId(orderItem.getInvoice().getInvoiceNo());
+      }
 
     Map<String, String> attributes = new HashMap<>();
     orderItem.getProductAttributes().forEach(

@@ -11,23 +11,18 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { usePings } from "react-pings";
 import {
-  Package,
-  Calendar,
   CheckCircle2,
-  Clock,
-  Truck,
   RotateCcw,
   RefreshCw,
   XCircle,
   Coins,
   ArrowLeft,
-  ShoppingBag,
-  ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
@@ -40,6 +35,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
+import { Image } from "@imagekit/next";
 
 const steps = [
   { key: "CREATED", label: "Placed" },
@@ -53,6 +50,8 @@ export function OrderDetail({ orderId }: { orderId: string }) {
   const userId = useAppStore((state) => state.userId);
   const pings = usePings();
   const queryClient = useQueryClient();
+
+  const router = useRouter();
 
   const [dialogAction, setDialogAction] = useState<
     "cancel" | "return" | "exchange" | null
@@ -195,15 +194,8 @@ export function OrderDetail({ orderId }: { orderId: string }) {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-xs text-muted-foreground">
-          Order ID: #{order.orderId}
-        </span>
-      </div>
-
-      {/* Status Banner */}
       <Card className="overflow-hidden border-border/80">
-        <CardHeader className="bg-muted/30 pb-4">
+        <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <CardTitle className="text-lg">Order Status</CardTitle>
@@ -229,7 +221,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
           </div>
         </CardHeader>
 
-        <CardContent className="pt-6">
+        <CardContent>
           {isCancelled ? (
             <div className="rounded-xl border border-destructive/20 bg-destructive/10 p-4 text-center">
               <XCircle className="mx-auto mb-2 size-8 text-destructive" />
@@ -255,11 +247,10 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                     className="flex flex-col items-center bg-card px-2"
                   >
                     <div
-                      className={`flex size-8 items-center justify-center rounded-full border-2 transition-all ${
-                        isCompleted
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-muted-foreground/30 bg-background text-muted-foreground"
-                      }`}
+                      className={`flex size-10 items-center justify-center rounded-full border-2 transition-all ${isCompleted
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-muted-foreground/30 bg-background text-muted-foreground"
+                        }`}
                     >
                       {isCompleted ? (
                         <CheckCircle2 className="size-4" />
@@ -268,11 +259,10 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                       )}
                     </div>
                     <span
-                      className={`mt-1.5 text-xs font-medium ${
-                        isCurrent
-                          ? "font-semibold text-foreground"
-                          : "text-muted-foreground"
-                      }`}
+                      className={`mt-1.5 text-xs font-medium ${isCurrent
+                        ? "font-semibold text-foreground"
+                        : "text-muted-foreground"
+                        }`}
                     >
                       {step.label}
                     </span>
@@ -281,24 +271,67 @@ export function OrderDetail({ orderId }: { orderId: string }) {
               })}
             </div>
           )}
+          <div className="mt-4">
+            {isCancellable && (
+              <Button
+                variant="destructive"
+                className="w-full"
+                onClick={() => setDialogAction("cancel")}
+              >
+                <XCircle className="size-4" /> Cancel Order
+              </Button>
+            )}
+
+            {isDelivered && (
+              <div className="flex itmes-center gap-2 flex-wrap">
+                <Button
+                  variant="outline"
+                  onClick={() => setDialogAction("return")}
+                >
+                  <RotateCcw className="size-4" /> Return Item
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setDialogAction("exchange")}
+                >
+                  <RefreshCw className="size-4" /> Exchange Item
+                </Button>
+                <Button asChild size="sm">
+                  <Link href={`/products/${order.productId}/reviews/add`}>
+                    Write a Review
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
 
-      {/* Order Item Details */}
-      <Card className="border-border/80">
-        <CardHeader>
-          <CardTitle className="text-lg">Item Details</CardTitle>
+      <Card>
+        <CardHeader className="border-b border-border">
+          <CardTitle>
+            Order Details
+          </CardTitle>
+          <CardDescription>
+            #{order.orderId}
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 p-4 sm:flex-row">
-            <div className="space-y-1">
-              <p className="text-base font-semibold">Product Item</p>
-              <p className="font-mono text-xs text-muted-foreground">
-                Product ID: {order.productId}
-              </p>
-              <p className="mt-7 text-sm">
-                Quantity: <span className="font-medium">{order.quantity}</span>
-              </p>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="py-2">
+              <h2 className="text-base font-semibold mb-4">Product Details</h2>
+              <Link href={order.productUrl} className="group">
+                <div className="flex items-center gap-2">
+                  <Image
+                    src={order.thumbnailUrl}
+                    height={80}
+                    width={80}
+                    className="rounded-sm size-20"
+                    alt={order.description || "Product Image"}
+                  />
+                  <p className="line-clamp-3 text-base leading-tight group-hover:underline">{order.description}</p>
+                </div>
+              </Link>
               {order.selectedAttributes &&
                 Object.keys(order.selectedAttributes).length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1.5">
@@ -311,59 +344,63 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                 )}
             </div>
 
-            <div className="space-y-1 text-left sm:text-right">
-              <p className="text-xl font-bold tracking-tight">
-                ₹{order.amount.toLocaleString()}
-              </p>
-              <p className="flex items-center gap-1 text-xs text-muted-foreground sm:justify-end">
-                <Coins className="size-3.5 text-amber-500" /> {order.coins}{" "}
-                Coins
-              </p>
-              <Button asChild variant="outline" size="sm" className="mt-6">
-                <Link href={`/products/${order.productId}`}>
-                  View Product <ExternalLink className="ml-1 size-3.5" />
-                </Link>
-              </Button>
+            <div className="rounded-xl border border-border p-4">
+              <h2 className="text-base font-semibold mb-2">Payment Details</h2>
+              <ul className="divide-y divide-dashed divide-border border-border my-4">
+                <li className="flex justify-between py-1.5">
+                  <span>Payment Method</span>
+                  <span className="capitalize">
+                    {order.paymentMethod}
+                  </span>
+                </li>
+                <li className="flex justify-between py-1.5">
+                  <span>Quantity</span>
+                  <span>
+                    {order.quantity}
+                  </span>
+                </li>
+                <li className="flex justify-between py-1.5">
+                  <span>Item Price</span>
+                  <span>
+                    {
+                      order.paymentMethod === "WALLET" ?
+                        Math.floor(order.coins / order.quantity) :
+                        Math.floor(order.amount / order.quantity)
+                    }
+                  </span>
+                </li>
+                <li className="flex justify-between py-1.5">
+                  <span>Grand Total</span>
+                  <span>
+                    {
+                      order.paymentMethod === "WALLET" ?
+                        order.coins :
+                        order.amount
+                    }
+                  </span>
+                </li>
+              </ul>
+              <div className="flex items-center justify-end">
+                {order.paymentMethod !== "WALLET" ? <p className="text-xl font-bold tracking-tight">
+                  ₹{order.amount.toLocaleString("en-IN")}
+                </p> :
+                  <p className="flex items-center gap-1 text-xl font-bold tracking-tight sm:justify-end">
+                    <Coins className="size-3.5 text-amber-500" /> {order.coins}{" "}
+                    Coins
+                  </p>}
+              </div>
             </div>
           </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3 pt-2">
-            {isCancellable && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => setDialogAction("cancel")}
-              >
-                <XCircle className="mr-1.5 size-4" /> Cancel Order
-              </Button>
-            )}
-
-            {isDelivered && (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setDialogAction("return")}
-                >
-                  <RotateCcw className="mr-1.5 size-4" /> Return Item
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setDialogAction("exchange")}
-                >
-                  <RefreshCw className="mr-1.5 size-4" /> Exchange Item
-                </Button>
-                <Button asChild size="sm">
-                  <Link href={`/products/${order.productId}/reviews/add`}>
-                    Write a Review
-                  </Link>
-                </Button>
-              </>
-            )}
-          </div>
         </CardContent>
+
+        <CardFooter className="justify-end">
+          <Button
+            className="w-full"
+            onClick={() => router.push(`/invoices/${order.invoiceId}`)}
+          >
+            View Invoice
+          </Button>
+        </CardFooter>
       </Card>
 
       {/* Confirmation Dialogs */}

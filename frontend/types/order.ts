@@ -14,10 +14,14 @@ export interface OrderResponse {
   quantity: number;
   amount: number;
   coins: number;
+  paymentMethod: string
   productUrl: string;
   productId: string;
+  thumbnailUrl: string;
+  description: string;
   selectedAttributes?: Record<string, string>;
   orderStatus: OrderStatus;
+  invoiceId: string;
   createdAt: string;
   confirmedAt?: string | null;
   processedAt?: string | null;

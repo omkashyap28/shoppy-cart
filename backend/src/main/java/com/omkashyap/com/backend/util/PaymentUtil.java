@@ -41,7 +41,7 @@ public class PaymentUtil {
     Payment newPayment = Payment.builder()
         .orderItem(orderItem)
         .paymentMethod(PaymentMethodEnum.WALLET)
-        .paymentStatus(PaymentStatusEnum.PENDING)
+        .paymentStatus(PaymentStatusEnum.SUCCESS)
         .amount(null)
         .coins(((long) orderItem.getCoins() * orderItem.getQuantity()))
         .build();

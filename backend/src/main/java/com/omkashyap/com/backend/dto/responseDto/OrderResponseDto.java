@@ -1,6 +1,8 @@
 package com.omkashyap.com.backend.dto.responseDto;
 
 import com.omkashyap.com.backend.type.OrderStatusEnum;
+import com.omkashyap.com.backend.type.PaymentMethodEnum;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,8 +21,12 @@ public class OrderResponseDto {
   private Integer quantity;
   private Double amount;
   private Integer coins;
+  private PaymentMethodEnum paymentMethod;
+  private String invoiceId;
   private String productUrl;
   private String productId;
+  private String thumbnailUrl;
+  private String description;
   private Map<String, String> selectedAttributes;
   private OrderStatusEnum orderStatus;
   private LocalDateTime createdAt;
