@@ -1,8 +1,20 @@
 "use client";
 
 import { Controller, useForm } from "react-hook-form";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "../ui/field";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "../ui/field";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,18 +31,27 @@ interface WalletPaymentCardProps {
   paymentId: string;
 }
 
-type MPinSchema = z.infer<typeof mPinScehma>
+type MPinSchema = z.infer<typeof mPinScehma>;
 
-export function WalletPaymentCard({ open, setOpen, onSuccess, paymentId }: WalletPaymentCardProps) {
-  return <Dialog open={open} onOpenChange={setOpen}>
-    <DialogContent showCloseButton={false}>
-      <DialogHeader>
-        <DialogTitle>Pay with Wallet</DialogTitle>
-        <DialogDescription>Confirm your MPIN to pay with wallet.</DialogDescription>
-      </DialogHeader>
-      <WalletPaymentForm onSuccess={onSuccess} paymentId={paymentId} />
-    </DialogContent>
-  </Dialog>
+export function WalletPaymentCard({
+  open,
+  setOpen,
+  onSuccess,
+  paymentId,
+}: WalletPaymentCardProps) {
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle>Pay with Wallet</DialogTitle>
+          <DialogDescription>
+            Confirm your MPIN to pay with wallet.
+          </DialogDescription>
+        </DialogHeader>
+        <WalletPaymentForm onSuccess={onSuccess} paymentId={paymentId} />
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 interface WalletPaymentFormProps {
@@ -39,16 +60,21 @@ interface WalletPaymentFormProps {
 }
 
 function WalletPaymentForm({ paymentId, onSuccess }: WalletPaymentFormProps) {
-
   const { handleSubmit, setError, reset, control } = useForm<MPinSchema>({
     resolver: zodResolver(mPinScehma),
     defaultValues: {
       mPin: "",
     },
-  })
+  });
 
   const makePayment = useMutation({
-    mutationFn: async ({ paymentId, mPin }: { paymentId: string, mPin: string }) => {
+    mutationFn: async ({
+      paymentId,
+      mPin,
+    }: {
+      paymentId: string;
+      mPin: string;
+    }) => {
       const response = await apiFetch("wallet/payment", {
         method: "POST",
         headers: {
@@ -93,41 +119,44 @@ function WalletPaymentForm({ paymentId, onSuccess }: WalletPaymentFormProps) {
 
   const handleFormSubmit = ({ mPin }: MPinSchema) => {
     makePayment.mutate({ paymentId, mPin });
-  }
+  };
 
-  return <form onSubmit={handleSubmit(handleFormSubmit)}>
-    <FieldGroup>
-      <Controller
-        name="mPin"
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field>
-            <FieldLabel htmlFor="mPin">
-              Enter you MPIN
-            </FieldLabel>
-            <FieldContent>
-              <InputOTP
-                {...field}
-                id="mPin"
-                maxLength={4}
-                pattern={REGEXP_ONLY_DIGITS}
-                // disabled={validateMPin.isPending}
-                autoFocus
-              >
-                <InputOTPGroup>
-                  {Array.from({ length: 4 }).map((_, idx) => (<InputOTPSlot index={idx} key={idx} />))}
-                </InputOTPGroup>
-              </InputOTP>
-            </FieldContent>
-            {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
-          </Field>
-        )}
-      />
-      <Field>
-        <Button type="submit">
-          Pay Now
-        </Button>
-      </Field>
-    </FieldGroup>
-  </form>
+  return (
+    <form onSubmit={handleSubmit(handleFormSubmit)}>
+      <FieldGroup>
+        <Controller
+          name="mPin"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field>
+              <FieldLabel htmlFor="mPin">Enter you MPIN</FieldLabel>
+              <FieldContent>
+                <InputOTP
+                  {...field}
+                  id="mPin"
+                  maxLength={4}
+                  pattern={REGEXP_ONLY_DIGITS}
+                  // disabled={validateMPin.isPending}
+                  autoFocus
+                  className="justify-center"
+                >
+                  <InputOTPGroup>
+                    {Array.from({ length: 4 }).map((_, idx) => (
+                      <InputOTPSlot index={idx} key={idx} mask={true} />
+                    ))}
+                  </InputOTPGroup>
+                </InputOTP>
+              </FieldContent>
+              {fieldState.error && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
+            </Field>
+          )}
+        />
+        <Field>
+          <Button type="submit">Pay Now</Button>
+        </Field>
+      </FieldGroup>
+    </form>
+  );
 }

@@ -35,7 +35,9 @@ export function Wallet() {
           <p className="mb-4 text-muted-foreground">Wallet is locked.</p>
           <Button onClick={() => setOpen(true)}>Unlock Wallet</Button>
         </div>
-      ) : <WalletCard wallet={wallet} onLockWallet={handleLock} />}
+      ) : (
+        <WalletCard wallet={wallet} onLockWallet={handleLock} />
+      )}
     </div>
   );
 }

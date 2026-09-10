@@ -5,8 +5,12 @@ import com.omkashyap.com.backend.dto.requestDto.WalletRequestDto;
 import com.omkashyap.com.backend.dto.responseDto.WalletPaymentResponseDto;
 import com.omkashyap.com.backend.dto.responseDto.WalletResponseDto;
 import com.omkashyap.com.backend.service.WalletService;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +25,17 @@ public class WalletController {
   @PostMapping
   ResponseEntity<WalletResponseDto> createUserWallet(
       @RequestHeader("Authorization") String authHeader,
-      @Valid @RequestBody WalletRequestDto requestDto
+      @Valid @RequestBody WalletRequestDto requestDto,
+      HttpServletResponse response
   ) {
+
+    Cookie cookie = new Cookie("hasWallet", "true");
+    cookie.setHttpOnly(true);
+    cookie.setSecure(false);
+    cookie.setPath("/");
+    cookie.setAttribute("SameSite", "Lax");
+    cookie.setMaxAge(7 * 24 * 60 * 60);
+
     return ResponseEntity.status(HttpStatus.CREATED).body(
         walletService.createUserWallet(authHeader, requestDto)
     );

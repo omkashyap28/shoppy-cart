@@ -104,7 +104,10 @@ export function ProductImageGallery({
         </div>
       </div>
 
-      <div className="w-full overflow-hidden lg:order-first" ref={thumbRef}>
+      <div
+        className="w-full scrollbar-none overflow-auto lg:order-first"
+        ref={thumbRef}
+      >
         <div className="flex flex-row gap-2.5 px-1 py-0.5 lg:h-120 lg:flex-col">
           {productImages.map((image, index) => (
             <Thumb

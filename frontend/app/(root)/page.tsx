@@ -1,5 +1,7 @@
-import { Hero, RecentViewed, Recommended } from "@/sections/index";
+import { Hero, RecentViewed, Recommended, Trendings } from "@/sections/index";
 import { Metadata } from "next";
+import { Suspense } from "react";
+import { Loader } from "@/components/layout";
 
 export const metadata: Metadata = {
   title: "Shop products with great discounts",
@@ -13,6 +15,9 @@ export default function Page() {
       <Hero />
       <RecentViewed />
       <Recommended />
+      <Suspense fallback={<Loader />}>
+        <Trendings />
+      </Suspense>
     </>
   );
 }

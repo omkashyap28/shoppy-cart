@@ -40,16 +40,6 @@ const data = {
       url: "/seller/products",
       icon: <ListIcon className="size-5!" />,
     },
-    {
-      title: "Discussion",
-      url: "/seller/discussion",
-      icon: <ChartBarIcon className="size-5!" />,
-    },
-    {
-      title: "Reviews",
-      url: "/seller/reviews",
-      icon: <FolderIcon className="size-5!" />,
-    },
   ],
 };
 

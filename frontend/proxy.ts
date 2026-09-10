@@ -24,6 +24,8 @@ const ROLE_PREFIXES: Record<string, string> = {
   "/affiliate": "affiliate",
 };
 
+const isPath = (pathname: string, route: string) => pathname === route || pathname.startsWith(`${route}/`);
+
 const AUTH_ROUTES = ["/login", "/register"];
 
 export function proxy(request: NextRequest) {
@@ -32,6 +34,7 @@ export function proxy(request: NextRequest) {
   const refreshToken = request.cookies.get("refreshToken")?.value;
   const hasSellerAccount = request.cookies.get("hasSellerAccount")?.value;
   const hasAffiliateAccount = request.cookies.get("hasAffiliateAccount")?.value;
+  const hasWallet = request.cookies.get("hasWallet")?.value;
 
   const isLoggedIn = !!refreshToken;
 
@@ -61,6 +64,23 @@ export function proxy(request: NextRequest) {
       );
     }
 
+    return NextResponse.next();
+  }
+
+  const isWalletRoute = isPath(pathname, "/wallet");
+  const isWalletRegisterRoute = isPath(pathname, "/wallet/register");
+  
+  if (isWalletRoute) {
+    if (!isLoggedIn) {
+      return toLogin();
+    } if (isWalletRegisterRoute) {
+      if (hasWallet) {
+        return NextResponse.redirect(new URL("/wallet", request.url));
+      }
+      return NextResponse.next();
+    } if (!hasWallet) {
+      return NextResponse.redirect(new URL("/wallet/register", request.url));
+    }
     return NextResponse.next();
   }
 

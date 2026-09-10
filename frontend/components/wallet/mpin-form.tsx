@@ -67,15 +67,20 @@ export function SecurityDialoge({
   );
 }
 
-function MPinForm({ onSuccess }: { onSuccess: (data: WalletResponse) => void }) {
+function MPinForm({
+  onSuccess,
+}: {
+  onSuccess: (data: WalletResponse) => void;
+}) {
   const [mask, setMask] = useState(true);
 
-  const { control, handleSubmit, reset, setError, setFocus } = useForm<MPinSchema>({
-    resolver: zodResolver(mPinScehma),
-    defaultValues: {
-      mPin: "",
-    },
-  });
+  const { control, handleSubmit, reset, setError, setFocus } =
+    useForm<MPinSchema>({
+      resolver: zodResolver(mPinScehma),
+      defaultValues: {
+        mPin: "",
+      },
+    });
 
   const validateMPin = useMutation({
     mutationFn: async ({ mPin }: MPinSchema) => {
@@ -141,7 +146,7 @@ function MPinForm({ onSuccess }: { onSuccess: (data: WalletResponse) => void }) 
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="mPin">Enter MPIN</FieldLabel>
               <FieldContent>
-                <div className="flex itmes-center gap-3">
+                <div className="items-center flex gap-3">
                   <InputOTP
                     {...field}
                     id="mPin"
@@ -172,9 +177,11 @@ function MPinForm({ onSuccess }: { onSuccess: (data: WalletResponse) => void }) 
                     {mask ? <Eye /> : <EyeOff />}
                   </Button>
                 </div>
-                {validateMPin.isPending && <FieldDescription className="text-sm tracking-tight text-muted-foreground">
-                  Verifying...
-                </FieldDescription>}
+                {validateMPin.isPending && (
+                  <FieldDescription className="text-sm tracking-tight text-muted-foreground">
+                    Verifying...
+                  </FieldDescription>
+                )}
               </FieldContent>
               {fieldState.error && (
                 <FieldError>{fieldState.error.message}</FieldError>
@@ -183,7 +190,10 @@ function MPinForm({ onSuccess }: { onSuccess: (data: WalletResponse) => void }) 
           )}
         />
 
-        <Link href="#" className="text-xs w-fit hover:underline text-muted-foreground underline-offset-2">
+        <Link
+          href="#"
+          className="w-fit text-xs text-muted-foreground underline-offset-2 hover:underline"
+        >
           Forget MPIN ?
         </Link>
       </FieldGroup>

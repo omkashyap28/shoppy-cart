@@ -80,7 +80,7 @@ export function Hero() {
             </h1>
             <div className="pointer-events-auto flex w-full items-center justify-center gap-3 max-xs:flex-col sm:gap-7">
               <Link
-                href="/"
+                href="#trendings"
                 className="rounded-full border-2 border-background bg-background px-5 py-2 text-xl font-semibold tracking-tight text-accent-foreground shadow-md transition-colors duration-200 hover:bg-background/90 max-xs:w-full!"
               >
                 <div className="flex items-center gap-2 max-xs:justify-center max-xs:gap-3 sm:gap-3">
@@ -88,7 +88,7 @@ export function Hero() {
                 </div>
               </Link>
               <Link
-                href="/"
+                href="/products"
                 className="relative overflow-hidden rounded-full border-2 border-background bg-linear-120 from-background/30 to-background/10 px-5 py-2 text-xl font-semibold tracking-tight text-background shadow-md backdrop-blur-md transition-colors duration-200 text-shadow-md hover:bg-background hover:text-accent-foreground hover:text-shadow-none max-xs:w-full!"
               >
                 <div className="flex items-center gap-2 max-xs:justify-center max-xs:gap-3 sm:gap-3">

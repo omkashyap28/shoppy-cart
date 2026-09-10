@@ -72,7 +72,7 @@ export function WalletCard({ wallet, onLockWallet }: WalletCardProps) {
             <div className="mt-2 flex items-baseline gap-3">
               <Coins className="size-8 animate-pulse text-amber-500" />
               <span className="text-4xl font-extrabold tracking-tight text-foreground">
-                {wallet ? wallet.coins.toLocaleString() : "0"}
+                {wallet ? wallet.coins.toLocaleString("en-IN") : "0"}
               </span>
               <span className="text-sm text-muted-foreground">
                 Coins (≈ {wallet ? wallet.coins.toLocaleString() : "0"})

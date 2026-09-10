@@ -179,9 +179,7 @@ export function RegisterForm() {
           </Button>
           <FieldDescription className="text-center">
             Already have an account?{" "}
-            <Link
-              href={`/login${searchParams.get("redirect") || ""}`}
-            >
+            <Link href={`/login${searchParams.get("redirect") || ""}`}>
               Login
             </Link>
           </FieldDescription>

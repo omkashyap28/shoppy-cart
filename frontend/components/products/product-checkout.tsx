@@ -190,9 +190,11 @@ export function ProductCheckout({ productId, product }: ProductCheckoutProps) {
                   <Field
                     key={addr.addressId}
                     orientation="horizontal"
-                    className={cn("border p-3.5 rounded-xl", selectedAddressId === addr.addressId
-                      ? "border-primary bg-primary/5 dark:bg-primary/10"
-                      : "border-border/60 hover:border-border"
+                    className={cn(
+                      "rounded-xl border p-3.5",
+                      selectedAddressId === addr.addressId
+                        ? "border-primary bg-primary/5 dark:bg-primary/10"
+                        : "border-border/60 hover:border-border"
                     )}
                   >
                     <RadioGroupItem
@@ -204,7 +206,8 @@ export function ProductCheckout({ productId, product }: ProductCheckoutProps) {
                         {addr.address}
                       </FieldLabel>
                       <FieldDescription>
-                        {addr.address}, {addr.street}, {addr.city},{addr.state}-{addr.postalCode}, {addr.country}
+                        {addr.address}, {addr.street}, {addr.city},{addr.state}-
+                        {addr.postalCode}, {addr.country}
                       </FieldDescription>
                     </FieldContent>
                   </Field>
@@ -233,9 +236,11 @@ export function ProductCheckout({ productId, product }: ProductCheckoutProps) {
               <Field
                 orientation="horizontal"
                 onClick={() => setPaymentMethod("PAY_ON_DELIVERY")}
-                className={cn("p-3.5 border rounded-xl cursor-pointer", paymentMethod === "PAY_ON_DELIVERY"
-                  ? "border-emerald-500 bg-emerald-500/5 dark:bg-emerald-500/10"
-                  : "border-border/60 hover:border-border"
+                className={cn(
+                  "cursor-pointer rounded-xl border p-3.5",
+                  paymentMethod === "PAY_ON_DELIVERY"
+                    ? "border-emerald-500 bg-emerald-500/5 dark:bg-emerald-500/10"
+                    : "border-border/60 hover:border-border"
                 )}
               >
                 <RadioGroupItem
@@ -256,20 +261,16 @@ export function ProductCheckout({ productId, product }: ProductCheckoutProps) {
               <Field
                 orientation="horizontal"
                 onClick={() => setPaymentMethod("WALLET")}
-                className={cn("p-3.5 border rounded-xl cursor-pointer", paymentMethod === "WALLET"
-                  ? "border-amber-500 bg-amber-500/5 dark:bg-amber-500/10"
-                  : "border-border/60 hover:border-border"
+                className={cn(
+                  "cursor-pointer rounded-xl border p-3.5",
+                  paymentMethod === "WALLET"
+                    ? "border-amber-500 bg-amber-500/5 dark:bg-amber-500/10"
+                    : "border-border/60 hover:border-border"
                 )}
               >
-                <RadioGroupItem
-                  value="WALLET"
-                  id="wallet"
-                  className="mt-1"
-                />
+                <RadioGroupItem value="WALLET" id="wallet" className="mt-1" />
                 <FieldContent>
-                  <FieldLabel htmlFor="wallet">
-                    Wallet Coins
-                  </FieldLabel>
+                  <FieldLabel htmlFor="wallet">Wallet Coins</FieldLabel>
                   <FieldDescription>
                     Instant 1-tap payment using your wallet coin balance (
                     {totalCoins} coins required).
@@ -280,20 +281,16 @@ export function ProductCheckout({ productId, product }: ProductCheckoutProps) {
               <Field
                 orientation="horizontal"
                 onClick={() => setPaymentMethod("UPI")}
-                className={cn("p-3.5 border rounded-xl cursor-pointer", paymentMethod === "UPI"
-                  ? "border-indigo-500 bg-indigo-500/5 dark:bg-indigo-500/10"
-                  : "border-border/60 hover:border-border"
+                className={cn(
+                  "cursor-pointer rounded-xl border p-3.5",
+                  paymentMethod === "UPI"
+                    ? "border-indigo-500 bg-indigo-500/5 dark:bg-indigo-500/10"
+                    : "border-border/60 hover:border-border"
                 )}
               >
-                <RadioGroupItem
-                  value="UPI"
-                  id="upi"
-                  className="mt-1"
-                />
+                <RadioGroupItem value="UPI" id="upi" className="mt-1" />
                 <FieldContent>
-                  <FieldLabel htmlFor="upi">
-                    UPI / QR Code
-                  </FieldLabel>
+                  <FieldLabel htmlFor="upi">UPI / QR Code</FieldLabel>
                   <FieldDescription>
                     Instant online payment via Google Pay, PhonePe, or Paytm.
                   </FieldDescription>

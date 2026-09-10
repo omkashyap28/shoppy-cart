@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
 
 export function Heading2({
-  children,
   className,
-}: {
+  ...props
+}: React.ComponentProps<"h2"> & {
   children: React.ReactNode;
   className?: string;
 }) {
@@ -13,8 +13,7 @@ export function Heading2({
         "mb-4 text-2xl font-semibold tracking-tight text-foreground",
         className
       )}
-    >
-      {children}
-    </h2>
+      {...props}
+    />
   );
 }

@@ -41,19 +41,19 @@ export function Theme() {
     [theme, setTheme]
   );
 
-  useEffect(() => {
-    const handleKeydown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "d") {
-        toggleTheme();
-      }
-    };
+  // useEffect(() => {
+  //   const handleKeydown = (e: KeyboardEvent) => {
+  //     if (e.key.toLowerCase() === "d") {
+  //       toggleTheme();
+  //     }
+  //   };
 
-    window.addEventListener("keydown", handleKeydown);
+  //   window.addEventListener("keydown", handleKeydown);
 
-    return () => {
-      window.removeEventListener("keydown", handleKeydown);
-    };
-  }, [toggleTheme]);
+  //   return () => {
+  //     window.removeEventListener("keydown", handleKeydown);
+  //   };
+  // }, [toggleTheme]);
 
   if (!mounted) return <Skeleton className="size-8! rounded-full!" />;
 

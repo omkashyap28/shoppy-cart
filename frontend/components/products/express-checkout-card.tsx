@@ -12,7 +12,11 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import {
   Dialog,
   DialogContent,
@@ -88,7 +92,7 @@ export function ExpressCheckoutCard({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          mpin,
+          mPin: Number(mpin),
         }),
       });
 
@@ -191,7 +195,6 @@ export function ExpressCheckoutCard({
                       className="size-4.5 bg-transparent text-amber-400"
                     />
                   </span>
-
                   Express Checkout
                 </div>
               </CardTitle>
@@ -205,9 +208,7 @@ export function ExpressCheckoutCard({
               <div className="space-y-4">
                 <RadioGroup
                   value={selected}
-                  onValueChange={(value) =>
-                    setSelected(value as PaymentMethod)
-                  }
+                  onValueChange={(value) => setSelected(value as PaymentMethod)}
                   disabled={isValidating}
                 >
                   <div className="flex shrink-0 items-center gap-2">
@@ -287,10 +288,10 @@ export function ExpressCheckoutCard({
               autoFocus
             >
               <InputOTPGroup>
-                <InputOTPSlot index={0} />
-                <InputOTPSlot index={1} />
-                <InputOTPSlot index={2} />
-                <InputOTPSlot index={3} />
+                <InputOTPSlot index={0} mask={true} />
+                <InputOTPSlot index={1} mask={true} />
+                <InputOTPSlot index={2} mask={true} />
+                <InputOTPSlot index={3} mask={true} />
               </InputOTPGroup>
             </InputOTP>
 

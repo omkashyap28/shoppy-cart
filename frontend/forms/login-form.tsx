@@ -77,6 +77,12 @@ export function LoginForm({}) {
     }
   };
 
+  const generateRegisterUrl = () => {
+    const url = new URL("/register", window.location.origin);
+    url.searchParams.set("redirect", searchParams.get("redirect") || "/");
+    return url.toString();
+  };
+
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>
@@ -144,7 +150,8 @@ export function LoginForm({}) {
             {loading && <Spinner />} Login
           </Button>
           <FieldDescription className="text-center">
-            Don&apos;t have an account? <Link href={`/register?redirect=${searchParams.get("redirect") || ""}`}>Sign up</Link>
+            Don&apos;t have an account?{" "}
+            <Link href={generateRegisterUrl()}>Sign up</Link>
           </FieldDescription>
         </Field>
       </FieldGroup>
